@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calendário de Escalas</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Ícones -->
+    <link rel="icon" type="image/png" href="icons/favicon.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <!-- Cores PWA -->
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Descrição -->
+    <meta name="description" content="Calendário de escalas de trabalho com ciclo de 4 semanas">
+
+
+    <style>
+        /* ===== ESTILOS (mesmos do código anterior) ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f1f5f9;
+            padding: 20px;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.modo-escuro {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        body.modo-escuro .seletor-equipe,
+        body.modo-escuro .navegacao-mes,
+        body.modo-escuro .estatistica-card,
+        body.modo-escuro .legenda,
+        body.modo-escuro .modal {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        body.modo-escuro .seletor-equipe label,
+        body.modo-escuro .navegacao-mes .mes-titulo,
+        body.modo-escuro .estatistica-card .label,
+        body.modo-escuro .legenda-item {
+            color: #cbd5e1;
+        }
+
+        body.modo-escuro .calendario th {
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+        }
+
+        body.modo-escuro .calendario td {
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        body.modo-escuro .botoes-equipe button {
+            background: #334155;
+            color: #e2e8f0;
+            border-color: #475569;
+        }
+
+        body.modo-escuro .botoes-equipe button.ativo {
+            color: white;
+        }
+
+        body.modo-escuro .navegacao-mes button {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        body.modo-escuro .btn-add-extra {
+            background: #f59e0b !important;
+            color: white !important;
+        }
+
+        body.modo-escuro .footer {
+            color: #64748b;
+            border-top-color: #334155;
+        }
+
+        body.modo-escuro .modal .campo input {
+            background: #334155;
+            color: #e2e8f0;
+            border-color: #475569;
+        }
+
+        body.modo-escuro .modal .campo input:focus {
+            border-color: #f59e0b;
+        }
+
+        body.modo-escuro .modal .item-extra {
+            background: #334155;
+        }
+
+        body.modo-escuro .modal .total-extra-modal {
+            background: #1e293b;
+            color: #fcd34d;
+        }
+
+        body.modo-escuro .calendario .dia-outro-periodo {
+            opacity: 0.25;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .header h1 {
+            color: #1e293b;
+            font-size: 1.6rem;
+            margin-bottom: 0;
+        }
+
+        body.modo-escuro .header h1 {
+            color: #e2e8f0;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            color: #1e293b;
+        }
+
+        body.modo-escuro .menu-toggle {
+            color: #e2e8f0;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.modo-escuro .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        .menu-overlay.ativo {
+            display: block;
+        }
+
+        .menu-lateral {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            padding: 24px 20px;
+            overflow-y: auto;
+        }
+
+        body.modo-escuro .menu-lateral {
+            background: #1e293b;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .menu-lateral.aberto {
+            left: 0;
+        }
+
+        .menu-lateral .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        body.modo-escuro .menu-lateral .menu-header {
+            border-bottom-color: #334155;
+        }
+
+        .menu-lateral .menu-header h2 {
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+
+        body.modo-escuro .menu-lateral .menu-header h2 {
+            color: #e2e8f0;
+        }
+
+        .menu-lateral .menu-fechar {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .menu-lateral .menu-fechar:hover {
+            color: #1e293b;
+        }
+
+        body.modo-escuro .menu-lateral .menu-fechar:hover {
+            color: #e2e8f0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #1e293b;
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        body.modo-escuro .menu-item {
+            color: #e2e8f0;
+        }
+
+        .menu-item:hover {
+            background: #f1f5f9;
+        }
+
+        body.modo-escuro .menu-item:hover {
+            background: #334155;
+        }
+
+        .menu-item .icone {
+            font-size: 1.3rem;
+            width: 32px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .menu-item .descricao {
+            flex: 1;
+        }
+
+        .menu-item .descricao small {
+            display: block;
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        body.modo-escuro .menu-item .descricao small {
+            color: #64748b;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 12px 0;
+        }
+
+        body.modo-escuro .menu-divider {
+            background: #334155;
+        }
+
+        .menu-item.toggle-tema {
+            cursor: pointer;
+        }
+
+        .menu-item.toggle-tema .status-tema {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-left: auto;
+        }
+
+        body.modo-escuro .menu-item.toggle-tema .status-tema {
+            color: #64748b;
+        }
+
+        .menu-item .badge-version {
+            font-size: 0.6rem;
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: #64748b;
+        }
+
+        body.modo-escuro .menu-item .badge-version {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .menu-jornada {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 8px 0 16px 0;
+        }
+
+        body.modo-escuro .menu-jornada {
+            background: #334155;
+        }
+
+        .menu-jornada .jornada-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+
+        body.modo-escuro .menu-jornada .jornada-item {
+            color: #e2e8f0;
+        }
+
+        .menu-jornada .jornada-item .valor {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        body.modo-escuro .menu-jornada .jornada-item .valor {
+            color: #34d399;
+        }
+
+        .menu-periodo {
+            background: #dbeafe;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 8px 0 16px 0;
+            border: 1px solid #bfdbfe;
+        }
+
+        body.modo-escuro .menu-periodo {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .menu-periodo .periodo-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.85rem;
+            color: #1e40af;
+        }
+
+        body.modo-escuro .menu-periodo .periodo-item {
+            color: #93c5fd;
+        }
+
+        .menu-periodo .periodo-item .valor {
+            font-weight: 600;
+        }
+
+        .subtitulo {
+            display: none;
+        }
+
+        .seletor-equipe {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .seletor-equipe label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+        }
+
+        body.modo-escuro .seletor-equipe label {
+            color: #94a3b8;
+        }
+
+        .botoes-equipe {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .botoes-equipe button {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 60px;
+            flex: 1;
+            max-width: 80px;
+            text-align: center;
+            color: #1e293b;
+        }
+
+        body.modo-escuro .botoes-equipe button {
+            color: #e2e8f0;
+        }
+
+        .botoes-equipe button:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .botoes-equipe button.ativo {
+            color: white;
+            border-color: currentColor;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 1.3rem;
+        }
+
+        .navegacao-mes {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .navegacao-mes button {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .navegacao-mes button:hover {
+            background: #e2e8f0;
+            transform: scale(1.05);
+        }
+
+        .navegacao-mes .mes-titulo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        body.modo-escuro .navegacao-mes .mes-titulo {
+            color: #e2e8f0;
+        }
+
+        .btn-add-extra {
+            background: #f59e0b !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 16px !important;
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s !important;
+            font-size: 0.9rem !important;
+        }
+
+        .btn-add-extra:hover {
+            background: #d97706 !important;
+            transform: scale(1.05) !important;
+        }
+
+        .calendario {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .calendario table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .calendario th {
+            padding: 10px 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #1e293b;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.5);
+            width: 14.28%;
+            text-align: center;
+        }
+
+        body.modo-escuro .calendario th {
+            color: #e2e8f0;
+        }
+
+        .calendario td {
+            padding: 4px 2px;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            height: 72px;
+            vertical-align: top;
+            position: relative;
+            transition: background 0.2s;
+            width: 14.28%;
+        }
+
+        body.modo-escuro .calendario td {
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .calendario .dia-outro-periodo {
+            opacity: 0.3;
+        }
+
+        .calendario .dia-outro-periodo .dia-numero {
+            font-weight: 300;
+        }
+
+        .calendario .dia-numero {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            padding: 2px 4px;
+            display: block;
+            text-align: center;
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        body.modo-escuro .calendario .dia-numero {
+            color: #e2e8f0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .calendario .dia-hoje .dia-numero {
+            color: #1e40af;
+            font-size: 1.2rem;
+        }
+
+        body.modo-escuro .calendario .dia-hoje .dia-numero {
+            color: #60a5fa;
+        }
+
+        .calendario .dia-hoje {
+            border: 3px solid #3B82F6;
+            box-shadow: inset 0 0 0 1px #3B82F6;
+            border-radius: 4px;
+        }
+
+        .calendario .dia-com-extra {
+            border: 2px solid #f59e0b !important;
+            box-shadow: inset 0 0 0 1px #f59e0b !important;
+        }
+
+        .calendario .status-dia {
+            display: block;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 1px 4px;
+            border-radius: 4px;
+            margin: 1px auto 0;
+            letter-spacing: 0.5px;
+            text-align: center;
+            width: 60%;
+            max-width: 38px;
+        }
+
+        .calendario .status-dia.top {
+            margin-top: 1px;
+            margin-bottom: 1px;
+        }
+
+        .calendario .evento-icone {
+            display: block;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            margin-top: 1px;
+        }
+
+        .calendario .evento-extra {
+            display: block;
+            font-size: 0.5rem;
+            font-weight: 700;
+            color: #92400e;
+            background: rgba(245, 158, 11, 0.15);
+            border-radius: 3px;
+            padding: 0px 4px;
+            margin: 1px auto 0;
+            max-width: 90%;
+        }
+
+        body.modo-escuro .calendario .evento-extra {
+            color: #fcd34d;
+            background: rgba(245, 158, 11, 0.20);
+        }
+
+        .calendario .dia-feriado {
+            background: rgba(220, 38, 38, 0.08) !important;
+        }
+
+        .calendario .dia-feriado-trabalhado {
+            background: rgba(220, 38, 38, 0.18) !important;
+            border: 2px solid #dc2626 !important;
+        }
+
+        .calendario .dia-comemorativo {
+            background: rgba(124, 58, 237, 0.06) !important;
+        }
+
+        .calendario .semana-label {
+            display: block;
+            font-size: 0.45rem;
+            color: rgba(0, 0, 0, 0.2);
+            margin-top: 1px;
+            font-weight: 600;
+        }
+
+        body.modo-escuro .calendario .semana-label {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .status-trabalho {
+            background: #3B82F6;
+            color: white;
+            box-shadow: 0 1px 3px rgba(59, 130, 246, 0.25);
+        }
+
+        body.modo-escuro .status-trabalho {
+            background: #2563eb;
+        }
+
+        .status-folga {
+            background: rgba(255, 255, 255, 0.7);
+            color: #64748b;
+            border: 1.5px dashed #94a3b8;
+        }
+
+        body.modo-escuro .status-folga {
+            background: rgba(30, 41, 59, 0.7);
+            color: #94a3b8;
+            border-color: #64748b;
+        }
+
+        .legenda {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            padding: 14px 16px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            flex-wrap: wrap;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        body.modo-escuro .legenda {
+            border-top-color: #334155;
+        }
+
+        .legenda-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            color: #1e293b;
+        }
+
+        body.modo-escuro .legenda-item {
+            color: #cbd5e1;
+        }
+
+        .legenda-cor {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .legenda-folga {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1.5px dashed #94a3b8;
+            flex-shrink: 0;
+        }
+
+        body.modo-escuro .legenda-folga {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: #64748b;
+        }
+
+        .legenda-feriado {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: rgba(220, 38, 38, 0.15);
+            border: 1.5px solid #dc2626;
+            flex-shrink: 0;
+        }
+
+        .legenda-feriado-trabalhado {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: rgba(220, 38, 38, 0.25);
+            border: 2px solid #dc2626;
+            flex-shrink: 0;
+        }
+
+        .legenda-comemorativo {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: rgba(124, 58, 237, 0.10);
+            border: 1.5px solid #7c3aed;
+            flex-shrink: 0;
+        }
+
+        .legenda-extra {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: rgba(245, 158, 11, 0.20);
+            border: 1.5px solid #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .legenda-feriados-lista {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 16px;
+            justify-content: center;
+            padding-top: 8px;
+            border-top: 1px solid #f1f5f9;
+            margin-top: 6px;
+        }
+
+        body.modo-escuro .legenda-feriados-lista {
+            border-top-color: #334155;
+        }
+
+        .legenda-feriados-lista .feriado-item {
+            font-size: 0.65rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        body.modo-escuro .legenda-feriados-lista .feriado-item {
+            color: #cbd5e1;
+        }
+
+        .legenda-feriados-lista .feriado-item .bullet {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legenda-feriados-lista .feriado-item .bullet.feriado {
+            background: #dc2626;
+        }
+
+        .legenda-feriados-lista .feriado-item .bullet.comemorativo {
+            background: #7c3aed;
+        }
+
+        .legenda-feriados-lista .feriado-item .bullet.trabalhado {
+            background: #dc2626;
+            border: 2px solid #991b1b;
+        }
+
+        .estatisticas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .estatistica-card {
+            background: white;
+            padding: 12px 10px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        body.modo-escuro .estatistica-card {
+            background: #1e293b;
+        }
+
+        .estatistica-card .numero {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .estatistica-card .label {
+            font-size: 0.65rem;
+            color: #64748b;
+        }
+
+        body.modo-escuro .estatistica-card .label {
+            color: #94a3b8;
+        }
+
+        .estatistica-card.trabalho .numero {
+            color: #3B82F6;
+        }
+
+        .estatistica-card.folga .numero {
+            color: #94a3b8;
+        }
+
+        .estatistica-card.total .numero {
+            color: #1e293b;
+        }
+
+        body.modo-escuro .estatistica-card.total .numero {
+            color: #e2e8f0;
+        }
+
+        .estatistica-card.percentual .numero {
+            color: #8B5CF6;
+        }
+
+        .estatistica-card.feriados .numero {
+            color: #dc2626;
+        }
+
+        .estatistica-card.horas .numero {
+            color: #059669;
+        }
+
+        body.modo-escuro .estatistica-card.horas .numero {
+            color: #34d399;
+        }
+
+        .estatistica-card.feriados-trabalhados .numero {
+            color: #b91c1c;
+        }
+
+        .estatistica-card.extra .numero {
+            color: #f59e0b;
+        }
+
+        .estatistica-card.total-extra .numero {
+            color: #d97706;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 16px;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        body.modo-escuro .footer {
+            color: #64748b;
+            border-top-color: #334155;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.ativo {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 480px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        body.modo-escuro .modal {
+            background: #1e293b;
+        }
+
+        .modal h2 {
+            color: #1e293b;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        body.modo-escuro .modal h2 {
+            color: #e2e8f0;
+        }
+
+        .modal .sub {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        body.modo-escuro .modal .sub {
+            color: #94a3b8;
+        }
+
+        .modal .campo {
+            margin-bottom: 16px;
+        }
+
+        .modal .campo label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        body.modo-escuro .modal .campo label {
+            color: #e2e8f0;
+        }
+
+        .modal .campo input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+
+        body.modo-escuro .modal .campo input {
+            background: #334155;
+            color: #e2e8f0;
+            border-color: #475569;
+        }
+
+        .modal .campo input:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        .modal .botoes-modal {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal .botoes-modal button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .modal .botoes-modal .btn-salvar {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .modal .botoes-modal .btn-salvar:hover {
+            background: #d97706;
+            transform: scale(1.02);
+        }
+
+        .modal .botoes-modal .btn-cancelar {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        body.modo-escuro .modal .botoes-modal .btn-cancelar {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .modal .botoes-modal .btn-cancelar:hover {
+            background: #e2e8f0;
+        }
+
+        body.modo-escuro .modal .botoes-modal .btn-cancelar:hover {
+            background: #475569;
+        }
+
+        .modal .lista-extras {
+            margin-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+        }
+
+        body.modo-escuro .modal .lista-extras {
+            border-top-color: #334155;
+        }
+
+        .modal .lista-extras h3 {
+            font-size: 0.9rem;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        body.modo-escuro .modal .lista-extras h3 {
+            color: #e2e8f0;
+        }
+
+        .modal .item-extra {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+
+        body.modo-escuro .modal .item-extra {
+            background: #334155;
+        }
+
+        .modal .item-extra .info {
+            color: #1e293b;
+        }
+
+        body.modo-escuro .modal .item-extra .info {
+            color: #e2e8f0;
+        }
+
+        .modal .item-extra .horas {
+            color: #f59e0b;
+            font-weight: 700;
+        }
+
+        .modal .item-extra .btn-remover {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0 4px;
+        }
+
+        .modal .item-extra .btn-remover:hover {
+            color: #dc2626;
+        }
+
+        .modal .total-extra-modal {
+            background: #fef3c7;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 12px;
+            font-weight: 700;
+            color: #92400e;
+            font-size: 1rem;
+        }
+
+        body.modo-escuro .modal .total-extra-modal {
+            background: #1e293b;
+            color: #fcd34d;
+        }
+
+        .periodo-info {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.visivel {
+            opacity: 1;
+        }
+
+        .toast.sucesso {
+            background: #059669;
+        }
+
+        .toast.erro {
+            background: #dc2626;
+        }
+
+        .toast.info {
+            background: #2563eb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 4px;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .menu-lateral {
+                width: 280px;
+                left: -300px;
+            }
+
+            .calendario td {
+                height: 56px;
+                padding: 2px 1px;
+            }
+
+            .calendario .dia-numero {
+                font-size: 0.85rem;
+            }
+
+            .calendario .dia-hoje .dia-numero {
+                font-size: 0.95rem;
+            }
+
+            .calendario .status-dia {
+                font-size: 0.45rem;
+                padding: 1px 3px;
+                width: 70%;
+                max-width: 30px;
+            }
+
+            .calendario .evento-icone {
+                font-size: 0.65rem;
+            }
+
+            .calendario .evento-extra {
+                font-size: 0.42rem;
+            }
+
+            .calendario .semana-label {
+                font-size: 0.4rem;
+            }
+
+            .navegacao-mes {
+                padding: 12px 16px;
+                justify-content: center;
+            }
+
+            .navegacao-mes .mes-titulo {
+                font-size: 1rem;
+                order: -1;
+                width: 100%;
+                text-align: center;
+            }
+
+            .estatisticas {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .legenda {
+                gap: 8px;
+                padding: 10px 12px;
+            }
+
+            .legenda-item {
+                font-size: 0.65rem;
+            }
+
+            .legenda-feriados-lista .feriado-item {
+                font-size: 0.55rem;
+            }
+
+            .modal {
+                padding: 20px;
+            }
+
+            .menu-item {
+                font-size: 0.85rem;
+                padding: 10px 12px;
+            }
+
+            .botoes-equipe button {
+                font-size: 1rem;
+                padding: 10px 12px;
+                min-width: 50px;
+                max-width: 65px;
+            }
+
+            .botoes-equipe button.ativo {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendario td {
+                height: 48px;
+                padding: 2px 1px;
+            }
+
+            .calendario th {
+                font-size: 0.5rem;
+                padding: 4px 1px;
+            }
+
+            .calendario .dia-numero {
+                font-size: 0.7rem;
+                padding: 1px 2px;
+            }
+
+            .calendario .dia-hoje .dia-numero {
+                font-size: 0.8rem;
+            }
+
+            .calendario .status-dia {
+                font-size: 0.4rem;
+                padding: 1px 2px;
+                width: 80%;
+                max-width: 26px;
+            }
+
+            .calendario .evento-icone {
+                font-size: 0.55rem;
+            }
+
+            .calendario .evento-extra {
+                font-size: 0.38rem;
+            }
+
+            .calendario .semana-label {
+                font-size: 0.35rem;
+            }
+
+            .botoes-equipe button {
+                font-size: 0.85rem;
+                padding: 8px 8px;
+                min-width: 40px;
+                max-width: 55px;
+            }
+
+            .botoes-equipe button.ativo {
+                font-size: 0.95rem;
+            }
+
+            .estatisticas {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .estatistica-card .numero {
+                font-size: 1.2rem;
+            }
+
+            .estatistica-card .label {
+                font-size: 0.6rem;
+            }
+
+            .modal .botoes-modal {
+                flex-direction: column;
+            }
+
+            .legenda-feriados-lista .feriado-item {
+                font-size: 0.5rem;
+            }
+
+            .menu-lateral {
+                width: 260px;
+                left: -280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toast" id="toast"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📅 Calendário de Escalas</h1>
+            <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menu">☰</button>
+        </div>
+
+        <div class="menu-overlay" id="menuOverlay" onclick="fecharMenu()"></div>
+
+        <div class="menu-lateral" id="menuLateral">
+            <div class="menu-header">
+                <h2>⚙️ Menu</h2>
+                <button class="menu-fechar" onclick="fecharMenu()">✕</button>
+            </div>
+
+            <div class="menu-periodo" id="menuPeriodo">
+                <div class="periodo-item">
+                    <span>📅 Período</span>
+                    <span class="valor" id="menuPeriodoInicio">16/06/2026</span>
+                </div>
+                <div class="periodo-item">
+                    <span>📅 Fim</span>
+                    <span class="valor" id="menuPeriodoFim">15/07/2026</span>
+                </div>
+                <div class="periodo-item" style="border-top:1px solid #bfdbfe; padding-top:8px; margin-top:4px;">
+                    <span>📊 Semanas</span>
+                    <span class="valor">6 semanas</span>
+                </div>
+            </div>
+
+            <div class="menu-jornada">
+                <div class="jornada-item">
+                    <span>⏱️ Jornada</span>
+                    <span class="valor">10h/dia</span>
+                </div>
+                <div class="jornada-item">
+                    <span>🍽️ Almoço</span>
+                    <span class="valor">1h</span>
+                </div>
+                <div class="jornada-item">
+                    <span>⚡ Efetivas</span>
+                    <span class="valor">9h/dia</span>
+                </div>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <button class="menu-item toggle-tema" onclick="toggleTema()">
+                <span class="icone">🌓</span>
+                <span class="descricao">
+                    Tema
+                    <small>Claro / Escuro</small>
+                </span>
+                <span class="status-tema" id="statusTema">🌞</span>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <button class="menu-item" onclick="exportarDados()">
+                <span class="icone">💾</span>
+                <span class="descricao">
+                    Exportar Dados
+                    <small>Backup completo</small>
+                </span>
+            </button>
+
+            <button class="menu-item" onclick="importarDados()">
+                <span class="icone">📂</span>
+                <span class="descricao">
+                    Importar Dados
+                    <small>Restaurar backup</small>
+                </span>
+            </button>
+
+            <button class="menu-item" onclick="limparDados()">
+                <span class="icone">🗑️</span>
+                <span class="descricao">
+                    Limpar Dados
+                    <small>Remover horas extras</small>
+                </span>
+            </button>
+
+            <button class="menu-item" onclick="resetarTudo()">
+                <span class="icone">🔄</span>
+                <span class="descricao">
+                    Resetar Tudo
+                    <small>Restaurar configurações padrão</small>
+                </span>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <button class="menu-item" onclick="abrirMelhorias()">
+                <span class="icone">💡</span>
+                <span class="descricao">
+                    Sugerir Melhoria
+                    <small>Envie sua ideia</small>
+                </span>
+            </button>
+
+            <button class="menu-item" onclick="abrirBug()">
+                <span class="icone">🐛</span>
+                <span class="descricao">
+                    Reportar Bug
+                    <small>Encontrou um problema?</small>
+                </span>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <div style="padding: 8px 14px; font-size: 0.7rem; color: #94a3b8; text-align: center;">
+                Versão 1.0.0
+                <span class="badge-version">Beta</span>
+            </div>
+        </div>
+
+        <div class="seletor-equipe">
+            <label>📋 Escala:</label>
+            <div class="botoes-equipe" id="botoesEquipe"></div>
+        </div>
+
+        <div class="navegacao-mes">
+            <button onclick="mudarPeriodo(-1)">◀</button>
+            <span class="mes-titulo">
+                <span id="periodoNome">Junho/Julho 2026</span>
+            </span>
+            <button onclick="mudarPeriodo(1)">▶</button>
+            <button class="btn-add-extra" onclick="abrirModalExtra()">➕ H.Extra</button>
+        </div>
+
+        <div class="calendario" id="calendarioContainer"></div>
+
+        <div class="legenda">
+            <div class="legenda-item">
+                <div class="legenda-cor" style="background:#3B82F6;"></div>
+                <span>Trabalho</span>
+            </div>
+            <div class="legenda-item">
+                <div class="legenda-folga"></div>
+                <span>Folga</span>
+            </div>
+            <div class="legenda-item">
+                <div class="legenda-feriado"></div>
+                <span>Feriado</span>
+            </div>
+            <div class="legenda-item">
+                <div class="legenda-feriado-trabalhado"></div>
+                <span>Feriado Trab.</span>
+            </div>
+            <div class="legenda-item">
+                <div class="legenda-comemorativo"></div>
+                <span>Comemorativo</span>
+            </div>
+            <div class="legenda-item">
+                <div class="legenda-extra"></div>
+                <span>Hora Extra</span>
+            </div>
+            <div class="legenda-feriados-lista" id="legendaFeriados"></div>
+        </div>
+
+        <div class="estatisticas" id="estatisticas"></div>
+
+        <div class="footer">By Adriano Monteiro</div>
+    </div>
+
+    <div class="modal-overlay" id="modalExtra">
+        <div class="modal">
+            <h2>➕ Hora Extra</h2>
+            <p class="sub">Adicione horas extras por dia</p>
+            <div class="campo">
+                <label>📅 Data</label>
+                <input type="date" id="inputDataExtra">
+            </div>
+            <div class="campo">
+                <label>⏰ Início</label>
+                <input type="time" id="inputInicioExtra" step="60">
+            </div>
+            <div class="campo">
+                <label>⏰ Término</label>
+                <input type="time" id="inputFimExtra" step="60">
+            </div>
+            <div class="botoes-modal">
+                <button class="btn-salvar" onclick="salvarExtra()">Salvar</button>
+                <button class="btn-cancelar" onclick="fecharModalExtra()">Fechar</button>
+            </div>
+            <div class="lista-extras" id="listaExtras">
+                <h3>📋 Horas Extras Registradas</h3>
+                <div id="listaExtrasContainer"></div>
+                <div class="total-extra-modal" id="totalExtraModal">Total: 0h</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // ===== TOAST =====
+        // =====================================================
+        function mostrarToast(mensagem, tipo = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.className = 'toast ' + tipo + ' visivel';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('visivel');
+            }, 3000);
+        }
+
+        // =====================================================
+        // ===== MENU =====
+        // =====================================================
+        function toggleMenu() {
+            document.getElementById('menuLateral').classList.toggle('aberto');
+            document.getElementById('menuOverlay').classList.toggle('ativo');
+        }
+        function fecharMenu() {
+            document.getElementById('menuLateral').classList.remove('aberto');
+            document.getElementById('menuOverlay').classList.remove('ativo');
+        }
+
+        // =====================================================
+        // ===== TEMA =====
+        // =====================================================
+        let temaEscuro = localStorage.getItem('temaEscuro') === 'true';
+        function aplicarTema() {
+            if (temaEscuro) {
+                document.body.classList.add('modo-escuro');
+                document.getElementById('statusTema').textContent = '🌙';
+            } else {
+                document.body.classList.remove('modo-escuro');
+                document.getElementById('statusTema').textContent = '🌞';
+            }
+            localStorage.setItem('temaEscuro', temaEscuro);
+        }
+        function toggleTema() { temaEscuro = !temaEscuro; aplicarTema(); fecharMenu(); }
+        aplicarTema();
+
+        // =====================================================
+        // ===== EMAIL =====
+        // =====================================================
+        function abrirMelhorias() {
+            fecharMenu();
+            window.open(`mailto:adri0mt@uni9.edu.br?subject=${encodeURIComponent('💡 Sugestão de Melhoria - Calendário de Escalas')}&body=${encodeURIComponent('Olá Adriano,\n\nGostaria de sugerir uma melhoria:\n\n[Descreva sua ideia aqui]\n\nObrigado!')}`, '_blank');
+        }
+        function abrirBug() {
+            fecharMenu();
+            window.open(`mailto:adri0mt@uni9.edu.br?subject=${encodeURIComponent('🐛 Reporte de Bug - Calendário de Escalas')}&body=${encodeURIComponent('Olá Adriano,\n\nEncontrei um problema:\n\n[Descreva o bug aqui]\n\nObrigado!')}`, '_blank');
+        }
+
+        // =====================================================
+        // ===== PERSISTÊNCIA =====
+        // =====================================================
+        const escalasPadrao = [
+            { id: 1, cor: "#3B82F6", semana1: "T T F T T T F", semana2: "F T T F T T T", semana3: "T F T T T F F", semana4: "F T T T F T T" },
+            { id: 2, cor: "#EF4444", semana1: "T F T T T F F", semana2: "F T T T F T T", semana3: "T T F T T T F", semana4: "F T T F T T T" },
+            { id: 3, cor: "#8B5CF6", semana1: "F T T F T T T", semana2: "T F T T T F F", semana3: "F T T T F T T", semana4: "T T F T T T F" },
+            { id: 4, cor: "#F59E0B", semana1: "F T T T F T T", semana2: "T T F T T T F", semana3: "F T T F T T T", semana4: "T F T T T F F" }
+        ];
+
+        function carregarEscalasStorage() {
+            const dados = localStorage.getItem('escalas');
+            if (dados) {
+                try {
+                    const parsed = JSON.parse(dados);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                } catch (e) { }
+            }
+            return null;
+        }
+
+        function salvarEscalasStorage(escalas) {
+            localStorage.setItem('escalas', JSON.stringify(escalas));
+        }
+
+        function carregarExtrasStorage() {
+            const dados = localStorage.getItem('horasExtras');
+            if (dados) {
+                try { return JSON.parse(dados); } catch (e) { }
+            }
+            return [];
+        }
+
+        function salvarExtrasStorage() {
+            localStorage.setItem('horasExtras', JSON.stringify(horasExtras));
+        }
+
+        function carregarPeriodoStorage() {
+            const index = localStorage.getItem('periodoIndex');
+            return index !== null ? parseInt(index) : 0;
+        }
+
+        function salvarPeriodoStorage(index) {
+            localStorage.setItem('periodoIndex', index);
+        }
+
+        // =====================================================
+        // ===== FERIADOS =====
+        // =====================================================
+        const feriados = {
+            '01-01': { nome: 'Confraternização Universal', tipo: 'feriado', icone: '🎆' },
+            '21-04': { nome: 'Tiradentes', tipo: 'feriado', icone: '⚔️' },
+            '01-05': { nome: 'Dia do Trabalho', tipo: 'feriado', icone: '🛠️' },
+            '07-09': { nome: 'Independência', tipo: 'feriado', icone: '🇧🇷' },
+            '12-10': { nome: 'N.S. Aparecida', tipo: 'feriado', icone: '🙏' },
+            '02-11': { nome: 'Finados', tipo: 'feriado', icone: '🕯️' },
+            '15-11': { nome: 'Procl. República', tipo: 'feriado', icone: '🏛️' },
+            '25-12': { nome: 'Natal', tipo: 'feriado', icone: '🎄' },
+            '17-02': { nome: 'Carnaval', tipo: 'feriado', icone: '🎭' },
+            '18-02': { nome: 'Quarta Cinzas', tipo: 'feriado', icone: '✝️' },
+            '03-04': { nome: 'Sexta Santa', tipo: 'feriado', icone: '✝️' },
+            '05-04': { nome: 'Páscoa', tipo: 'feriado', icone: '🐣' },
+            '21-06': { nome: 'Corpus Christi', tipo: 'feriado', icone: '⛪' },
+            '25-01': { nome: 'Aniv. SP', tipo: 'feriado', icone: '🏙️' },
+            '09-07': { nome: 'Revol. Const.', tipo: 'feriado', icone: '⚡' },
+            '14-02': { nome: 'Dia dos Namorados', tipo: 'comemorativo', icone: '💕' },
+            '08-03': { nome: 'Dia da Mulher', tipo: 'comemorativo', icone: '👩' },
+            '22-04': { nome: 'Descobrimento', tipo: 'comemorativo', icone: '⛵' },
+            '13-05': { nome: 'Abolição', tipo: 'comemorativo', icone: '📜' },
+            '12-06': { nome: 'Dia dos Namorados', tipo: 'comemorativo', icone: '💕' },
+            '11-08': { nome: 'Dia do Estudante', tipo: 'comemorativo', icone: '📚' },
+            '07-10': { nome: 'Dia do Livro', tipo: 'comemorativo', icone: '📖' },
+            '20-11': { nome: 'Consc. Negra', tipo: 'comemorativo', icone: '✊' },
+            '31-10': { nome: 'Halloween', tipo: 'comemorativo', icone: '🎃' },
+            '24-12': { nome: 'Véspera Natal', tipo: 'comemorativo', icone: '🎄' },
+            '31-12': { nome: 'Véspera Ano Novo', tipo: 'comemorativo', icone: '🎆' }
+        };
+
+        // =====================================================
+        // ===== HORAS EXTRAS =====
+        // =====================================================
+        let horasExtras = carregarExtrasStorage();
+
+        // =====================================================
+        // ===== ESCALAS =====
+        // =====================================================
+        let equipes = carregarEscalasStorage() || JSON.parse(JSON.stringify(escalasPadrao));
+
+        // =====================================================
+        // ===== CORES =====
+        // =====================================================
+        const coresPeriodos = ['#f3e8ff', '#fce4ec', '#e8f5e9', '#fff3e0', '#e3f2fd', '#f3e5f5', '#fce4ec', '#e0f7fa', '#fff8e1', '#f1f8e9', '#fbe9e7', '#e8eaf6'];
+        const coresDestaque = ['#7c3aed', '#db2777', '#059669', '#d97706', '#2563eb', '#7c3aed', '#db2777', '#0891b2', '#ca8a04', '#65a30d', '#ea580c', '#4f46e5'];
+
+        const DATA_REFERENCIA = new Date(2026, 6, 5);
+        const HORAS_POR_DIA = 9;
+        let equipeSelecionada = equipes[0];
+        let periodoIndex = carregarPeriodoStorage();
+        const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+        // =====================================================
+        // ===== FUNÇÕES DE PERÍODO (CORRIGIDAS) =====
+        // =====================================================
+
+        function getPeriodoData(mes, ano) {
+            // 🔥 CORREÇÃO: Validação mais robusta
+            if (isNaN(mes) || isNaN(ano)) {
+                const hoje = new Date();
+                let mesAtual = hoje.getMonth();
+                let anoAtual = hoje.getFullYear();
+                if (hoje.getDate() <= 15) {
+                    mesAtual--;
+                    if (mesAtual < 0) {
+                        mesAtual = 11;
+                        anoAtual--;
+                    }
+                }
+                return getPeriodoData(mesAtual, anoAtual);
+            }
+
+            while (mes < 0) { mes += 12; ano--; }
+            while (mes > 11) { mes -= 12; ano++; }
+
+            const inicio = new Date(ano, mes, 16);
+            const fim = new Date(ano, mes + 1, 15);
+            return { inicio, fim };
+        }
+
+        function getPeriodoAtual() {
+            const hoje = new Date();
+            let mes = hoje.getMonth();
+            let ano = hoje.getFullYear();
+
+            if (hoje.getDate() <= 15) {
+                mes = mes - 1;
+                if (mes < 0) {
+                    mes = 11;
+                    ano--;
+                }
+            }
+            return getPeriodoData(mes, ano);
+        }
+
+        function getPeriodoPorIndex(index) {
+            const atual = getPeriodoAtual();
+            let mes = atual.inicio.getMonth();
+            let ano = atual.inicio.getFullYear();
+
+            // 🔥 CORREÇÃO: Adiciona o índice corretamente
+            mes = mes + index;
+
+            // 🔥 CORREÇÃO: Ajuste de ano robusto
+            while (mes < 0) {
+                mes += 12;
+                ano--;
+            }
+            while (mes > 11) {
+                mes -= 12;
+                ano++;
+            }
+
+            // 🔥 CORREÇÃO: Validação de segurança
+            if (ano < 2020 || ano > 2100) {
+                const hoje = new Date();
+                let mesAtual = hoje.getMonth();
+                let anoAtual = hoje.getFullYear();
+                if (hoje.getDate() <= 15) {
+                    mesAtual--;
+                    if (mesAtual < 0) {
+                        mesAtual = 11;
+                        anoAtual--;
+                    }
+                }
+                return getPeriodoData(mesAtual, anoAtual);
+            }
+
+            return getPeriodoData(mes, ano);
+        }
+
+        function getNomePeriodo(periodo) {
+            const mesInicio = periodo.inicio.getMonth();
+            const mesFim = periodo.fim.getMonth();
+            const ano = periodo.inicio.getFullYear();
+            const anoFim = periodo.fim.getFullYear();
+
+            // 🔥 CORREÇÃO: Nome com ano correto
+            if (ano !== anoFim) {
+                return `${meses[mesInicio]} ${ano} / ${meses[mesFim]} ${anoFim}`;
+            }
+
+            if (mesInicio === mesFim) {
+                return `${meses[mesInicio]} ${ano}`;
+            } else {
+                return `${meses[mesInicio]}/${meses[mesFim]} ${ano}`;
+            }
+        }
+
+        function dataEstaNoPeriodo(data, periodo) {
+            return data >= periodo.inicio && data <= periodo.fim;
+        }
+
+        function formatarDataPeriodo(data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        function getDiasNoPeriodo(periodo) {
+            return Math.floor((periodo.fim - periodo.inicio) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        // =====================================================
+        // ===== FUNÇÕES AUXILIARES =====
+        // =====================================================
+        function parseSemana(semana) {
+            return semana.trim().split(/\s+/).map(s => s.toUpperCase() === 'T' ? 1 : 0);
+        }
+        function getCicloCompleto(equipe) {
+            const s1 = parseSemana(equipe.semana1);
+            const s2 = parseSemana(equipe.semana2);
+            const s3 = parseSemana(equipe.semana3);
+            const s4 = parseSemana(equipe.semana4);
+            return [...s1, ...s2, ...s3, ...s4];
+        }
+        function obterStatusDia(equipe, data) {
+            const ciclo = getCicloCompleto(equipe);
+            const diffDias = Math.floor((data - DATA_REFERENCIA) / (1000 * 60 * 60 * 24));
+            const totalDias = ciclo.length;
+            const posicao = ((diffDias % totalDias) + totalDias) % totalDias;
+            return ciclo[posicao];
+        }
+        function getDataComemorativa(dia, mes) {
+            const chave = `${String(dia).padStart(2, '0')}-${String(mes).padStart(2, '0')}`;
+            return feriados[chave] || null;
+        }
+        function getExtrasPorData(dataStr) {
+            return horasExtras.filter(item => item.data === dataStr);
+        }
+        function getTotalExtras() {
+            return horasExtras.reduce((acc, item) => acc + item.horas, 0);
+        }
+        function getTotalExtrasPorPeriodo(periodo) {
+            let total = 0;
+            horasExtras.forEach(item => {
+                const data = new Date(item.data + 'T00:00:00');
+                if (data >= periodo.inicio && data <= periodo.fim) {
+                    total += item.horas;
+                }
+            });
+            return total;
+        }
+        function getFeriadosDoPeriodo(periodo) {
+            const resultados = [];
+            const dataAtual = new Date(periodo.inicio);
+            while (dataAtual <= periodo.fim) {
+                const dia = dataAtual.getDate();
+                const mes = dataAtual.getMonth() + 1;
+                const dataComemorativa = getDataComemorativa(dia, mes);
+                if (dataComemorativa) {
+                    const status = obterStatusDia(equipeSelecionada, dataAtual);
+                    resultados.push({
+                        data: new Date(dataAtual),
+                        ...dataComemorativa,
+                        trabalhado: status === 1
+                    });
+                }
+                dataAtual.setDate(dataAtual.getDate() + 1);
+            }
+            return resultados;
+        }
+        function horasParaMinutos(horas) { return Math.round(horas * 60); }
+        function formatarMinutos(minutos) {
+            const h = Math.floor(minutos / 60);
+            const m = minutos % 60;
+            if (h > 0 && m > 0) return `${h}h${m}min`;
+            if (h > 0) return `${h}h`;
+            return `${m}min`;
+        }
+
+        // =====================================================
+        // ===== MODAL =====
+        // =====================================================
+        function abrirModalExtra() {
+            document.getElementById('modalExtra').classList.add('ativo');
+            const hoje = new Date();
+            document.getElementById('inputDataExtra').value = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+            document.getElementById('inputInicioExtra').value = '08:00';
+            document.getElementById('inputFimExtra').value = '18:00';
+            renderizarListaExtras();
+        }
+        function fecharModalExtra() { document.getElementById('modalExtra').classList.remove('ativo'); }
+
+        function salvarExtra() {
+            const data = document.getElementById('inputDataExtra').value;
+            const inicio = document.getElementById('inputInicioExtra').value;
+            const fim = document.getElementById('inputFimExtra').value;
+
+            if (!data || !inicio || !fim) {
+                mostrarToast('Preencha todos os campos!', 'erro');
+                return;
+            }
+
+            const [hInicio, mInicio] = inicio.split(':').map(Number);
+            const [hFim, mFim] = fim.split(':').map(Number);
+
+            let totalMinutos = (hFim * 60 + mFim) - (hInicio * 60 + mInicio);
+            if (totalMinutos < 0) totalMinutos += 1440;
+
+            const horas = totalMinutos / 60;
+
+            if (horas <= 0) {
+                mostrarToast('Horário inválido!', 'erro');
+                return;
+            }
+
+            horasExtras.push({
+                data: data,
+                inicio: inicio,
+                fim: fim,
+                horas: horas
+            });
+
+            salvarExtrasStorage();
+            renderizarListaExtras();
+            renderizarCalendario();
+            renderizarEstatisticas();
+            renderizarLegendaFeriados();
+            atualizarPeriodoInfo();
+            mostrarToast('✅ Hora extra adicionada com sucesso!', 'sucesso');
+
+            document.getElementById('inputInicioExtra').value = '08:00';
+            document.getElementById('inputFimExtra').value = '18:00';
+        }
+
+        function removerExtra(index) {
+            if (confirm('Remover esta hora extra?')) {
+                horasExtras.splice(index, 1);
+                salvarExtrasStorage();
+                renderizarListaExtras();
+                renderizarCalendario();
+                renderizarEstatisticas();
+                renderizarLegendaFeriados();
+                atualizarPeriodoInfo();
+                mostrarToast('🗑️ Hora extra removida', 'info');
+            }
+        }
+
+        function renderizarListaExtras() {
+            const container = document.getElementById('listaExtrasContainer');
+            const totalModal = document.getElementById('totalExtraModal');
+            if (horasExtras.length === 0) {
+                container.innerHTML = '<p style="color: #94a3b8; font-size: 0.85rem; text-align: center; padding: 12px;">Nenhuma hora extra registrada</p>';
+                totalModal.textContent = 'Total: 0h';
+                return;
+            }
+            const sorted = [...horasExtras].sort((a, b) => b.data.localeCompare(a.data));
+            let html = '';
+            sorted.forEach((item) => {
+                const dataFormatada = item.data.split('-').reverse().join('/');
+                const index = horasExtras.indexOf(item);
+                const minutos = horasParaMinutos(item.horas);
+                html += `<div class="item-extra">
+                    <span class="info">${dataFormatada} ${item.inicio} - ${item.fim}</span>
+                    <span class="horas">${formatarMinutos(minutos)}</span>
+                    <button class="btn-remover" onclick="removerExtra(${index})">✕</button>
+                </div>`;
+            });
+            container.innerHTML = html;
+            const totalMin = horasParaMinutos(getTotalExtras());
+            totalModal.textContent = `Total: ${formatarMinutos(totalMin)}`;
+        }
+
+        // =====================================================
+        // ===== EXPORTAR / IMPORTAR =====
+        // =====================================================
+        function exportarDados() {
+            const dados = {
+                versao: "1.0.0",
+                dataExportacao: new Date().toISOString(),
+                escalas: equipes,
+                horasExtras: horasExtras,
+                temaEscuro: temaEscuro
+            };
+
+            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_escalas_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            fecharMenu();
+            mostrarToast('✅ Dados exportados com sucesso!', 'sucesso');
+        }
+
+        function importarDados() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    try {
+                        const dados = JSON.parse(event.target.result);
+
+                        if (!dados.escalas || !Array.isArray(dados.escalas)) {
+                            mostrarToast('❌ Arquivo inválido!', 'erro');
+                            return;
+                        }
+
+                        if (!confirm(`Importar ${dados.horasExtras ? dados.horasExtras.length : 0} horas extras e ${dados.escalas.length} escalas?`)) {
+                            return;
+                        }
+
+                        equipes = dados.escalas;
+                        if (dados.horasExtras) horasExtras = dados.horasExtras;
+                        if (dados.temaEscuro !== undefined) {
+                            temaEscuro = dados.temaEscuro;
+                            aplicarTema();
+                        }
+
+                        salvarEscalasStorage(equipes);
+                        salvarExtrasStorage();
+
+                        equipeSelecionada = equipes[0] || equipes[0];
+                        renderizarBotoesEquipe();
+                        renderizarCalendario();
+                        renderizarEstatisticas();
+                        renderizarLegendaFeriados();
+                        atualizarPeriodoInfo();
+                        renderizarListaExtras();
+
+                        mostrarToast('✅ Dados importados com sucesso!', 'sucesso');
+                    } catch (erro) {
+                        mostrarToast('❌ Erro ao importar: ' + erro.message, 'erro');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+            fecharMenu();
+        }
+
+        // =====================================================
+        // ===== LIMPAR E RESETAR =====
+        // =====================================================
+        function limparDados() {
+            if (confirm('Tem certeza que deseja remover TODAS as horas extras?')) {
+                horasExtras = [];
+                salvarExtrasStorage();
+                renderizarListaExtras();
+                renderizarCalendario();
+                renderizarEstatisticas();
+                renderizarLegendaFeriados();
+                atualizarPeriodoInfo();
+                mostrarToast('🗑️ Todas as horas extras foram removidas', 'info');
+                fecharMenu();
+            }
+        }
+
+        function resetarTudo() {
+            if (confirm('⚠️ Isso irá restaurar todas as configurações para o padrão.\n\nTem certeza?')) {
+                if (confirm('Última confirmação: TODOS os dados serão perdidos!')) {
+                    equipes = JSON.parse(JSON.stringify(escalasPadrao));
+                    salvarEscalasStorage(equipes);
+
+                    horasExtras = [];
+                    salvarExtrasStorage();
+
+                    periodoIndex = 0;
+                    salvarPeriodoStorage(0);
+
+                    equipeSelecionada = equipes[0];
+
+                    temaEscuro = false;
+                    aplicarTema();
+
+                    renderizarBotoesEquipe();
+                    renderizarCalendario();
+                    renderizarEstatisticas();
+                    renderizarLegendaFeriados();
+                    atualizarPeriodoInfo();
+                    renderizarListaExtras();
+
+                    mostrarToast('🔄 Tudo foi resetado para o padrão!', 'sucesso');
+                    fecharMenu();
+                }
+            }
+        }
+
+        // =====================================================
+        // ===== BOTÕES EQUIPE =====
+        // =====================================================
+        function renderizarBotoesEquipe() {
+            const container = document.getElementById('botoesEquipe');
+            container.innerHTML = '';
+            equipes.forEach(equipe => {
+                const btn = document.createElement('button');
+                btn.textContent = equipe.id;
+                btn.style.color = equipe.cor;
+                if (equipe.id === equipeSelecionada.id) {
+                    btn.classList.add('ativo');
+                    btn.style.background = equipe.cor;
+                    btn.style.color = 'white';
+                }
+                btn.onclick = () => selecionarEquipe(equipe);
+                container.appendChild(btn);
+            });
+        }
+        function selecionarEquipe(equipe) {
+            equipeSelecionada = equipe;
+            renderizarBotoesEquipe();
+            renderizarCalendario();
+            renderizarEstatisticas();
+            renderizarLegendaFeriados();
+            atualizarPeriodoInfo();
+        }
+        function mudarPeriodo(delta) {
+            periodoIndex += delta;
+            salvarPeriodoStorage(periodoIndex);
+            renderizarCalendario();
+            renderizarEstatisticas();
+            renderizarLegendaFeriados();
+            atualizarPeriodoInfo();
+        }
+
+        // =====================================================
+        // ===== RENDER =====
+        // =====================================================
+        function atualizarPeriodoInfo() {
+            const periodo = getPeriodoPorIndex(periodoIndex);
+            document.getElementById('periodoNome').textContent = getNomePeriodo(periodo);
+            document.getElementById('menuPeriodoInicio').textContent = formatarDataPeriodo(periodo.inicio);
+            document.getElementById('menuPeriodoFim').textContent = formatarDataPeriodo(periodo.fim);
+        }
+
+        function renderizarLegendaFeriados() {
+            const container = document.getElementById('legendaFeriados');
+            const periodo = getPeriodoPorIndex(periodoIndex);
+            const feriadosPeriodo = getFeriadosDoPeriodo(periodo);
+            if (feriadosPeriodo.length === 0) { container.innerHTML = ''; return; }
+            let html = '';
+            feriadosPeriodo.forEach(item => {
+                const classe = item.trabalhado ? 'trabalhado' : item.tipo;
+                const sufixo = item.trabalhado ? ' ⚠️' : '';
+                html += `<span class="feriado-item"><span class="bullet ${classe}"></span>${item.icone} ${item.nome}${sufixo}</span>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderizarCalendario() {
+            const container = document.getElementById('calendarioContainer');
+            const periodo = getPeriodoPorIndex(periodoIndex);
+            const corPeriodo = coresPeriodos[periodo.inicio.getMonth()];
+            const corDestaque = coresDestaque[periodo.inicio.getMonth()];
+
+            const primeiroDia = new Date(periodo.inicio);
+            const diaSemana = primeiroDia.getDay();
+            primeiroDia.setDate(primeiroDia.getDate() - diaSemana);
+            const ultimoDia = new Date(primeiroDia);
+            ultimoDia.setDate(ultimoDia.getDate() + 41);
+
+            const hoje = new Date();
+            const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+
+            let html = `<table style="background: ${corPeriodo}; border-radius: 12px; overflow: hidden;">
+                <thead><tr>`;
+            diasSemana.forEach(dia => {
+                html += `<th style="background: ${corPeriodo}; color: ${corDestaque};">${dia}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            let semanaAtual = 1;
+            let dataAtual = new Date(primeiroDia);
+            let rowOpen = false;
+
+            for (let i = 0; i < 42; i++) {
+                if (i % 7 === 0) {
+                    if (rowOpen) html += '</tr>';
+                    html += `<tr>`;
+                    rowOpen = true;
+                }
+
+                const dia = dataAtual.getDate();
+                const mes = dataAtual.getMonth() + 1;
+                const ano = dataAtual.getFullYear();
+                const dataStr = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+
+                const status = obterStatusDia(equipeSelecionada, dataAtual);
+                const isHoje = dataStr === hojeStr;
+                const noPeriodo = dataEstaNoPeriodo(dataAtual, periodo);
+                const dataComemorativa = getDataComemorativa(dia, mes);
+                const extras = getExtrasPorData(dataStr);
+                const temExtra = extras.length > 0;
+                const totalExtraDia = extras.reduce((acc, item) => acc + item.horas, 0);
+
+                const classePeriodo = noPeriodo ? '' : 'dia-outro-periodo';
+                const classeHoje = isHoje ? 'dia-hoje' : '';
+                const classeExtra = temExtra ? 'dia-com-extra' : '';
+                const statusTexto = status === 1 ? 'T' : 'F';
+                const statusClasse = status === 1 ? 'status-trabalho' : 'status-folga';
+
+                let classeEspecial = '';
+                let iconeEspecial = '';
+                if (dataComemorativa) {
+                    if (dataComemorativa.tipo === 'feriado') {
+                        if (status === 1) {
+                            classeEspecial = 'dia-feriado-trabalhado';
+                            iconeEspecial = `<span class="evento-icone">${dataComemorativa.icone}⚠️</span>`;
+                        } else {
+                            classeEspecial = 'dia-feriado';
+                            iconeEspecial = `<span class="evento-icone">${dataComemorativa.icone}</span>`;
+                        }
+                    } else {
+                        classeEspecial = 'dia-comemorativo';
+                        iconeEspecial = `<span class="evento-icone">${dataComemorativa.icone}</span>`;
+                    }
+                }
+
+                let labelExtra = '';
+                if (temExtra) {
+                    const extraMin = horasParaMinutos(totalExtraDia);
+                    labelExtra = `<span class="evento-extra">➕ ${formatarMinutos(extraMin)}</span>`;
+                }
+
+                let semanaLabel = '';
+                if (i % 7 === 0) {
+                    semanaLabel = `<span class="semana-label">S${semanaAtual}</span>`;
+                    semanaAtual++;
+                }
+
+                html += `<td class="${classeHoje} ${classeExtra} ${classeEspecial} ${classePeriodo}" style="background: ${corPeriodo}; border-color: rgba(0,0,0,0.06);">
+                    <span class="status-dia top ${statusClasse}">${statusTexto}</span>
+                    <span class="dia-numero" style="${isHoje ? `color: ${corDestaque};` : ''}">${dia}</span>
+                    ${iconeEspecial}
+                    ${labelExtra}
+                    ${semanaLabel}
+                </td>`;
+
+                dataAtual.setDate(dataAtual.getDate() + 1);
+            }
+
+            if (rowOpen) html += '</tr>';
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderizarEstatisticas() {
+            const container = document.getElementById('estatisticas');
+            const periodo = getPeriodoPorIndex(periodoIndex);
+            const diasNoPeriodo = getDiasNoPeriodo(periodo);
+            let trabalhos = 0, folgas = 0, feriadosCount = 0, feriadosTrabalhadosCount = 0, horasTrabalhadas = 0;
+            const dataAtual = new Date(periodo.inicio);
+            while (dataAtual <= periodo.fim) {
+                const status = obterStatusDia(equipeSelecionada, dataAtual);
+                const dia = dataAtual.getDate();
+                const mes = dataAtual.getMonth() + 1;
+                const dataComemorativa = getDataComemorativa(dia, mes);
+                if (dataComemorativa && dataComemorativa.tipo === 'feriado') {
+                    feriadosCount++;
+                    if (status === 1) feriadosTrabalhadosCount++;
+                }
+                if (status === 1) { trabalhos++; horasTrabalhadas += HORAS_POR_DIA; }
+                else { folgas++; }
+                dataAtual.setDate(dataAtual.getDate() + 1);
+            }
+            const minutosTrabalhados = horasParaMinutos(horasTrabalhadas);
+            const totalExtrasPeriodo = getTotalExtrasPorPeriodo(periodo);
+            const totalExtrasMin = horasParaMinutos(totalExtrasPeriodo);
+            const totalGeralMin = horasParaMinutos(getTotalExtras());
+            const percentual = Math.round((trabalhos / diasNoPeriodo) * 100);
+
+            container.innerHTML = `
+                <div class="estatistica-card trabalho"><span class="numero">${trabalhos}</span><span class="label">Dias Trabalhados</span></div>
+                <div class="estatistica-card folga"><span class="numero">${folgas}</span><span class="label">Dias de Folga</span></div>
+                <div class="estatistica-card horas"><span class="numero">${formatarMinutos(minutosTrabalhados)}</span><span class="label">Horas Efetivas</span></div>
+                <div class="estatistica-card total"><span class="numero">${diasNoPeriodo}</span><span class="label">Total de Dias</span></div>
+                <div class="estatistica-card percentual"><span class="numero">${percentual}%</span><span class="label">% Trabalhado</span></div>
+                <div class="estatistica-card feriados"><span class="numero">${feriadosCount}</span><span class="label">Feriados</span></div>
+                <div class="estatistica-card feriados-trabalhados"><span class="numero">${feriadosTrabalhadosCount}</span><span class="label">Feriados Trab.</span></div>
+                <div class="estatistica-card extra"><span class="numero">${formatarMinutos(totalExtrasMin)}</span><span class="label">H.Extra Período</span></div>
+                <div class="estatistica-card total-extra"><span class="numero">${formatarMinutos(totalGeralMin)}</span><span class="label">Total H.Extra</span></div>
+            `;
+        }
+
+        // =====================================================
+        // ===== INICIALIZAÇÃO =====
+        // =====================================================
+        renderizarBotoesEquipe();
+        renderizarCalendario();
+        renderizarEstatisticas();
+        renderizarLegendaFeriados();
+        atualizarPeriodoInfo();
+        renderizarListaExtras();
+
+        document.getElementById('modalExtra').addEventListener('click', function (e) {
+            if (e.target === this) fecharModalExtra();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') { fecharMenu(); fecharModalExtra(); }
+        });
+
+        console.log('✅ Calendário inicializado!');
+        console.log('📅 Período atual:', getNomePeriodo(getPeriodoPorIndex(periodoIndex)));
+    </script>
+</body>
+
+</html>
