@@ -17,4 +17,4 @@ Sistema de visualização de escalas de trabalho com ciclo de 4 semanas, feriado
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/abl0n/calendario-escalas.git
+git clone https://github.com/abl0n/calendario-escalas.git# calendario-escalas
