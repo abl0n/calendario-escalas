@@ -1,0 +1,111 @@
+/* =====================================================
+   CALENDÁRIO
+   ===================================================== */
+
+.calendario {
+  background: var(--color-surface, #ffffff);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+  margin-top: var(--space-md, 16px);
+}
+
+.calendario table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.calendario th {
+  padding: 12px 4px;
+  font-size: var(--text-xs, 0.75rem);
+  text-transform: uppercase;
+  font-weight: var(--font-bold, 700);
+  text-align: center;
+  background: var(--color-bg, #f1f5f9);
+  color: var(--color-text, #1e293b);
+  border-bottom: 3px solid var(--color-border, #e2e8f0);
+}
+
+.calendario td {
+  height: 72px;
+  padding: 6px;
+  vertical-align: top;
+  border: 1px solid var(--color-border, #e2e8f0);
+  background: var(--color-surface, #ffffff);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.calendario td:hover {
+  background: var(--color-bg, #f1f5f9);
+}
+
+/* Dia atual */
+.dia-hoje {
+  border: 2px solid var(--color-primary, #3B82F6) !important;
+  background: rgba(59, 130, 246, 0.05) !important;
+}
+
+/* Número do dia */
+.dia-numero {
+  font-weight: var(--font-bold, 700);
+  font-size: var(--text-md, 1rem);
+  color: var(--color-text, #1e293b);
+}
+
+/* Status T/F */
+.status-dia {
+  display: inline-block;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-bold, 700);
+  padding: 1px 8px;
+  border-radius: var(--radius-sm, 6px);
+  margin-top: 2px;
+}
+
+.status-trabalho {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-folga {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* Feriados */
+.dia-feriado {
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+.dia-feriado-trabalhado {
+  background: rgba(239, 68, 68, 0.18) !important;
+  border: 2px solid #ef4444 !important;
+}
+.dia-comemorativo {
+  background: rgba(139, 92, 246, 0.06) !important;
+}
+.dia-com-extra {
+  border: 2px solid #f59e0b !important;
+}
+
+.dia-outro-periodo {
+  opacity: 0.3;
+}
+
+/* Eventos */
+.evento-icone {
+  font-size: var(--text-xs, 0.75rem);
+  display: block;
+  margin-top: 2px;
+}
+
+.evento-extra {
+  display: block;
+  font-size: 0.55rem;
+  font-weight: var(--font-bold, 700);
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.15);
+  border-radius: 3px;
+  padding: 0 4px;
+  margin-top: 2px;
+}

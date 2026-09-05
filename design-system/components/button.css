@@ -1,0 +1,76 @@
+/* =====================================================
+   BOTÕES
+   ===================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm, 8px);
+  padding: 10px 20px;
+  font-family: var(--font-base, system-ui, sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semibold, 600);
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+  min-height: 40px;
+}
+
+/* Variantes */
+.btn-primary {
+  background: var(--color-primary, #3B82F6);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--color-primary-hover, #2563eb);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0,0,0,0.1));
+}
+
+.btn-success {
+  background: var(--color-success, #10B981);
+  color: #fff;
+}
+.btn-success:hover {
+  background: var(--color-success-hover, #059669);
+}
+
+.btn-danger {
+  background: var(--color-danger, #EF4444);
+  color: #fff;
+}
+.btn-danger:hover {
+  background: var(--color-danger-hover, #dc2626);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--color-border, #e2e8f0);
+  color: var(--color-text, #1e293b);
+}
+.btn-ghost:hover {
+  background: var(--color-bg, #f1f5f9);
+}
+
+/* Tamanhos */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: var(--text-xs, 0.75rem);
+  min-height: 32px;
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: var(--text-md, 1rem);
+  min-height: 48px;
+}
+
+/* Largura total */
+.btn-full {
+  width: 100%;
+  justify-content: center;
+}

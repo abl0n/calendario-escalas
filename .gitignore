@@ -1,0 +1,129 @@
+# =====================================================
+# .gitignore - Calendário de Escalas
+# Projeto: HTML + CSS + JavaScript Vanilla
+# =====================================================
+
+# ===== IDE e Editores =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-*
+*.sublime-workspace
+*.sublime-project
+
+# ===== Sistema Operacional =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ===== Arquivos de Backup =====
+*.backup
+*.bak
+*.tmp
+*.temp
+*.old
+*.orig
+
+# ===== Build e Distribuição =====
+dist/
+build/
+*.min.js
+*.min.css
+
+# ===== Dependências (se usar algum gerenciador) =====
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===== Arquivos de Configuração Local =====
+*.local
+*.local.json
+config.local.js
+config.local.css
+
+# ===== Logs =====
+*.log
+logs/
+*.log.*
+
+# ===== Dados do Usuário (IMPORTANTE!) =====
+# 🔥 Não versionar dados pessoais
+*.db
+*.sqlite
+*.sqlite3
+localStorage.json
+user-data.json
+*.backup.json
+
+# ===== Arquivos de Teste =====
+*.test.js
+*.spec.js
+test/
+tests/
+__tests__/
+
+# ===== Documentação Gerada =====
+docs/
+api/
+*.md.bak
+
+# ===== Arquivos de Exemplo =====
+*.example
+*.sample
+*.template
+
+# ===== Arquivos Ocultos =====
+.env
+.env.*
+!.env.example
+
+# ===== PWA =====
+# 🔥 Mantenha os ícones, mas não versionar gerados automaticamente
+# icons-generated/
+# *.generated.png
+
+# ===== Editor de Código =====
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# ===== Outros =====
+*.tmp
+*.temp
+*.cache
+*.min
+*.map
+*.sourcemap
+
+# =====================================================
+# 🔥 EXCEÇÕES - Arquivos que DEVEM ser versionados
+# =====================================================
+
+# Configurações essenciais
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Arquivos de exemplo
+!.env.example
+!config.example.js
+
+# Ícones PWA (versionar os essenciais)
+!icons/favicon.png
+!icons/icon-192.png
+!icons/icon-512.png
+
+# =====================================================
+# 📌 NOTA: 
+# Os arquivos de dados (funcTestes.json, localStorage.json) 
+# NÃO devem ser versionados se contiverem dados reais.
+# Mantenha apenas arquivos de exemplo/schema.
+# =====================================================

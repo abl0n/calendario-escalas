@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Calendário de Escalas</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Ícones -->
+    <link rel="icon" type="image/png" href="icons/favicon.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <!-- Cores PWA -->
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Descrição -->
+    <meta name="description" content="Calendário de escalas de trabalho com ciclo de 4 semanas">
+
+    <!-- 🔥 MATERIAL ICONS (CDN) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- 🔥 ÍCONES ANIMADOS -->
+    <link rel="stylesheet" href="assets/css/icons-animated.css">
+
+    <!-- CSS do Projeto -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="design-system/index.css">
+
+    <!-- JS Module -->
+    <script type="module" src="js/app.js"></script>
+</head>
+
+<body>
+    <!-- ============================================================
+    LOADING OVERLAY
+    ============================================================ -->
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,0.85); z-index:9999; justify-content:center; align-items:center; flex-direction:column; gap:16px; backdrop-filter:blur(4px);">
+        <span class="material-icons mi-spin" style="font-size:48px; color:#3B82F6;">refresh</span>
+        <div style="font-size:1.1rem; font-weight:600; color:#f1f5f9;">Carregando...</div>
+    </div>
+
+    <!-- ============================================================
+    TOAST NOTIFICATION
+    ============================================================ -->
+    <div class="toast" id="toastNotification"></div>
+
+    <!-- ============================================================
+    APP CONTAINER
+    ============================================================ -->
+    <div class="app-container" role="main">
+
+        <!-- ============================================================
+        HEADER - APENAS ESCALAS COM CORES
+        ============================================================ -->
+        <header class="header-escalas" id="headerEscalas">
+            <div class="escalas-container">
+                <!-- Os botões serão gerados pelo JavaScript -->
+                <div class="botoes-equipe" id="botoesEquipe"></div>
+            </div>
+        </header>
+
+        <!-- ============================================================
+        MENU OVERLAY
+        ============================================================ -->
+        <div class="menu-overlay" id="menuOverlay" onclick="window.fecharMenu()"></div>
+
+        <!-- ============================================================
+        MENU LATERAL
+        ============================================================ -->
+        <nav class="menu-lateral" id="menuLateral" role="navigation" aria-label="Menu principal">
+            <div class="menu-header">
+                <h2>
+                    <span class="material-icons" style="font-size:20px; vertical-align:middle;">settings</span>
+                    Menu
+                </h2>
+                <button class="menu-fechar" onclick="window.fecharMenu()" aria-label="Fechar menu">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+
+            <!-- GUIA RÁPIDO -->
+            <div class="menu-guia" onclick="window.abrirGuia()" style="padding:12px 16px; margin:8px 0 16px; background:var(--color-bg, #f1f5f9); border-radius:8px; cursor:pointer; border:1px solid var(--color-border, #e2e8f0);">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span class="material-icons mi-float" style="font-size:24px; color:#3B82F6;">help</span>
+                    <div>
+                        <div style="font-size:0.85rem; font-weight:600; color:var(--color-text, #1e293b);">Guia Rápido</div>
+                        <div style="font-size:0.65rem; color:var(--color-text-muted, #64748b);">Clique para ver dicas de uso</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔥 BOTÃO CADASTRAR FUNCIONÁRIO -->
+            <button class="menu-item" onclick="window.abrirModalPessoa()" style="background: var(--color-primary, #3B82F6); color: white; border-radius: 8px; margin: 8px 0; width:100%;">
+                <span class="icone">
+                    <span class="material-icons" style="color: white;">person_add</span>
+                </span>
+                <span class="descricao" style="color: white;">
+                    Cadastrar Funcionário
+                    <small style="color: rgba(255,255,255,0.7);">Adicionar novo funcionário</small>
+                </span>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <!-- CONFIGURAÇÃO DO PERÍODO -->
+            <div class="menu-periodo-config" style="padding: 12px 16px; margin: 8px 0 16px; background: var(--color-bg, #f1f5f9); border-radius: 8px;">
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <span style="font-size:0.75rem; font-weight:600; color:var(--color-text, #1e293b);">
+                        <span class="material-icons" style="font-size:16px; vertical-align:middle;">date_range</span>
+                        Período
+                    </span>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:4px;">
+                            <span style="font-size:0.65rem; color:var(--color-text-muted, #64748b);">Início</span>
+                            <input type="number" id="periodoDiaInicio" class="input" value="16" min="1" max="31" style="width:55px; padding:6px 8px; text-align:center; border:1px solid var(--color-border, #e2e8f0); border-radius:4px; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b);">
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px;">
+                            <span style="font-size:0.65rem; color:var(--color-text-muted, #64748b);">Fim</span>
+                            <input type="number" id="periodoDiaFim" class="input" value="15" min="1" max="31" style="width:55px; padding:6px 8px; text-align:center; border:1px solid var(--color-border, #e2e8f0); border-radius:4px; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b);">
+                        </div>
+                        <button class="btn btn-primary" style="padding:6px 12px; font-size:0.75rem;" onclick="window.aplicarPeriodo()">
+                            <span class="material-icons" style="font-size:16px;">check</span>
+                            Aplicar
+                        </button>
+                    </div>
+                    <div style="font-size:0.55rem; color:var(--color-text-muted, #64748b);">
+                        Ex: Início 16, Fim 15 → 16/08 a 15/09
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <!-- TEMA -->
+            <button class="menu-item toggle-tema" onclick="window.toggleTema()">
+                <span class="icone">
+                    <span class="material-icons">dark_mode</span>
+                </span>
+                <span class="descricao">
+                    Tema
+                    <small>Claro / Escuro</small>
+                </span>
+                <span class="status-tema" id="statusTema">🌞</span>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <!-- EXPORTAR -->
+            <button class="menu-item" onclick="window.exportarDados()">
+                <span class="icone">
+                    <span class="material-icons mi-hover-float">download</span>
+                </span>
+                <span class="descricao">
+                    Exportar Dados
+                    <small>Backup completo</small>
+                </span>
+            </button>
+
+            <!-- IMPORTAR -->
+            <button class="menu-item" onclick="window.importarDados()">
+                <span class="icone">
+                    <span class="material-icons mi-hover-float">upload</span>
+                </span>
+                <span class="descricao">
+                    Importar Dados
+                    <small>Restaurar backup</small>
+                </span>
+            </button>
+
+            <!-- LIMPAR DADOS -->
+            <button class="menu-item" onclick="window.limparDados()">
+                <span class="icone">
+                    <span class="material-icons mi-pulse" style="color:#EF4444;">delete</span>
+                </span>
+                <span class="descricao">
+                    Limpar Dados
+                    <small>Remover horas extras</small>
+                </span>
+            </button>
+
+            <!-- RESETAR -->
+            <button class="menu-item" onclick="window.resetarTudo()">
+                <span class="icone">
+                    <span class="material-icons mi-hover-spin">sync</span>
+                </span>
+                <span class="descricao">
+                    Resetar Tudo
+                    <small>Restaurar padrão</small>
+                </span>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <!-- SUGERIR MELHORIA -->
+            <button class="menu-item" onclick="window.abrirMelhorias()">
+                <span class="icone">
+                    <span class="material-icons mi-float" style="color:#F59E0B;">lightbulb</span>
+                </span>
+                <span class="descricao">
+                    Sugerir Melhoria
+                    <small>Envie sua ideia</small>
+                </span>
+            </button>
+
+            <!-- REPORTAR BUG -->
+            <button class="menu-item" onclick="window.abrirBug()">
+                <span class="icone">
+                    <span class="material-icons mi-pulse" style="color:#EF4444;">bug_report</span>
+                </span>
+                <span class="descricao">
+                    Reportar Bug
+                    <small>Encontrou um problema?</small>
+                </span>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <!-- VERSÃO -->
+            <div style="padding: 8px 14px; font-size: 0.7rem; color: var(--color-text-muted, #64748b); text-align: center;">
+                Versão 1.0.0
+                <span class="badge-version">Beta</span>
+            </div>
+        </nav>
+
+        <!-- ============================================================
+        NAVEGAÇÃO DO CALENDÁRIO
+        ============================================================ -->
+        <div class="navegacao-mes">
+            <button class="btn btn-ghost" onclick="window.mudarPeriodo(-1)" aria-label="Período anterior">
+                <span class="material-icons">chevron_left</span>
+            </button>
+            <span class="mes-titulo">
+                <span class="material-icons" style="font-size:18px; vertical-align:middle;">calendar_month</span>
+                <span id="periodoNome">Junho/Julho 2026</span>
+            </span>
+            <button class="btn btn-ghost" onclick="window.mudarPeriodo(1)" aria-label="Próximo período">
+                <span class="material-icons">chevron_right</span>
+            </button>
+        </div>
+
+        <!-- ============================================================
+        CALENDÁRIO
+        ============================================================ -->
+        <section class="calendario" id="calendarioContainer" role="region" aria-label="Calendário de escalas"></section>
+
+        <!-- ============================================================
+        CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
+        ============================================================ -->
+        <div class="contadores-container" id="contadoresContainer">
+            <div class="contador-item total" onclick="window.abrirPopup('total')" title="Ver todos os funcionários da escala">
+                <span class="contador-icone">👥</span>
+                <span class="contador-numero" id="numPessoasEscala">0</span>
+                <span class="contador-label">Total</span>
+            </div>
+            <div class="contador-item manha" onclick="window.abrirPopup('M')" title="Ver funcionários da manhã">
+                <span class="contador-icone">☀️</span>
+                <span class="contador-numero" id="numManha">0</span>
+                <span class="contador-label">Manhã</span>
+            </div>
+            <div class="contador-item tarde" onclick="window.abrirPopup('T')" title="Ver funcionários da tarde">
+                <span class="contador-icone">🌆</span>
+                <span class="contador-numero" id="numTarde">0</span>
+                <span class="contador-label">Tarde</span>
+            </div>
+            <div class="contador-item noite" onclick="window.abrirPopup('N')" title="Ver funcionários da noite">
+                <span class="contador-icone">🌙</span>
+                <span class="contador-numero" id="numNoite">0</span>
+                <span class="contador-label">Noite</span>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        POPUP LISTA DE FUNCIONÁRIOS
+        ============================================================ -->
+        <div class="modal-overlay" id="popupOverlay" onclick="window.fecharPopup()">
+            <div class="modal-content" onclick="event.stopPropagation()" role="dialog" aria-label="Lista de funcionários">
+                <div class="popup-header">
+                    <h3 id="popupTitulo">
+                        <span class="material-icons" style="font-size:20px; vertical-align:middle;">people</span>
+                        Funcionários
+                    </h3>
+                    <span class="popup-total" id="popupTotal">Total: 0</span>
+                    <button class="menu-fechar" onclick="window.fecharPopup()" aria-label="Fechar">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <div class="popup-conteudo" id="popupConteudo"></div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        POPUP ESTATÍSTICAS
+        ============================================================ -->
+        <div class="modal-overlay" id="popupEstatisticas" onclick="window.fecharEstatisticas()">
+            <div class="modal-content" onclick="event.stopPropagation()" role="dialog" aria-label="Estatísticas detalhadas">
+                <div class="popup-header">
+                    <h3>
+                        <span class="material-icons" style="font-size:20px; vertical-align:middle;">bar_chart</span>
+                        Estatísticas Detalhadas
+                    </h3>
+                    <button class="menu-fechar" onclick="window.fecharEstatisticas()" aria-label="Fechar">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <div class="popup-conteudo" id="popupEstatisticasConteudo"></div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        POPUP DETALHES DO DIA
+        ============================================================ -->
+        <div class="modal-overlay" id="popupDetalhesDia">
+            <div class="modal-content" onclick="event.stopPropagation()" role="dialog" aria-label="Detalhes do dia">
+                <div class="popup-header">
+                    <h3 id="detalhesTitulo">
+                        <span class="material-icons" style="font-size:20px; vertical-align:middle;">calendar_today</span>
+                        Detalhes do Dia
+                    </h3>
+                    <button class="menu-fechar" onclick="window.fecharDetalhesDia()" aria-label="Fechar">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <div class="popup-conteudo" id="detalhesConteudo"></div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        FOOTER - MENU DE AÇÕES (RODAPÉ)
+        ============================================================ -->
+        <footer class="footer-actions" role="navigation" aria-label="Menu de ações">
+            <div class="footer-actions-inner">
+                
+                <!-- Botão 1: Menu Hambúrguer -->
+                <button class="footer-btn" onclick="window.toggleMenu()" aria-label="Abrir menu">
+                    <span class="material-icons mi-hover-scale">menu</span>
+                    <span class="footer-btn-label">Menu</span>
+                </button>
+
+                <!-- Botão 2: Hora Extra -->
+                <button class="footer-btn footer-btn-primary" onclick="window.abrirModalExtra()" aria-label="Adicionar hora extra">
+                    <span class="material-icons mi-hover-spin">access_time</span>
+                    <span class="footer-btn-label">Hora Extra</span>
+                </button>
+
+                <!-- Botão 3: Estatísticas -->
+                <button class="footer-btn" onclick="window.abrirEstatisticas()" aria-label="Ver estatísticas">
+                    <span class="material-icons mi-pulse" style="color:#8B5CF6;">bar_chart</span>
+                    <span class="footer-btn-label">Estatísticas</span>
+                </button>
+
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ============================================================
+    MODAL HORA EXTRA
+    ============================================================ -->
+    <div class="modal-overlay" id="modalExtra">
+        <div class="modal-content" role="dialog" aria-label="Adicionar hora extra">
+            <h2>
+                <span class="material-icons" style="font-size:24px; vertical-align:middle;">access_time</span>
+                Hora Extra
+            </h2>
+            <p class="sub">Adicione horas extras por dia</p>
+
+            <div class="campo">
+                <label for="inputDataExtra">
+                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">calendar_today</span>
+                    Data
+                </label>
+                <input type="date" id="inputDataExtra" class="input" lang="pt-BR">
+            </div>
+
+            <div class="campo">
+                <label for="inputInicioExtra">
+                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">schedule</span>
+                    Início
+                </label>
+                <input type="time" id="inputInicioExtra" class="input" step="60">
+            </div>
+
+            <div class="campo">
+                <label for="inputFimExtra">
+                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">schedule</span>
+                    Término
+                </label>
+                <input type="time" id="inputFimExtra" class="input" step="60">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="window.salvarExtra()">
+                    <span class="material-icons">check</span>
+                    Salvar
+                </button>
+                <button class="btn btn-ghost" onclick="window.fecharModalExtra()">
+                    <span class="material-icons">close</span>
+                    Cancelar
+                </button>
+            </div>
+
+            <div class="lista-extras" id="listaExtras">
+                <h3>
+                    <span class="material-icons" style="font-size:18px; vertical-align:middle;">list</span>
+                    Horas Extras Registradas
+                </h3>
+                <div id="listaExtrasContainer"></div>
+                <div class="total-extra-modal" id="totalExtraModal">Total: 0h</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    MODAL PESSOA
+    ============================================================ -->
+    <div class="modal-overlay" id="modalPessoa">
+        <div class="modal-content" role="dialog" aria-label="Cadastrar funcionário">
+            <h2 id="modalPessoaTitulo">
+                <span class="material-icons" style="font-size:24px; vertical-align:middle;">person_add</span>
+                Cadastrar Funcionário
+            </h2>
+            <p class="sub" id="modalPessoaSubtitulo">Vincule o funcionário à escala e turno</p>
+
+            <div class="campo">
+                <label for="inputNomePessoa">
+                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">person</span>
+                    Nome Completo
+                </label>
+                <input type="text" id="inputNomePessoa" class="input" placeholder="Ex: João Silva">
+            </div>
+
+            <div class="campo">
+                <label for="inputContatoPessoa">
+                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">phone</span>
+                    Contato
+                </label>
+                <input type="text" id="inputContatoPessoa" class="input" placeholder="Ex: (11) 99999-9999">
+            </div>
+
+            <div class="campo">
+                <label for="inputEscalaPessoa">
+                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">assignment</span>
+                    Escala
+                </label>
+                <select id="inputEscalaPessoa" class="input">
+                    <option value="1">Escala 1</option>
+                    <option value="2">Escala 2</option>
+                    <option value="3">Escala 3</option>
+                    <option value="4">Escala 4</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="inputTurnoPessoa">
+                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">schedule</span>
+                    Turno
+                </label>
+                <select id="inputTurnoPessoa" class="input">
+                    <option value="M">☀️ Manhã</option>
+                    <option value="T">🌆 Tarde</option>
+                    <option value="N">🌙 Noite</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="window.salvarPessoa()">
+                    <span class="material-icons">check</span>
+                    Salvar
+                </button>
+                <button class="btn btn-ghost" onclick="window.fecharModalPessoa()">
+                    <span class="material-icons">close</span>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    SERVICE WORKER
+    ============================================================ -->
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('✅ Service Worker registrado com sucesso!'))
+                    .catch(error => console.log('⚠️ Falha ao registrar Service Worker:', error));
+            });
+        }
+    </script>
+
+</body>
+
+</html>
