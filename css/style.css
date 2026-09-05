@@ -287,24 +287,111 @@
 }
 
 /* ===== STATUS T/F ===== */
-#calendarioContainer .status-dia {
-    display: inline-block !important;
-    font-size: 0.65rem !important;
+/* =====================================================
+   STATUS DO DIA - CALENDÁRIO
+   ===================================================== */
+
+/* 🔥 STATUS - TRABALHO (AZUL FORTE) */
+.status-trabalho {
+    background: #1D4ED8 !important;  /* Azul escuro forte */
+    color: #FFFFFF !important;
     font-weight: 800 !important;
-    padding: 1px 8px !important;
-    border-radius: 4px !important;
-    margin-top: 2px !important;
+    font-size: 0.75rem !important;
+    padding: 3px 10px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.4) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
     letter-spacing: 0.5px !important;
+    border: 1px solid #1E40AF !important;
 }
 
-#calendarioContainer .status-trabalho {
-    background: #dbeafe !important;
-    color: #1d4ed8 !important;
+/* 🔥 STATUS - FOLGA (VERDE FORTE) */
+.status-folga {
+    background: #059669 !important;  /* Verde escuro forte */
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    font-size: 0.75rem !important;
+    padding: 3px 10px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    letter-spacing: 0.5px !important;
+    border: 1px solid #047857 !important;
 }
 
-#calendarioContainer .status-folga {
-    background: #f1f5f9 !important;
-    color: #64748b !important;
+/* =====================================================
+   MODO ESCURO
+   ===================================================== */
+
+body.modo-escuro .status-trabalho {
+    background: #3B82F6 !important;  /* Azul mais claro no escuro */
+    color: #FFFFFF !important;
+    border-color: #2563EB !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5) !important;
+}
+
+body.modo-escuro .status-folga {
+    background: #10B981 !important;  /* Verde mais claro no escuro */
+    color: #FFFFFF !important;
+    border-color: #059669 !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* =====================================================
+   LEGENDA - CORES ATUALIZADAS
+   ===================================================== */
+
+.legenda-cor {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+/* Trabalho - Azul */
+.legenda-trabalho {
+    background: #1D4ED8 !important;
+    border: 1px solid #1E40AF !important;
+}
+
+/* Folga - Verde */
+.legenda-folga {
+    background: #059669 !important;
+    border: 1px solid #047857 !important;
+}
+
+body.modo-escuro .legenda-trabalho {
+    background: #3B82F6 !important;
+    border-color: #2563EB !important;
+}
+
+body.modo-escuro .legenda-folga {
+    background: #10B981 !important;
+    border-color: #059669 !important;
+}
+
+/* =====================================================
+   RESPONSIVO
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .status-trabalho,
+    .status-folga {
+        font-size: 0.6rem !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .status-trabalho,
+    .status-folga {
+        font-size: 0.5rem !important;
+        padding: 1px 4px !important;
+        border-radius: 3px !important;
+        min-width: 18px !important;
+        text-align: center !important;
+    }
 }
 
 /* ===== FORA DO PERÍODO ===== */
@@ -1176,4 +1263,223 @@
     justify-content: center;
     border: 2px solid var(--color-surface, #ffffff);
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* ===== CAMPOS DO FORMULÁRIO ===== */
+.campo input,
+.campo select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--color-border, #e2e8f0);
+    border-radius: var(--radius-md, 8px);
+    font-size: var(--text-base, 1rem);
+    background: var(--color-surface, #ffffff);
+    color: var(--color-text, #1e293b);
+    transition: all 0.2s ease;
+    font-family: var(--font-family, system-ui, sans-serif);
+    height: 44px;
+}
+
+.campo input:focus,
+.campo select:focus {
+    outline: none;
+    border-color: var(--color-primary, #3B82F6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.campo input::placeholder {
+    color: var(--color-text-light, #94a3b8);
+}
+
+.campo label {
+    display: block;
+    font-weight: var(--font-semibold, 600);
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--color-text, #1e293b);
+    margin-bottom: var(--space-1, 4px);
+}
+
+.campo label .material-icons {
+    font-size: 16px;
+    vertical-align: middle;
+    color: var(--color-text-muted, #64748b);
+}
+
+/* =====================================================
+   RODAPÉ - MENU DE AÇÕES
+   ===================================================== */
+
+.footer-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--color-surface, #ffffff);
+    border-top: 2px solid var(--color-border, #e2e8f0);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: block !important;
+}
+
+[data-theme="dark"] .footer-actions {
+    background: var(--color-surface, #1e293b);
+    border-top-color: var(--color-border, #334155);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.footer-actions-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 8px;
+}
+
+/* 🔥 REMOVER O DISPLAY: NONE PARA DESKTOP */
+/* ANTES:
+@media (min-width: 768px) {
+    .footer-actions {
+        display: none !important;
+    }
+}
+*/
+
+/* 🔥 NOVO: MANTER RODAPÉ EM TODAS AS TELAS */
+.footer-actions {
+    display: block !important;
+}
+
+/* Ajuste para telas muito grandes (opcional) */
+@media (min-width: 1200px) {
+    .footer-actions {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 16px 16px 0 0;
+    }
+}
+
+.app-container {
+    padding-bottom: 80px;
+}
+
+/* Ajuste para iPhone com notch */
+@supports (padding: max(0px)) {
+    .footer-actions {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+}
+
+/* =====================================================
+   POPUP - CABEÇALHO E BOTÃO FECHAR
+   ===================================================== */
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--color-border, #f1f5f9);
+    position: relative;
+}
+
+.popup-header h3 {
+    font-size: 1.1rem;
+    color: var(--color-text, #1e293b);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.popup-header .popup-total {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #64748b);
+    margin-right: 12px;
+}
+
+/* 🔥 BOTÃO FECHAR - POSIÇÃO CORRETA */
+.popup-header .menu-fechar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text-muted, #94a3b8);
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.popup-header .menu-fechar:hover {
+    background: var(--color-bg, #f1f5f9);
+    color: var(--color-text, #1e293b);
+}
+
+.popup-header .menu-fechar .material-icons {
+    font-size: 22px;
+}
+
+/* =====================================================
+   MODAL - CABEÇALHO E BOTÃO FECHAR
+   ===================================================== */
+
+.modal-content .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4, 16px);
+    padding-bottom: var(--space-3, 12px);
+    border-bottom: 1px solid var(--color-border, #e2e8f0);
+    position: relative;
+}
+
+.modal-content .popup-header h3 {
+    font-size: var(--text-lg, 1.125rem);
+    font-weight: var(--font-bold, 700);
+    color: var(--color-text, #1e293b);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.modal-content .popup-header .menu-fechar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text-muted, #94a3b8);
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.modal-content .popup-header .menu-fechar:hover {
+    background: var(--color-bg, #f1f5f9);
+    color: var(--color-text, #1e293b);
+}
+
+.modal-content .popup-header .menu-fechar .material-icons {
+    font-size: 22px;
 }

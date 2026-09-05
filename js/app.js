@@ -53,8 +53,8 @@ import {
     carregarPessoasStorage, salvarPessoasStorage
 } from './utils/storage.js';
 
-import { recarregarPessoas } from './core/pessoas.js';
-
+//import { recarregarPessoas } from './core/pessoas.js';
+import { getPessoas, recarregarPessoas } from './core/pessoas.js';
 // =====================================================
 // VARIÁVEIS GLOBAIS
 // =====================================================
@@ -205,10 +205,11 @@ function renderizarCalendario() {
             labelExtra = `<span class="evento-extra">➕ ${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}</span>`;
         }
 
+        // 🔥 ADICIONAR ONCLICK PARA ABRIR DETALHES
         html += `<td class="${classeHoje} ${classeExtra} ${classeEspecial} ${classePeriodo}" 
-            data-data="${dataStr}"
-            onclick="window.abrirDetalhesDia('${dataStr}')"
-            style="cursor:pointer;">
+                    data-data="${dataStr}"
+                    onclick="window.abrirDetalhesDia('${dataStr}')"
+                    style="cursor:pointer;">
             <span class="status-dia ${statusClasse}">${statusTexto}</span>
             <span class="dia-numero">${dia}</span>
             ${iconeEspecial}
@@ -364,6 +365,7 @@ function atualizarPeriodoInfo() {
     const periodo = getPeriodoPorIndex(periodoIndex);
     const periodoNome = document.getElementById('periodoNome');
     if (periodoNome) {
+        // 🔥 Usar o novo formato com 3 letras
         periodoNome.textContent = getNomePeriodo(periodo);
     }
 }
@@ -375,6 +377,171 @@ function mudarPeriodo(delta) {
     renderizarLegendaFeriados();
     atualizarPeriodoInfo();
 }
+
+// =====================================================
+// POPUP FUNCIONÁRIOS ADM
+// =====================================================
+
+function abrirPopupADM() {
+    const overlay = document.getElementById('popupOverlay');
+    const titulo = document.getElementById('popupTitulo');
+    const conteudo = document.getElementById('popupConteudo');
+    const total = document.getElementById('popupTotal');
+
+    if (!overlay) {
+        console.error('❌ Elemento overlay do popup não encontrado!');
+        return;
+    }
+
+    const todasPessoas = getPessoas();
+    const pessoasADM = todasPessoas.filter(p => p.tipo === 'ADM');
+
+    // 🔥 REMOVER ÍCONE - APENAS TEXTO
+    if (titulo) {
+        titulo.textContent = '🏢 Funcionários Administrativos';
+    }
+
+    pessoasADM.sort((a, b) => a.nome.localeCompare(b.nome));
+
+    if (conteudo) {
+        if (pessoasADM.length === 0) {
+            conteudo.innerHTML = `
+                <div style="text-align:center; padding: 40px 20px; color: var(--color-text-muted, #64748b);">
+                    <span style="font-size:48px;">🏢</span>
+                    <p style="margin-top:12px; font-size:0.95rem;">
+                        Nenhum funcionário administrativo cadastrado.
+                    </p>
+                    <small style="font-size:0.75rem;">Para adicionar, selecione "ADM" no campo "Tipo" ao cadastrar.</small>
+                </div>
+            `;
+        } else {
+            const coresTurnos = {
+                'M': { bg: '#FEF3C7', text: '#92400E', badge: '#F59E0B' },
+                'T': { bg: '#FFEDD5', text: '#7C2D12', badge: '#EA580C' },
+                'N': { bg: '#E0E7FF', text: '#1E1B4B', badge: '#4F46E5' }
+            };
+
+            let html = `
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="
+                    padding: 8px 16px;
+                    background: #10B981;
+                    border-radius: 8px;
+                    color: white;
+                    text-align: center;
+                    font-weight: 600;
+                    font-size: 0.85rem;
+                    margin-bottom: 4px;
+                ">
+                    🏢 Administrativos (${pessoasADM.length})
+                </div>
+            `;
+            
+            pessoasADM.forEach(p => {
+                const cores = coresTurnos[p.turno] || coresTurnos['M'];
+                
+                html += `
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 12px 16px;
+                        background: var(--color-bg, #f8fafc);
+                        border-radius: 10px;
+                        border-left: 4px solid #10B981;
+                        transition: all 0.2s ease;
+                    ">
+                        <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                            <span style="font-weight:600; font-size:0.95rem; color: var(--color-text, #1e293b);">
+                                ${p.nome}
+                            </span>
+                            ${p.cargo ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
+                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">work</span>
+                                ${p.cargo}
+                            </span>` : ''}
+                            ${p.empresa ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
+                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">business</span>
+                                ${p.empresa}
+                            </span>` : ''}
+                            ${p.contato ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
+                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">phone</span>
+                                ${p.contato}
+                            </span>` : ''}
+                            <span style="font-size:0.65rem; color: #10B981; font-weight:600;">
+                                <span class="material-icons" style="font-size:12px; vertical-align:middle;">verified</span>
+                                ADM
+                            </span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+                            <span style="
+                                font-size:0.65rem;
+                                font-weight:700;
+                                padding:2px 12px;
+                                border-radius:20px;
+                                background: ${cores.bg};
+                                color: ${cores.text};
+                            ">E${p.escalaId}-${p.turno}</span>
+                            <div style="display:flex; gap:4px;">
+                                <button onclick="window.editarFuncionario('${p.id}')" 
+                                    style="
+                                        background: none;
+                                        border: none;
+                                        cursor: pointer;
+                                        padding: 4px 8px;
+                                        border-radius: 6px;
+                                        color: var(--color-primary, #3B82F6);
+                                        transition: background 0.2s;
+                                    "
+                                    onmouseenter="this.style.background='var(--color-bg, #f1f5f9)'"
+                                    onmouseleave="this.style.background='transparent'"
+                                    title="Editar">
+                                    <span class="material-icons" style="font-size:18px;">edit</span>
+                                </button>
+                                <button onclick="window.removerPessoa('${p.id}')" 
+                                    style="
+                                        background: none;
+                                        border: none;
+                                        cursor: pointer;
+                                        padding: 4px 8px;
+                                        border-radius: 6px;
+                                        color: #EF4444;
+                                        transition: background 0.2s;
+                                    "
+                                    onmouseenter="this.style.background='#FEE2E2'"
+                                    onmouseleave="this.style.background='transparent'"
+                                    title="Excluir">
+                                    <span class="material-icons" style="font-size:18px;">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                </div>
+                <div style="
+                    margin-top: 16px;
+                    padding: 12px 16px;
+                    background: #10B981;
+                    border-radius: 10px;
+                    color: white;
+                    text-align: center;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                ">
+                    Total: ${pessoasADM.length} funcionário${pessoasADM.length > 1 ? 's' : ''} ADM
+                </div>
+            `;
+            conteudo.innerHTML = html;
+        }
+    }
+
+    if (total) total.textContent = `ADM: ${pessoasADM.length}`;
+    overlay.classList.add('ativo');
+}
+
+
 
 // --- HORAS EXTRAS ---
 function renderizarListaExtras() {
@@ -459,9 +626,12 @@ function removerExtra(index) {
 // --- PESSOAS ---
 function salvarPessoa() {
     const nome = document.getElementById('inputNomePessoa')?.value?.trim();
-    const contato = document.getElementById('inputContatoPessoa')?.value?.trim();
+    const cargo = document.getElementById('inputCargoPessoa')?.value?.trim() || '';
+    const empresa = document.getElementById('inputEmpresaPessoa')?.value?.trim() || '';
+    const contato = document.getElementById('inputContatoPessoa')?.value?.trim() || '';
     const escalaId = parseInt(document.getElementById('inputEscalaPessoa')?.value || '1');
     const turno = document.getElementById('inputTurnoPessoa')?.value || 'M';
+    const tipo = document.getElementById('inputTipoPessoa')?.value || 'OPERACIONAL';
     const editando = document.getElementById('modalPessoa')?.dataset?.editando;
 
     if (!nome) {
@@ -469,26 +639,53 @@ function salvarPessoa() {
         return;
     }
 
+    // Verificar duplicado
     const duplicado = pessoas.find(p => p.nome.toLowerCase() === nome.toLowerCase() && p.escalaId === escalaId);
     if (duplicado && !editando) {
         mostrarToast('⚠️ Funcionário já cadastrado nesta escala!', 'erro');
         return;
     }
 
+    // 🔥 GARANTIR QUE O TIPO ESTÁ SENDO SALVO
     if (editando) {
         const index = pessoas.findIndex(p => p.id === parseInt(editando));
         if (index !== -1) {
-            pessoas[index] = { ...pessoas[index], nome, contato, escalaId, turno };
+            pessoas[index] = { 
+                ...pessoas[index], 
+                nome, 
+                cargo,
+                empresa,
+                contato, 
+                escalaId, 
+                turno, 
+                tipo: tipo || 'OPERACIONAL'  // ← Garantir tipo
+            };
         }
         mostrarToast('✅ Funcionário atualizado com sucesso!', 'sucesso');
     } else {
-        pessoas.push({ id: Date.now(), nome, contato, escalaId, turno });
+        const novaPessoa = { 
+            id: Date.now(), 
+            nome, 
+            cargo,
+            empresa,
+            contato, 
+            escalaId, 
+            turno, 
+            tipo: tipo || 'OPERACIONAL'  // ← Garantir tipo
+        };
+        pessoas.push(novaPessoa);
+        console.log('📝 Novo funcionário cadastrado:', novaPessoa); // ← Debug
         mostrarToast('✅ Funcionário cadastrado com sucesso!', 'sucesso');
     }
 
     salvarPessoasStorage(pessoas);
     atualizarContadores();
     fecharModalPessoa();
+    
+    // 🔥 FORÇAR RECARREGAR DADOS NO POPUP
+    if (typeof recarregarPessoas === 'function') {
+        recarregarPessoas();
+    }
 }
 
 function removerPessoa(id) {
@@ -502,7 +699,23 @@ function removerPessoa(id) {
 }
 
 function editarFuncionario(id) {
+    console.log('✏️ Editando funcionário ID:', id);
+    
+    // 🔥 FECHAR POPUP ANTES DE ABRIR MODAL
     fecharPopup();
+    
+    // 🔥 BUSCAR O FUNCIONÁRIO PELO ID
+    const pessoa = pessoas.find(p => p.id === parseInt(id) || p.id === String(id));
+    
+    if (!pessoa) {
+        console.error('❌ Funcionário não encontrado! ID:', id);
+        mostrarToast('❌ Funcionário não encontrado!', 'erro');
+        return;
+    }
+    
+    console.log('📝 Funcionário encontrado:', pessoa);
+    
+    // 🔥 ABRIR MODAL COM OS DADOS DO FUNCIONÁRIO
     abrirModalPessoa(id);
 }
 
@@ -1162,6 +1375,7 @@ function fecharDetalhesDia() {
 
 window.abrirDetalhesDia = abrirDetalhesDia;
 window.fecharDetalhesDia = fecharDetalhesDia;
+window.abrirPopupADM = abrirPopupADM;
 // =====================================================
 // INICIALIZAÇÃO
 // =====================================================

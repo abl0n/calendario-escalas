@@ -229,12 +229,14 @@ export function obterDiaSemanaAbreviado(dataStr) {
     }
 }
 
-export function mesAnoToString(mes, ano) {
-    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
-                   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    return `${meses[mes]} ${ano}`;
+// ===== MÊS ABREVIADO (3 LETRAS) =====
+export function obterMesAbreviado(index) {
+    const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 
+                   'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    return meses[index] || '???';
 }
 
+// ===== NOME DO MÊS COMPLETO =====
 export function obterNomeMes(index) {
     const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];

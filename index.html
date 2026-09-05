@@ -235,7 +235,7 @@
                 <span class="material-icons">chevron_left</span>
             </button>
             <span class="mes-titulo">
-                <span class="material-icons" style="font-size:18px; vertical-align:middle;">calendar_month</span>
+                <span class="material-icons" style="font-size:18px; vertical-align:middle;"></span>
                 <span id="periodoNome">Junho/Julho 2026</span>
             </span>
             <button class="btn btn-ghost" onclick="window.mudarPeriodo(1)" aria-label="Próximo período">
@@ -335,7 +335,7 @@
         <footer class="footer-actions" role="navigation" aria-label="Menu de ações">
             <div class="footer-actions-inner">
                 
-                <!-- Botão 1: Menu Hambúrguer -->
+                <!-- Botão 1: Menu -->
                 <button class="footer-btn" onclick="window.toggleMenu()" aria-label="Abrir menu">
                     <span class="material-icons mi-hover-scale">menu</span>
                     <span class="footer-btn-label">Menu</span>
@@ -344,13 +344,20 @@
                 <!-- Botão 2: Hora Extra -->
                 <button class="footer-btn footer-btn-primary" onclick="window.abrirModalExtra()" aria-label="Adicionar hora extra">
                     <span class="material-icons mi-hover-spin">access_time</span>
-                    <span class="footer-btn-label">Hora Extra</span>
+                    <span class="footer-btn-label">H.Extra</span>
                 </button>
 
                 <!-- Botão 3: Estatísticas -->
                 <button class="footer-btn" onclick="window.abrirEstatisticas()" aria-label="Ver estatísticas">
                     <span class="material-icons mi-pulse" style="color:#8B5CF6;">bar_chart</span>
-                    <span class="footer-btn-label">Estatísticas</span>
+                    <span class="footer-btn-label">Stats</span>
+                </button>
+
+
+                <!-- 🔥 BOTÃO ADM - SEM LUPA, APENAS O ÍCONE GROUP_SEARCH -->
+                <button class="footer-btn" onclick="window.abrirPopupADM()" aria-label="Ver funcionários administrativos">
+                    <span class="material-icons mi-hover-scale" style="color:#10B981;">contacts</span>
+                    <span class="footer-btn-label">ADM</span>
                 </button>
 
             </div>
@@ -419,66 +426,96 @@
     MODAL PESSOA
     ============================================================ -->
     <div class="modal-overlay" id="modalPessoa">
-        <div class="modal-content" role="dialog" aria-label="Cadastrar funcionário">
-            <h2 id="modalPessoaTitulo">
-                <span class="material-icons" style="font-size:24px; vertical-align:middle;">person_add</span>
-                Cadastrar Funcionário
-            </h2>
-            <p class="sub" id="modalPessoaSubtitulo">Vincule o funcionário à escala e turno</p>
+    <div class="modal-content" role="dialog" aria-label="Cadastrar funcionário">
+        <h2 id="modalPessoaTitulo">
+            <span class="material-icons" style="font-size:24px; vertical-align:middle;">person_add</span>
+            Cadastrar Funcionário
+        </h2>
+        <p class="sub" id="modalPessoaSubtitulo">Vincule o funcionário à escala e turno</p>
 
-            <div class="campo">
-                <label for="inputNomePessoa">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">person</span>
-                    Nome Completo
-                </label>
-                <input type="text" id="inputNomePessoa" class="input" placeholder="Ex: João Silva">
-            </div>
+        <div class="campo">
+            <label for="inputNomePessoa">
+                <span class="material-icons" style="font-size:16px; vertical-align:middle;">person</span>
+                Nome Completo *
+            </label>
+            <input type="text" id="inputNomePessoa" class="input" placeholder="Ex: João Silva" required>
+        </div>
 
-            <div class="campo">
-                <label for="inputContatoPessoa">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">phone</span>
-                    Contato
-                </label>
-                <input type="text" id="inputContatoPessoa" class="input" placeholder="Ex: (11) 99999-9999">
-            </div>
+        <!-- 🔥 CAMPO CARGO (NOVO) -->
+        <div class="campo">
+            <label for="inputCargoPessoa">
+                <span class="material-icons" style="font-size:16px; vertical-align:middle;">work</span>
+                Cargo
+            </label>
+            <input type="text" id="inputCargoPessoa" class="input" placeholder="Ex: Analista, Supervisor, Gerente">
+        </div>
 
-            <div class="campo">
-                <label for="inputEscalaPessoa">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">assignment</span>
-                    Escala
-                </label>
-                <select id="inputEscalaPessoa" class="input">
-                    <option value="1">Escala 1</option>
-                    <option value="2">Escala 2</option>
-                    <option value="3">Escala 3</option>
-                    <option value="4">Escala 4</option>
-                </select>
-            </div>
+        <!-- 🔥 CAMPO EMPRESA (NOVO) -->
+        <div class="campo">
+            <label for="inputEmpresaPessoa">
+                <span class="material-icons" style="font-size:16px; vertical-align:middle;">business</span>
+                Empresa
+            </label>
+            <input type="text" id="inputEmpresaPessoa" class="input" placeholder="Ex: Empresa XYZ Ltda">
+        </div>
 
-            <div class="campo">
-                <label for="inputTurnoPessoa">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;">schedule</span>
-                    Turno
-                </label>
-                <select id="inputTurnoPessoa" class="input">
-                    <option value="M">☀️ Manhã</option>
-                    <option value="T">🌆 Tarde</option>
-                    <option value="N">🌙 Noite</option>
-                </select>
-            </div>
+        <div class="campo">
+            <label for="inputContatoPessoa">
+                <span class="material-icons" style="font-size:16px; vertical-align:middle;">phone</span>
+                Contato
+            </label>
+            <input type="text" id="inputContatoPessoa" class="input" placeholder="Ex: (11) 99999-9999">
+        </div>
 
-            <div class="modal-actions">
-                <button class="btn btn-primary" onclick="window.salvarPessoa()">
-                    <span class="material-icons">check</span>
-                    Salvar
-                </button>
-                <button class="btn btn-ghost" onclick="window.fecharModalPessoa()">
-                    <span class="material-icons">close</span>
-                    Cancelar
-                </button>
-            </div>
+        <div class="campo">
+            <label for="inputEscalaPessoa">
+                <span class="material-icons" style="font-size:16px; vertical-align:middle;">assignment</span>
+                Escala
+            </label>
+            <select id="inputEscalaPessoa" class="input">
+                <option value="1">📅 Escala 1</option>
+                <option value="2">📆 Escala 2</option>
+                <option value="3">🗓️ Escala 3</option>
+                <option value="4">📋 Escala 4</option>
+            </select>
+        </div>
+
+        <div class="campo">
+            <label for="inputTurnoPessoa">
+                <span class="material-icons" style="font-size:16px; vertical-align:middle;">schedule</span>
+                Turno
+            </label>
+            <select id="inputTurnoPessoa" class="input">
+                <option value="M">☀️ Manhã</option>
+                <option value="T">🌆 Tarde</option>
+                <option value="N">🌙 Noite</option>
+            </select>
+        </div>
+
+        <!-- 🔥 CAMPO TIPO (NOVO) -->
+        <div class="campo">
+            <label for="inputTipoPessoa">
+                <span class="material-icons" style="font-size:16px; vertical-align:middle;">badge</span>
+                Tipo
+            </label>
+            <select id="inputTipoPessoa" class="input">
+                <option value="OPERACIONAL">🔧 Operacional</option>
+                <option value="ADM">🏢 Administrativo</option>
+            </select>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="window.salvarPessoa()">
+                <span class="material-icons">check</span>
+                Salvar
+            </button>
+            <button class="btn btn-ghost" onclick="window.fecharModalPessoa()">
+                <span class="material-icons">close</span>
+                Cancelar
+            </button>
         </div>
     </div>
+</div>
 
     <!-- ============================================================
     SERVICE WORKER

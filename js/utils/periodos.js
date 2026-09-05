@@ -2,7 +2,7 @@
 // PERÍODOS - Manipulação e Cálculo de Períodos
 // =====================================================
 
-import { MESES } from '../config.js';
+import { obterMesAbreviado } from './helpers.js';
 
 let DIA_INICIO = 16;
 let DIA_FIM = 15;
@@ -111,20 +111,24 @@ export function getPeriodoPorIndex(index = 0) {
     return getPeriodoData(mes, ano);
 }
 
+// 🔥 FUNÇÃO CORRIGIDA - USANDO obterMesAbreviado DO HELPERS
 export function getNomePeriodo(periodo) {
     const mesInicio = periodo.inicio.getMonth();
     const mesFim = periodo.fim.getMonth();
     const ano = periodo.inicio.getFullYear();
     const anoFim = periodo.fim.getFullYear();
 
+    const mesInicioAbr = obterMesAbreviado(mesInicio);
+    const mesFimAbr = obterMesAbreviado(mesFim);
+
     if (ano !== anoFim) {
-        return `${MESES[mesInicio]} ${ano} / ${MESES[mesFim]} ${anoFim}`;
+        return `${mesInicioAbr} ${ano} / ${mesFimAbr} ${anoFim}`;
     }
 
     if (mesInicio === mesFim) {
-        return `${MESES[mesInicio]} ${ano}`;
+        return `${mesInicioAbr} ${ano}`;
     } else {
-        return `${MESES[mesInicio]}/${MESES[mesFim]} ${ano}`;
+        return `${mesInicioAbr}/${mesFimAbr} ${ano}`;
     }
 }
 

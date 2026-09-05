@@ -16,7 +16,7 @@ export function atualizarEquipePopup(equipe) {
 }
 
 export function abrirPopup(tipo) {
-    const overlay = document.getElementById('popupOverlay') || document.getElementById('popupGenerico');
+    const overlay = document.getElementById('popupOverlay');
     const titulo = document.getElementById('popupTitulo');
     const conteudo = document.getElementById('popupConteudo');
     const total = document.getElementById('popupTotal');
@@ -38,32 +38,42 @@ export function abrirPopup(tipo) {
     let tituloTexto = '';
     let turnoLabel = '';
     let corDestaque = '';
+    let icone = '';
 
     if (tipo === 'total') {
-        tituloTexto = `👥 Todos os Funcionários - Escala ${escalaAtual}`;
+        tituloTexto = `Todos os Funcionários - Escala ${escalaAtual}`;
         turnoLabel = 'Todos';
         corDestaque = '#3B82F6';
+        icone = 'people';
     } else if (tipo === 'M') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'M');
-        tituloTexto = `☀️ Manhã - Escala ${escalaAtual}`;
+        tituloTexto = `Manhã - Escala ${escalaAtual}`;
         turnoLabel = 'Manhã';
         corDestaque = '#F59E0B';
+        icone = 'wb_sunny';
     } else if (tipo === 'T') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'T');
-        tituloTexto = `🌆 Tarde - Escala ${escalaAtual}`;
+        tituloTexto = `Tarde - Escala ${escalaAtual}`;
         turnoLabel = 'Tarde';
         corDestaque = '#EA580C';
+        icone = 'cloud';
     } else if (tipo === 'N') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'N');
-        tituloTexto = `🌙 Noite - Escala ${escalaAtual}`;
+        tituloTexto = `Noite - Escala ${escalaAtual}`;
         turnoLabel = 'Noite';
         corDestaque = '#4F46E5';
+        icone = 'bedtime';
     } else {
         mostrarToast('❌ Tipo de filtro inválido!', 'erro');
         return;
     }
 
-    if (titulo) titulo.textContent = tituloTexto;
+    if (titulo) {
+        titulo.innerHTML = `
+            <span class="material-icons" style="font-size:20px; vertical-align:middle; color:${corDestaque};">${icone}</span>
+            ${tituloTexto}
+        `;
+    }
 
     pessoasFiltradas.sort((a, b) => a.nome.localeCompare(b.nome));
 
@@ -71,7 +81,7 @@ export function abrirPopup(tipo) {
         if (pessoasFiltradas.length === 0) {
             conteudo.innerHTML = `
                 <div style="text-align:center; padding: 40px 20px; color: var(--color-text-muted, #64748b);">
-                    <span class="material-icons" style="font-size:48px; opacity:0.3;">people</span>
+                    <span class="material-icons" style="font-size:48px; opacity:0.3;">${icone}</span>
                     <p style="margin-top:12px; font-size:0.95rem;">
                         ${tipo === 'total' ? 'Nenhum funcionário cadastrado nesta escala.' : `Nenhum funcionário no turno ${turnoLabel}.`}
                     </p>
@@ -79,12 +89,7 @@ export function abrirPopup(tipo) {
                 </div>
             `;
         } else {
-            const turnosLabels = {
-                'M': 'E' + escalaAtual + '-M',
-                'T': 'E' + escalaAtual + '-T',
-                'N': 'E' + escalaAtual + '-N'
-            };
-
+            // 🔥 MESMO PADRÃO DA LISTA ADM
             const coresTurnos = {
                 'M': { bg: '#FEF3C7', text: '#92400E', badge: '#F59E0B' },
                 'T': { bg: '#FFEDD5', text: '#7C2D12', badge: '#EA580C' },
@@ -93,10 +98,21 @@ export function abrirPopup(tipo) {
 
             let html = `
                 <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="
+                    padding: 8px 16px;
+                    background: ${corDestaque};
+                    border-radius: 8px;
+                    color: white;
+                    text-align: center;
+                    font-weight: 600;
+                    font-size: 0.85rem;
+                    margin-bottom: 4px;
+                ">
+                    ${tituloTexto} (${pessoasFiltradas.length})
+                </div>
             `;
             
             pessoasFiltradas.forEach(p => {
-                const badge = turnosLabels[p.turno] || p.turno;
                 const cores = coresTurnos[p.turno] || coresTurnos['M'];
                 
                 html += `
@@ -114,9 +130,21 @@ export function abrirPopup(tipo) {
                             <span style="font-weight:600; font-size:0.95rem; color: var(--color-text, #1e293b);">
                                 ${p.nome}
                             </span>
+                            ${p.cargo ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
+                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">work</span>
+                                ${p.cargo}
+                            </span>` : ''}
+                            ${p.empresa ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
+                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">business</span>
+                                ${p.empresa}
+                            </span>` : ''}
                             ${p.contato ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
                                 <span class="material-icons" style="font-size:14px; vertical-align:middle;">phone</span>
                                 ${p.contato}
+                            </span>` : ''}
+                            ${p.tipo === 'ADM' ? `<span style="font-size:0.65rem; color: #10B981; font-weight:600;">
+                                <span class="material-icons" style="font-size:12px; vertical-align:middle;">verified</span>
+                                ADM
                             </span>` : ''}
                         </div>
                         <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
@@ -127,7 +155,7 @@ export function abrirPopup(tipo) {
                                 border-radius:20px;
                                 background: ${cores.bg};
                                 color: ${cores.text};
-                            ">${badge}</span>
+                            ">E${p.escalaId}-${p.turno}</span>
                             <div style="display:flex; gap:4px;">
                                 <button onclick="window.editarFuncionario('${p.id}')" 
                                     style="
@@ -170,7 +198,7 @@ export function abrirPopup(tipo) {
                 <div style="
                     margin-top: 16px;
                     padding: 12px 16px;
-                    background: var(--color-primary, #3B82F6);
+                    background: ${corDestaque};
                     border-radius: 10px;
                     color: white;
                     text-align: center;
@@ -189,7 +217,7 @@ export function abrirPopup(tipo) {
 }
 
 export function fecharPopup() {
-    const overlay = document.getElementById('popupOverlay') || document.getElementById('popupGenerico');
+    const overlay = document.getElementById('popupOverlay');
     if (overlay) {
         overlay.classList.remove('ativo');
     }

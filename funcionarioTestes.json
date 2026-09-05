@@ -38,6 +38,26 @@
   ],
   "horasExtras": [],
   "pessoas": [
+     { 
+      "id": 1, 
+      "nome": "Adriano Monteiro", 
+      "cargo": "Coordenador", 
+      "empresa": "Tech Solutions", 
+      "contato": "(11) 91234-5678", 
+      "escalaId": 1, 
+      "turno": "M", 
+      "tipo": "ADM" 
+    },
+    { 
+      "id": 2, 
+      "nome": "Marina Santos", 
+      "cargo": "Analista", 
+      "empresa": "Tech Solutions", 
+      "contato": "(11) 92345-6789", 
+      "escalaId": 1, 
+      "turno": "T", 
+      "tipo": "ADM" 
+    },
     { "id": 1001, "nome": "João Silva", "contato": "(11) 91234-5678", "escalaId": 1, "turno": "M" },
     { "id": 1002, "nome": "Maria Oliveira", "contato": "(11) 92345-6789", "escalaId": 1, "turno": "M" },
     { "id": 1003, "nome": "Carlos Santos", "contato": "(11) 93456-7890", "escalaId": 1, "turno": "M" },
