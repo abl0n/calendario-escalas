@@ -400,7 +400,7 @@ function mudarPeriodo(delta) {
 }
 
 // =====================================================
-// POPUP FUNCIONÁRIOS ADM
+// POPUP FUNCIONÁRIOS ADM - MESMO LAYOUT
 // =====================================================
 
 function abrirPopupADM() {
@@ -422,7 +422,7 @@ function abrirPopupADM() {
             <svg class="icon" width="20" height="20" style="color:#10B981;">
                 <use href="assets/icons/sprite.svg#icon-contacts"></use>
             </svg>
-            Funcionários Administrativos
+            Administrativos
         `;
     }
 
@@ -442,12 +442,7 @@ function abrirPopupADM() {
                 </div>
             `;
         } else {
-            const coresTurnos = {
-                'M': { bg: '#FEF3C7', text: '#92400E', badge: '#F59E0B' },
-                'T': { bg: '#FFEDD5', text: '#7C2D12', badge: '#EA580C' },
-                'N': { bg: '#E0E7FF', text: '#1E1B4B', badge: '#4F46E5' }
-            };
-
+            // 🔥 MESMO LAYOUT DOS CARDS
             let html = `
                 <div style="display:flex; flex-direction:column; gap:8px;">
                 <div style="
@@ -472,93 +467,124 @@ function abrirPopupADM() {
             `;
             
             pessoasADM.forEach(p => {
+                // Cores do turno
+                const coresTurnos = {
+                    'M': { bg: '#FEF3C7', text: '#92400E', badge: '#F59E0B', nome: 'Manhã' },
+                    'T': { bg: '#FFEDD5', text: '#7C2D12', badge: '#EA580C', nome: 'Tarde' },
+                    'N': { bg: '#E0E7FF', text: '#1E1B4B', badge: '#4F46E5', nome: 'Noite' }
+                };
                 const cores = coresTurnos[p.turno] || coresTurnos['M'];
                 
+                // 🔥 CARD DO FUNCIONÁRIO ADM
                 html += `
                     <div style="
                         display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        padding: 12px 16px;
-                        background: var(--color-bg, #f8fafc);
+                        flex-direction: column;
+                        padding: 14px 16px;
+                        background: var(--color-surface, #ffffff);
                         border-radius: 10px;
+                        border: 1px solid var(--color-border, #e2e8f0);
                         border-left: 4px solid #10B981;
                         transition: all 0.2s ease;
+                        gap: 4px;
                     ">
-                        <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
-                            <span style="font-weight:600; font-size:0.95rem; color: var(--color-text, #1e293b);">
-                                ${p.nome}
-                            </span>
-                            ${p.cargo ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                        <!-- Nome -->
+                        <div style="font-weight:600; font-size:1rem; color: var(--color-text, #1e293b);">
+                            ${p.nome}
+                        </div>
+                        
+                        <!-- Cargo -->
+                        ${p.cargo ? `
+                            <div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color: var(--color-text-muted, #64748b);">
+                                <svg class="icon" width="16" height="16">
                                     <use href="assets/icons/sprite.svg#icon-work"></use>
                                 </svg>
                                 ${p.cargo}
-                            </span>` : ''}
-                            ${p.empresa ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Empresa -->
+                        ${p.empresa ? `
+                            <div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color: var(--color-text-muted, #64748b);">
+                                <svg class="icon" width="16" height="16">
                                     <use href="assets/icons/sprite.svg#icon-business"></use>
                                 </svg>
                                 ${p.empresa}
-                            </span>` : ''}
-                            ${p.contato ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Contato -->
+                        ${p.contato ? `
+                            <div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color: var(--color-text-muted, #64748b);">
+                                <svg class="icon" width="16" height="16">
                                     <use href="assets/icons/sprite.svg#icon-phone"></use>
                                 </svg>
                                 ${p.contato}
-                            </span>` : ''}
-                            <span style="font-size:0.65rem; color: #10B981; font-weight:600;">
-                                <svg class="icon" width="12" height="12" style="vertical-align:middle;">
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Badges: ADM + Turno -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-top:2px; flex-wrap:wrap;">
+                            <span style="font-size:0.6rem; background: #10B981; color: white; padding:2px 10px; border-radius:12px; font-weight:600; display:flex; align-items:center; gap:4px;">
+                                <svg class="icon" width="12" height="12" style="color:white;">
                                     <use href="assets/icons/sprite.svg#icon-verified"></use>
                                 </svg>
                                 ADM
                             </span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
                             <span style="
-                                font-size:0.65rem;
+                                font-size:0.6rem;
                                 font-weight:700;
-                                padding:2px 12px;
-                                border-radius:20px;
+                                padding:2px 10px;
+                                border-radius:12px;
                                 background: ${cores.bg};
                                 color: ${cores.text};
                             ">E${p.escalaId}-${p.turno}</span>
-                            <div style="display:flex; gap:4px;">
-                                <button onclick="window.editarFuncionario('${p.id}')" 
-                                    style="
-                                        background: none;
-                                        border: none;
-                                        cursor: pointer;
-                                        padding: 4px 8px;
-                                        border-radius: 6px;
-                                        color: var(--color-primary, #3B82F6);
-                                        transition: background 0.2s;
-                                    "
-                                    onmouseenter="this.style.background='var(--color-bg, #f1f5f9)'"
-                                    onmouseleave="this.style.background='transparent'"
-                                    title="Editar">
-                                    <svg class="icon" width="18" height="18">
-                                        <use href="assets/icons/sprite.svg#icon-edit"></use>
-                                    </svg>
-                                </button>
-                                <button onclick="window.removerPessoa('${p.id}')" 
-                                    style="
-                                        background: none;
-                                        border: none;
-                                        cursor: pointer;
-                                        padding: 4px 8px;
-                                        border-radius: 6px;
-                                        color: #EF4444;
-                                        transition: background 0.2s;
-                                    "
-                                    onmouseenter="this.style.background='#FEE2E2'"
-                                    onmouseleave="this.style.background='transparent'"
-                                    title="Excluir">
-                                    <svg class="icon" width="18" height="18">
-                                        <use href="assets/icons/sprite.svg#icon-delete"></use>
-                                    </svg>
-                                </button>
-                            </div>
+                        </div>
+                        
+                        <!-- Botões de ação (Editar e Excluir) -->
+                        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px; padding-top:8px; border-top:1px solid var(--color-border, #e2e8f0);">
+                            <button onclick="window.editarFuncionario('${p.id}')" 
+                                style="
+                                    background: none;
+                                    border: none;
+                                    cursor: pointer;
+                                    padding: 4px 10px;
+                                    border-radius: 6px;
+                                    color: var(--color-primary, #3B82F6);
+                                    transition: background 0.2s;
+                                    display:flex;
+                                    align-items:center;
+                                    gap:4px;
+                                    font-size:0.8rem;
+                                "
+                                onmouseenter="this.style.background='var(--color-bg, #f1f5f9)'"
+                                onmouseleave="this.style.background='transparent'"
+                                title="Editar">
+                                <svg class="icon" width="16" height="16">
+                                    <use href="assets/icons/sprite.svg#icon-edit"></use>
+                                </svg>
+                            </button>
+                            <button onclick="window.removerPessoa('${p.id}')" 
+                                style="
+                                    background: none;
+                                    border: none;
+                                    cursor: pointer;
+                                    padding: 4px 10px;
+                                    border-radius: 6px;
+                                    color: #EF4444;
+                                    transition: background 0.2s;
+                                    display:flex;
+                                    align-items:center;
+                                    gap:4px;
+                                    font-size:0.8rem;
+                                "
+                                onmouseenter="this.style.background='#FEE2E2'"
+                                onmouseleave="this.style.background='transparent'"
+                                title="Excluir">
+                                <svg class="icon" width="16" height="16">
+                                    <use href="assets/icons/sprite.svg#icon-delete"></use>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 `;
