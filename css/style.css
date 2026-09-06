@@ -1,15 +1,43 @@
-/* ==========================================================================
-   REGRAS ESPECÍFICAS DA APLICAÇÃO (LAYOUT & CALENDÁRIO)
-   ========================================================================== */
+/* ============================================================
+   VARIÁVEIS & RESET (opcional - ajuste conforme seu projeto)
+   ============================================================ */
+:root {
+    --color-primary: #3B82F6;
+    --color-primary-hover: #2563EB;
+    --color-success: #10B981;
+    --color-danger: #EF4444;
+    --color-warning: #F59E0B;
+    --color-surface: #ffffff;
+    --color-text: #1e293b;
+    --color-text-muted: #64748b;
+    --color-border: #e2e8f0;
+    --color-bg: #f8fafc;
+    --color-bg-alt: #f1f5f9;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --font-family: system-ui, -apple-system, sans-serif;
+    --space-1: 4px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+}
 
-/* Ajustes de Layout Específicos */
+/* ============================================================
+   1. LAYOUT GERAL
+   ============================================================ */
 .app-container {
     max-width: 900px;
     margin: 0 auto;
     padding: var(--space-4, 16px);
+    padding-bottom: 80px; /* espaço para o footer fixo */
 }
 
-/* Header & Titulo */
+/* ============================================================
+   2. HEADER
+   ============================================================ */
 .header {
     display: flex;
     align-items: center;
@@ -32,46 +60,109 @@
     padding: 4px;
 }
 
-/* Seletor de Equipe & Contadores */
+/* ============================================================
+   3. ESCALAS / BOTÕES DE EQUIPE
+   ============================================================ */
+.header-escalas {
+    background: var(--color-surface, #ffffff);
+    border-radius: var(--radius-lg, 12px);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--color-border, #e2e8f0);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+    min-height: 70px;
+}
+
 .botoes-equipe {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 12px;
+    justify-content: center;
+    width: 100%;
 }
 
-.contador-pessoas {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 12px;
-}
-
-.contador-item {
-    padding: 6px 12px;
-    border-radius: var(--radius-sm, 6px);
-    font-size: 0.75rem;
-    font-weight: 600;
+.botoes-equipe button {
+    padding: 10px 20px;
+    border: 2px solid var(--color-border, #e2e8f0);
+    border-radius: var(--radius-md, 8px);
+    background: var(--color-surface, #ffffff);
+    font-weight: 700;
+    font-size: 1rem;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    min-width: 60px;
+    flex: 1;
+    max-width: 100px;
+    text-align: center;
+    color: var(--color-text, #1e293b);
+    font-family: var(--font-family, system-ui, sans-serif);
+    min-height: 48px;
+    position: relative;
+    overflow: hidden;
+    will-change: transform;
 }
 
-.contador-item:hover {
-    opacity: 0.85;
+.botoes-equipe button:hover {
+    transform: scale(1.05);
 }
 
-.contador-item.total { background: var(--color-bg-alt, #f1f5f9); color: var(--color-text); }
-.contador-item.manha { background: #fef3c7; color: #b45309; }
-.contador-item.tarde { background: #ffedd5; color: #c2410c; }
-.contador-item.noite { background: #e0e7ff; color: #3730a3; }
+.botoes-equipe button.ativo {
+    color: white;
+    border-color: currentColor;
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0,0,0,0.15));
+    font-size: 1.05rem;
+}
 
-/* Navegação do Mês */
+/* Badge de seleção ativo */
+.botoes-equipe button.ativo::before {
+    content: '✓';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #10B981;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-surface, #ffffff);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Ripple effect */
+.botoes-equipe button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: width 0.6s ease, height 0.6s ease, top 0.6s ease, left 0.6s ease;
+}
+
+.botoes-equipe button:active::after {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    left: -100px;
+}
+
+/* ============================================================
+   4. NAVEGAÇÃO DO MÊS
+   ============================================================ */
 .navegacao-mes {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin: var(--space-4, 16px) 0;
     gap: 8px;
+    min-height: 52px;
 }
 
 .mes-titulo {
@@ -80,147 +171,18 @@
     color: var(--color-text);
 }
 
-/* Malha do Calendário */
-.calendario {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 10px;
-}
-
-.dia-card {
-    background: var(--color-card-bg, #ffffff);
-    border: 1px solid var(--color-border, #e2e8f0);
-    border-radius: var(--radius-md, 8px);
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 90px;
-    position: relative;
-}
-
-.dia-card.hoje {
-    border: 2px solid var(--color-primary);
-}
-
-.dia-card .numero-dia {
-    font-weight: 700;
-    font-size: 1rem;
-}
-
-.dia-card .dia-semana {
-    font-size: 0.7rem;
-    color: var(--color-text-muted);
-}
-
-/* Legenda do Calendário */
-.legenda {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: var(--space-6, 24px);
-    padding-top: 12px;
-    border-top: 1px solid var(--color-border);
-    font-size: 0.75rem;
-}
-
-.legenda-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.legenda-cor {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-}
-
-.legenda-folga { width: 12px; height: 12px; border-radius: 3px; background: #e2e8f0; }
-.legenda-feriado { width: 12px; height: 12px; border-radius: 3px; background: #fca5a5; }
-.legenda-feriado-trabalhado { width: 12px; height: 12px; border-radius: 3px; background: #f87171; }
-.legenda-comemorativo { width: 12px; height: 12px; border-radius: 3px; background: #fde047; }
-.legenda-extra { width: 12px; height: 12px; border-radius: 3px; background: #86efac; }
-
-/* Menu Lateral */
-.menu-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: none;
-    z-index: 100;
-}
-
-.menu-overlay.ativo { display: block; }
-
-.menu-lateral {
-    position: fixed;
-    top: 0; left: -280px;
-    width: 280px; height: 100%;
-    background: var(--color-card-bg, #ffffff);
-    z-index: 101;
-    transition: transform 0.3s ease;
-    overflow-y: auto;
-    padding: 16px;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-}
-
-.menu-lateral.ativo {
-    transform: translateX(280px);
-}
-
-.menu-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.menu-divider {
-    height: 1px;
-    background: var(--color-border);
-    margin: 12px 0;
-}
-
-.menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 10px;
-    background: none;
-    border: none;
-    border-radius: var(--radius-sm, 6px);
-    color: var(--color-text);
-    cursor: pointer;
-    text-align: left;
-}
-
-.menu-item:hover {
-    background: var(--color-bg-alt, #f1f5f9);
-}
-
-/* Footer */
-.footer {
-    text-align: center;
-    margin-top: 32px;
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-}
-
-/* =====================================================
-   CORREÇÃO DO CALENDÁRIO - LARGURA 100%
-   ===================================================== */
-
-/* ===== FORÇA O CONTAINER A OCUPAR 100% ===== */
+/* ============================================================
+   5. CALENDÁRIO (TABELA)
+   ============================================================ */
 #calendarioContainer {
     width: 100% !important;
     max-width: 100% !important;
+    min-height: 420px !important;
     overflow-x: auto;
-    display: block;
+    display: block !important;
+    position: relative !important;
 }
 
-/* ===== TABELA DO CALENDÁRIO ===== */
 #calendarioContainer table {
     width: 100% !important;
     min-width: 100% !important;
@@ -231,9 +193,9 @@
     margin: 0 !important;
 }
 
-/* ===== CABEÇALHO ===== */
+/* Cabeçalho */
 #calendarioContainer th {
-    width: 14.28% !important; /* 100% / 7 dias */
+    width: 14.28% !important;
     padding: 8px 4px !important;
     text-align: center !important;
     font-size: 0.75rem !important;
@@ -242,9 +204,11 @@
     border-radius: 6px 6px 0 0 !important;
 }
 
-/* ===== CÉLULAS ===== */
+/* Células */
 #calendarioContainer td {
-    height: 65px !important;
+    height: 72px !important;
+    min-height: 72px !important;
+    max-height: 72px !important;
     padding: 4px 6px !important;
     text-align: center !important;
     vertical-align: top !important;
@@ -255,6 +219,8 @@
     cursor: pointer !important;
     position: relative !important;
     overflow: hidden !important;
+    box-sizing: border-box !important;
+    will-change: background-color;
 }
 
 #calendarioContainer td:hover {
@@ -263,14 +229,14 @@
     transform: translateY(-1px) !important;
 }
 
-/* ===== DIA ATUAL ===== */
+/* Dia atual */
 #calendarioContainer .dia-hoje {
     border: 2px solid var(--color-primary, #3B82F6) !important;
     background: rgba(59, 130, 246, 0.05) !important;
     box-shadow: inset 0 0 0 1px var(--color-primary, #3B82F6) !important;
 }
 
-/* ===== DIA NÚMERO ===== */
+/* Número do dia */
 #calendarioContainer .dia-numero {
     display: block !important;
     font-size: 1.1rem !important;
@@ -280,121 +246,12 @@
     margin-top: 2px !important;
 }
 
-/* ===== DIA HOJE NÚMERO ===== */
 #calendarioContainer .dia-hoje .dia-numero {
     color: var(--color-primary, #3B82F6) !important;
     font-size: 1.2rem !important;
 }
 
-/* ===== STATUS T/F ===== */
-/* =====================================================
-   STATUS DO DIA - CALENDÁRIO
-   ===================================================== */
-
-/* 🔥 STATUS - TRABALHO (AZUL FORTE) */
-.status-trabalho {
-    background: #1D4ED8 !important;  /* Azul escuro forte */
-    color: #FFFFFF !important;
-    font-weight: 800 !important;
-    font-size: 0.75rem !important;
-    padding: 3px 10px !important;
-    border-radius: 6px !important;
-    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.4) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-    letter-spacing: 0.5px !important;
-    border: 1px solid #1E40AF !important;
-}
-
-/* 🔥 STATUS - FOLGA (VERDE FORTE) */
-.status-folga {
-    background: #059669 !important;  /* Verde escuro forte */
-    color: #FFFFFF !important;
-    font-weight: 800 !important;
-    font-size: 0.75rem !important;
-    padding: 3px 10px !important;
-    border-radius: 6px !important;
-    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-    letter-spacing: 0.5px !important;
-    border: 1px solid #047857 !important;
-}
-
-/* =====================================================
-   MODO ESCURO
-   ===================================================== */
-
-body.modo-escuro .status-trabalho {
-    background: #3B82F6 !important;  /* Azul mais claro no escuro */
-    color: #FFFFFF !important;
-    border-color: #2563EB !important;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5) !important;
-}
-
-body.modo-escuro .status-folga {
-    background: #10B981 !important;  /* Verde mais claro no escuro */
-    color: #FFFFFF !important;
-    border-color: #059669 !important;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.5) !important;
-}
-
-/* =====================================================
-   LEGENDA - CORES ATUALIZADAS
-   ===================================================== */
-
-.legenda-cor {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-/* Trabalho - Azul */
-.legenda-trabalho {
-    background: #1D4ED8 !important;
-    border: 1px solid #1E40AF !important;
-}
-
-/* Folga - Verde */
-.legenda-folga {
-    background: #059669 !important;
-    border: 1px solid #047857 !important;
-}
-
-body.modo-escuro .legenda-trabalho {
-    background: #3B82F6 !important;
-    border-color: #2563EB !important;
-}
-
-body.modo-escuro .legenda-folga {
-    background: #10B981 !important;
-    border-color: #059669 !important;
-}
-
-/* =====================================================
-   RESPONSIVO
-   ===================================================== */
-
-@media (max-width: 768px) {
-    .status-trabalho,
-    .status-folga {
-        font-size: 0.6rem !important;
-        padding: 2px 6px !important;
-        border-radius: 4px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .status-trabalho,
-    .status-folga {
-        font-size: 0.5rem !important;
-        padding: 1px 4px !important;
-        border-radius: 3px !important;
-        min-width: 18px !important;
-        text-align: center !important;
-    }
-}
-
-/* ===== FORA DO PERÍODO ===== */
+/* Fora do período */
 #calendarioContainer .dia-outro-periodo {
     opacity: 0.3 !important;
 }
@@ -403,11 +260,10 @@ body.modo-escuro .legenda-folga {
     color: var(--color-text-light, #94a3b8) !important;
 }
 
-/* ===== FERIADOS ===== */
+/* Feriados */
 #calendarioContainer .dia-feriado {
     background: rgba(239, 68, 68, 0.08) !important;
 }
-
 #calendarioContainer .dia-feriado .dia-numero {
     color: #dc2626 !important;
 }
@@ -416,7 +272,6 @@ body.modo-escuro .legenda-folga {
     background: rgba(239, 68, 68, 0.18) !important;
     border: 2px solid #ef4444 !important;
 }
-
 #calendarioContainer .dia-feriado-trabalhado .dia-numero {
     color: #dc2626 !important;
 }
@@ -424,22 +279,20 @@ body.modo-escuro .legenda-folga {
 #calendarioContainer .dia-comemorativo {
     background: rgba(139, 92, 246, 0.06) !important;
 }
-
 #calendarioContainer .dia-comemorativo .dia-numero {
     color: #7c3aed !important;
 }
 
-/* ===== HORA EXTRA ===== */
+/* Hora extra */
 #calendarioContainer .dia-com-extra {
     border: 2px solid var(--color-warning, #F59E0B) !important;
     background: rgba(245, 158, 11, 0.05) !important;
 }
-
 #calendarioContainer .dia-com-extra .dia-numero {
     color: #d97706 !important;
 }
 
-/* ===== EVENTOS ===== */
+/* Eventos */
 #calendarioContainer .evento-icone {
     display: block !important;
     font-size: 0.7rem !important;
@@ -459,224 +312,124 @@ body.modo-escuro .legenda-folga {
     line-height: 1.4 !important;
 }
 
-/* =====================================================
-   RESPONSIVO - TABLET
-   ===================================================== */
-
-@media (max-width: 768px) {
-    #calendarioContainer td {
-        height: 55px !important;
-        padding: 3px 4px !important;
-    }
-    
-    #calendarioContainer .dia-numero {
-        font-size: 0.9rem !important;
-    }
-    
-    #calendarioContainer .status-dia {
-        font-size: 0.55rem !important;
-        padding: 0 6px !important;
-    }
-    
-    #calendarioContainer .evento-icone {
-        font-size: 0.6rem !important;
-    }
-    
-    #calendarioContainer .evento-extra {
-        font-size: 0.45rem !important;
-    }
-    
-    #calendarioContainer th {
-        font-size: 0.6rem !important;
-        padding: 4px 2px !important;
-    }
+/* ============================================================
+   6. STATUS (TRABALHO / FOLGA)
+   ============================================================ */
+.status-trabalho {
+    background: #1D4ED8 !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    font-size: 0.75rem !important;
+    padding: 3px 10px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.4) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    letter-spacing: 0.5px !important;
+    border: 1px solid #1E40AF !important;
 }
 
-/* =====================================================
-   RESPONSIVO - MOBILE
-   ===================================================== */
-
-@media (max-width: 480px) {
-    #calendarioContainer td {
-        height: 45px !important;
-        padding: 2px 3px !important;
-        border-radius: 4px !important;
-        border-spacing: 2px !important;
-    }
-    
-    #calendarioContainer table {
-        border-spacing: 2px !important;
-    }
-    
-    #calendarioContainer .dia-numero {
-        font-size: 0.75rem !important;
-        margin-top: 0 !important;
-    }
-    
-    #calendarioContainer .status-dia {
-        font-size: 0.45rem !important;
-        padding: 0 4px !important;
-        margin-top: 0 !important;
-    }
-    
-    #calendarioContainer .evento-icone {
-        font-size: 0.5rem !important;
-        margin-top: 0 !important;
-    }
-    
-    #calendarioContainer .evento-extra {
-        font-size: 0.4rem !important;
-        padding: 0 2px !important;
-        margin-top: 0 !important;
-    }
-    
-    #calendarioContainer th {
-        font-size: 0.5rem !important;
-        padding: 3px 1px !important;
-    }
+.status-folga {
+    background: #059669 !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    font-size: 0.75rem !important;
+    padding: 3px 10px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    letter-spacing: 0.5px !important;
+    border: 1px solid #047857 !important;
 }
 
-/* =====================================================
-   DETALHES DO DIA - POPUP
-   ===================================================== */
-
-.detalhe-item {
+/* ============================================================
+   7. LEGENDA
+   ============================================================ */
+.legenda {
     display: flex;
-    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 12px;
-    padding: 12px 16px;
-    background: var(--color-bg, #f1f5f9);
-    border-radius: 8px;
-    border-left: 4px solid var(--color-primary, #3B82F6);
+    margin-top: var(--space-6, 24px);
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.75rem;
 }
 
-.detalhe-icone {
-    font-size: 1.2rem;
+.legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legenda-cor {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
     flex-shrink: 0;
-    margin-top: 2px;
 }
 
-.detalhe-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: var(--color-text-muted, #64748b);
-    font-weight: 600;
-    letter-spacing: 0.5px;
+.legenda-trabalho {
+    background: #1D4ED8 !important;
+    border: 1px solid #1E40AF !important;
 }
 
-.detalhe-valor {
-    font-size: 0.95rem;
-    color: var(--color-text, #1e293b);
+.legenda-folga {
+    background: #059669 !important;
+    border: 1px solid #047857 !important;
 }
 
-/* Célula do calendário com cursor pointer */
-.calendario td {
-    cursor: pointer !important;
+.legenda-feriado {
+    background: #fca5a5 !important;
+}
+.legenda-feriado-trabalhado {
+    background: #f87171 !important;
+}
+.legenda-comemorativo {
+    background: #fde047 !important;
+}
+.legenda-extra {
+    background: #86efac !important;
 }
 
-.calendario td:hover {
-    transform: scale(1.02);
-    z-index: 2;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-/* =====================================================
-   HEADER - APENAS ESCALAS COM CORES
-   ===================================================== */
-
-.header-escalas {
-    background: var(--color-surface, #ffffff);
-    border-radius: var(--radius-lg, 12px);
-    padding: 12px 16px;
-    margin-bottom: 12px;
-    border: 1px solid var(--color-border, #e2e8f0);
-    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
-}
-
-[data-theme="dark"] .header-escalas {
-    background: var(--color-surface, #1e293b);
-    border-color: var(--color-border, #334155);
-}
-
-.escalas-container {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-/* ===== BOTÕES DAS ESCALAS ===== */
-.botoes-equipe {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 100%;
-}
-
-.botoes-equipe button {
-    padding: 10px 20px;
-    border: 2px solid var(--color-border, #e2e8f0);
-    border-radius: var(--radius-md, 8px);
-    background: var(--color-surface, #ffffff);
-    font-weight: var(--font-bold, 700);
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 60px;
-    flex: 1;
-    max-width: 100px;
-    text-align: center;
-    color: var(--color-text, #1e293b);
-    font-family: var(--font-family, system-ui, sans-serif);
-}
-
-.botoes-equipe button:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0,0,0,0.1));
-}
-
-.botoes-equipe button.ativo {
-    color: white;
-    border-color: currentColor;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0,0,0,0.15));
-    font-size: 1.05rem;
-}
-
-/* =====================================================
-   CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
-   ===================================================== */
-
+/* ============================================================
+   8. CONTADORES
+   ============================================================ */
 .contadores-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-top: 16px;
-    margin-bottom: 16px;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+    min-height: 80px !important;
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
     padding: 0 2px;
 }
 
 .contador-item {
     display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 2px !important;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 2px solid transparent;
-    min-height: 56px !important;
-    height: auto !important;
-    box-sizing: border-box;
-    will-change: transform;
-    overflow: hidden;
-    width: 100%;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 64px !important;
+    height: 64px !important;
+    padding: 8px 4px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    border: 2px solid transparent !important;
+    box-sizing: border-box !important;
+    will-change: transform !important;
     gap: 1px;
 }
 
-/* ===== ÍCONES ===== */
+.contador-item:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.contador-item:active {
+    transform: scale(0.95) !important;
+}
+
+/* Ícones dos contadores */
 .contador-item .icon {
     width: 20px !important;
     height: 20px !important;
@@ -684,9 +437,8 @@ body.modo-escuro .legenda-folga {
     display: block;
 }
 
-/* ===== NÚMERO ===== */
 .contador-item .contador-numero {
-    font-size: 1.2rem !important;
+    font-size: 1.5rem !important;
     font-weight: 700 !important;
     line-height: 1.1 !important;
     margin: 0;
@@ -694,7 +446,6 @@ body.modo-escuro .legenda-folga {
     display: block;
 }
 
-/* ===== LABEL ===== */
 .contador-item .contador-label {
     font-size: 0.5rem !important;
     font-weight: 600 !important;
@@ -707,337 +458,31 @@ body.modo-escuro .legenda-folga {
     display: block;
 }
 
-/* =====================================================
-   RESPONSIVO - TABLET (768px)
-   ===================================================== */
-
-@media (max-width: 768px) {
-    .contadores-container {
-        gap: 6px;
-        padding: 0 2px;
-    }
-    
-    .contador-item {
-        min-height: 48px !important;
-        padding: 4px 2px !important;
-        border-radius: 6px;
-    }
-    
-    .contador-item .icon {
-        width: 16px !important;
-        height: 16px !important;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 1rem !important;
-    }
-    
-    .contador-item .contador-label {
-        font-size: 0.45rem !important;
-        letter-spacing: 0.1px;
-    }
-}
-
-/* =====================================================
-   RESPONSIVO - MOBILE PEQUENO (480px)
-   ===================================================== */
-
-@media (max-width: 480px) {
-    .contadores-container {
-        gap: 4px;
-        padding: 0 2px;
-        margin-top: 12px;
-        margin-bottom: 12px;
-    }
-    
-    .contador-item {
-        min-height: 40px !important;
-        padding: 3px 1px !important;
-        border-radius: 4px;
-        border-width: 1.5px;
-    }
-    
-    .contador-item .icon {
-        width: 14px !important;
-        height: 14px !important;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 0.85rem !important;
-        font-weight: 700 !important;
-    }
-    
-    .contador-item .contador-label {
-        font-size: 0.4rem !important;
-        letter-spacing: 0px;
-        font-weight: 600;
-    }
-}
-
-/* =====================================================
-   RESPONSIVO - MOBILE MUITO PEQUENO (380px)
-   ===================================================== */
-
-@media (max-width: 380px) {
-    .contadores-container {
-        gap: 3px;
-        padding: 0 1px;
-    }
-    
-    .contador-item {
-        min-height: 36px !important;
-        padding: 2px 1px !important;
-        border-radius: 4px;
-    }
-    
-    .contador-item .icon {
-        width: 12px !important;
-        height: 12px !important;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 0.75rem !important;
-    }
-    
-    .contador-item .contador-label {
-        font-size: 0.35rem !important;
-    }
-}
-
-/* =====================================================
-   CORES DOS CONTADORES
-   ===================================================== */
-
+/* Cores dos contadores */
 .contador-item.total {
     background: #e2e8f0;
     border-color: #94a3b8;
     color: #1e293b;
 }
-
 .contador-item.manha {
     background: #fef3c7;
     border-color: #f59e0b;
     color: #92400e;
 }
-
 .contador-item.tarde {
     background: #ffedd5;
     border-color: #ea580c;
     color: #7c2d12;
 }
-
 .contador-item.noite {
     background: #e0e7ff;
     border-color: #4f46e5;
     color: #1e1b4b;
 }
 
-/* =====================================================
-   MODO ESCURO
-   ===================================================== */
-
-[data-theme="dark"] .contador-item.total {
-    background: #334155;
-    border-color: #475569;
-    color: #f1f5f9;
-}
-
-[data-theme="dark"] .contador-item.manha {
-    background: #451a03;
-    border-color: #f59e0b;
-    color: #fcd34d;
-}
-
-[data-theme="dark"] .contador-item.tarde {
-    background: #431407;
-    border-color: #ea580c;
-    color: #fdba74;
-}
-
-[data-theme="dark"] .contador-item.noite {
-    background: #1e1b4b;
-    border-color: #6366f1;
-    color: #a5b4fc;
-}
-
-/* =====================================================
-   HOVER E TOQUE
-   ===================================================== */
-
-.contador-item:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.contador-item:active {
-    transform: scale(0.95);
-}
-
-/* =====================================================
-   RODAPÉ - MENU DE AÇÕES (MOBILE)
-   ===================================================== */
-
-.footer-actions {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--color-surface, #ffffff);
-    border-top: 2px solid var(--color-border, #e2e8f0);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: block !important;
-}
-
-[data-theme="dark"] .footer-actions {
-    background: var(--color-surface, #1e293b);
-    border-top-color: var(--color-border, #334155);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.footer-actions-inner {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 0 8px;
-}
-
-.footer-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    background: none;
-    border: none;
-    padding: 4px 16px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    min-height: 48px;
-    min-width: 56px;
-    position: relative;
-    color: var(--color-text-muted, #64748b);
-    -webkit-tap-highlight-color: transparent;
-}
-
-.footer-btn .material-icons {
-    font-size: 26px;
-    transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.footer-btn:active {
-    transform: scale(0.92);
-}
-
-.footer-btn-label {
-    font-size: 0.55rem;
-    font-weight: 600;
-    color: var(--color-text-muted, #64748b);
-    letter-spacing: 0.3px;
-    transition: color 0.3s ease;
-}
-
-/* Botão principal (destaque) */
-.footer-btn-primary .material-icons {
-    color: var(--color-primary, #3B82F6);
-}
-
-.footer-btn-primary .footer-btn-label {
-    color: var(--color-primary, #3B82F6);
-}
-
-.footer-btn-primary .material-icons {
-    font-size: 30px;
-}
-
-/* Hover e toque */
-.footer-btn:hover {
-    background: var(--color-bg, #f1f5f9);
-}
-
-.footer-btn:hover .material-icons {
-    transform: translateY(-2px);
-}
-
-.footer-btn-primary:hover .material-icons {
-    color: var(--color-primary-hover, #2563eb);
-}
-
-/* =====================================================
-   RESPONSIVO - RODAPÉ
-   ===================================================== */
-
-/* Mobile - rodapé visível */
-@media (max-width: 767px) {
-    .footer-actions {
-        display: block !important;
-    }
-    
-    .app-container {
-        padding-bottom: 80px;
-    }
-}
-
-/* Tablet e Desktop - esconder rodapé */
-@media (min-width: 768px) {
-    .footer-actions {
-        display: none !important;
-    }
-    
-    .app-container {
-        padding-bottom: 20px;
-    }
-}
-
-/* Ajuste para iPhone com notch */
-@supports (padding: max(0px)) {
-    .footer-actions {
-        padding-bottom: max(8px, env(safe-area-inset-bottom));
-    }
-}
-
-/* Telas muito pequenas */
-@media (max-width: 380px) {
-    .footer-btn {
-        padding: 4px 10px;
-        min-width: 44px;
-    }
-    
-    .footer-btn .material-icons {
-        font-size: 22px;
-    }
-    
-    .footer-btn-label {
-        font-size: 0.5rem;
-    }
-}
-
-/* Animaçao de entrada */
-.footer-actions {
-    animation: footerSlideUp 0.3s ease-out;
-}
-
-@keyframes footerSlideUp {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* =====================================================
-   POPUP DE FUNCIONÁRIOS - LAYOUT MODERNO
-   ===================================================== */
-
+/* ============================================================
+   9. POPUP DE FUNCIONÁRIOS
+   ============================================================ */
 .popup-conteudo {
     padding: 4px 0;
 }
@@ -1078,11 +523,6 @@ body.modo-escuro .legenda-folga {
     color: var(--color-text-muted, #64748b);
 }
 
-.popup-item-modern .popup-contato .material-icons {
-    font-size: 14px;
-    vertical-align: middle;
-}
-
 .popup-badge-modern {
     font-size: 0.65rem;
     font-weight: 700;
@@ -1090,17 +530,14 @@ body.modo-escuro .legenda-folga {
     border-radius: 20px;
     flex-shrink: 0;
 }
-
 .popup-badge-modern.turno-M {
     background: #FEF3C7;
     color: #92400E;
 }
-
 .popup-badge-modern.turno-T {
     background: #FFEDD5;
     color: #7C2D12;
 }
-
 .popup-badge-modern.turno-N {
     background: #E0E7FF;
     color: #1E1B4B;
@@ -1111,7 +548,6 @@ body.modo-escuro .legenda-folga {
     gap: 4px;
     flex-shrink: 0;
 }
-
 .popup-actions-modern button {
     background: none;
     border: none;
@@ -1121,19 +557,15 @@ body.modo-escuro .legenda-folga {
     transition: all 0.2s ease;
     color: var(--color-text-muted, #64748b);
 }
-
 .popup-actions-modern .btn-edit {
     color: var(--color-primary, #3B82F6);
 }
-
 .popup-actions-modern .btn-edit:hover {
     background: #DBEAFE;
 }
-
 .popup-actions-modern .btn-delete {
     color: #EF4444;
 }
-
 .popup-actions-modern .btn-delete:hover {
     background: #FEE2E2;
 }
@@ -1149,65 +581,307 @@ body.modo-escuro .legenda-folga {
     font-size: 0.9rem;
 }
 
-/* =====================================================
-   BOTÕES DAS ESCALAS - CORES FORTES
-   ===================================================== */
+/* ============================================================
+   10. POPUP DE ESTATÍSTICAS - LISTA VERTICAL
+   ============================================================ */
+#popupEstatisticasConteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px 0;
+}
 
-.botoes-equipe button {
+.estatistica-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--color-surface, #ffffff);
+    border-radius: 12px;
+    border-left: 4px solid #64748b;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease;
+    min-height: 64px;
+}
+
+.estatistica-card:active {
+    transform: scale(0.98);
+}
+
+.estatistica-card .estatistica-icon {
+    font-size: 22px;
+    width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.estatistica-card .estatistica-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.estatistica-card .estatistica-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.estatistica-card .estatistica-valor {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Cores das bordas por tipo */
+.estatistica-card.periodo { border-left-color: #64748b; }
+.estatistica-card.total-dias { border-left-color: #64748b; }
+.estatistica-card.trabalhados { border-left-color: #3B82F6; }
+.estatistica-card.folga { border-left-color: #10B981; }
+.estatistica-card.feriados { border-left-color: #EF4444; }
+.estatistica-card.feriados-trab { border-left-color: #DC2626; }
+.estatistica-card.horas { border-left-color: #059669; }
+.estatistica-card.percentual { border-left-color: #8B5CF6; }
+.estatistica-card.extra { border-left-color: #F59E0B; }
+.estatistica-card.funcionarios { border-left-color: #64748b; }
+.estatistica-card.manha { border-left-color: #F59E0B; }
+.estatistica-card.tarde { border-left-color: #EA580C; }
+.estatistica-card.noite { border-left-color: #4F46E5; }
+
+/* ============================================================
+   11. HEADER DO POPUP / MODAL
+   ============================================================ */
+.popup-header,
+.modal-content .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4, 16px);
+    padding-bottom: var(--space-3, 12px);
+    border-bottom: 2px solid var(--color-border, #f1f5f9);
     position: relative;
-    overflow: hidden;
 }
 
-.botoes-equipe button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    transition: width 0.6s ease, height 0.6s ease, top 0.6s ease, left 0.6s ease;
+.popup-header h3,
+.modal-content .popup-header h3 {
+    font-size: 1.1rem;
+    color: var(--color-text, #1e293b);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
 }
 
-.botoes-equipe button:active::after {
-    width: 300px;
-    height: 300px;
-    top: -100px;
-    left: -100px;
+.popup-header .popup-total {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #64748b);
+    margin-right: 12px;
 }
 
-/* Efeito de seleção */
-.botoes-equipe button.ativo {
-    position: relative;
-}
-
-.botoes-equipe button.ativo::before {
-    content: '✓';
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #10B981;
-    color: white;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    font-size: 12px;
+/* Botão fechar - UNIFICADO */
+.popup-header .menu-fechar,
+.modal-content .popup-header .menu-fechar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted, #94a3b8);
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--color-surface, #ffffff);
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
-/* ===== CAMPOS DO FORMULÁRIO ===== */
+.popup-header .menu-fechar:hover,
+.modal-content .popup-header .menu-fechar:hover {
+    background: var(--color-bg, #f1f5f9);
+    color: var(--color-text, #1e293b);
+}
+
+/* ============================================================
+   12. MENU LATERAL
+   ============================================================ */
+.menu-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    z-index: 100;
+}
+.menu-overlay.ativo { display: block; }
+
+.menu-lateral {
+    position: fixed;
+    top: 0; left: -280px;
+    width: 280px; height: 100%;
+    background: var(--color-card-bg, #ffffff);
+    z-index: 101;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    padding: 16px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    will-change: transform;
+}
+.menu-lateral.ativo {
+    transform: translateX(280px);
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.menu-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 12px 0;
+}
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    color: var(--color-text);
+    cursor: pointer;
+    text-align: left;
+}
+.menu-item:hover {
+    background: var(--color-bg-alt, #f1f5f9);
+}
+
+/* ============================================================
+   13. FOOTER FIXO (RODAPÉ DE AÇÕES)
+   ============================================================ */
+.footer-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--color-surface, #ffffff);
+    border-top: 2px solid var(--color-border, #e2e8f0);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: block !important;
+    animation: footerSlideUp 0.3s ease-out;
+}
+
+@keyframes footerSlideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.footer-actions-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 8px;
+}
+
+.footer-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    padding: 4px 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    min-height: 48px;
+    min-width: 56px;
+    color: var(--color-text-muted, #64748b);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.footer-btn .material-icons {
+    font-size: 26px;
+    transition: transform 0.3s ease, color 0.3s ease;
+    will-change: transform;
+}
+.footer-btn:active { transform: scale(0.92); }
+.footer-btn:hover { background: var(--color-bg, #f1f5f9); }
+.footer-btn:hover .material-icons { transform: translateY(-2px) scale(1.1); }
+
+.footer-btn-label {
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #64748b);
+    letter-spacing: 0.3px;
+}
+
+/* Botão principal */
+.footer-btn-primary .material-icons {
+    color: var(--color-primary, #3B82F6);
+    font-size: 30px;
+}
+.footer-btn-primary .footer-btn-label {
+    color: var(--color-primary, #3B82F6);
+}
+.footer-btn-primary:hover .material-icons {
+    color: var(--color-primary-hover, #2563eb);
+}
+
+/* ============================================================
+   14. DETALHES DO DIA
+   ============================================================ */
+.detalhe-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--color-bg, #f1f5f9);
+    border-radius: 8px;
+    border-left: 4px solid var(--color-primary, #3B82F6);
+}
+
+.detalhe-icone {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.detalhe-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #64748b);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.detalhe-valor {
+    font-size: 0.95rem;
+    color: var(--color-text, #1e293b);
+}
+
+/* ============================================================
+   15. FORMULÁRIO
+   ============================================================ */
 .campo input,
 .campo select {
     width: 100%;
     padding: 10px 12px;
     border: 2px solid var(--color-border, #e2e8f0);
     border-radius: var(--radius-md, 8px);
-    font-size: var(--text-base, 1rem);
+    font-size: 1rem;
     background: var(--color-surface, #ffffff);
     color: var(--color-text, #1e293b);
     transition: all 0.2s ease;
@@ -1228,606 +902,15 @@ body.modo-escuro .legenda-folga {
 
 .campo label {
     display: block;
-    font-weight: var(--font-semibold, 600);
-    font-size: var(--text-sm, 0.875rem);
+    font-weight: 600;
+    font-size: 0.875rem;
     color: var(--color-text, #1e293b);
     margin-bottom: var(--space-1, 4px);
 }
 
-.campo label .material-icons {
-    font-size: 16px;
-    vertical-align: middle;
-    color: var(--color-text-muted, #64748b);
-}
-
-/* =====================================================
-   RODAPÉ - MENU DE AÇÕES
-   ===================================================== */
-
-.footer-actions {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--color-surface, #ffffff);
-    border-top: 2px solid var(--color-border, #e2e8f0);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: block !important;
-}
-
-[data-theme="dark"] .footer-actions {
-    background: var(--color-surface, #1e293b);
-    border-top-color: var(--color-border, #334155);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.footer-actions-inner {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 0 8px;
-}
-
-/* 🔥 REMOVER O DISPLAY: NONE PARA DESKTOP */
-/* ANTES:
-@media (min-width: 768px) {
-    .footer-actions {
-        display: none !important;
-    }
-}
-*/
-
-/* 🔥 NOVO: MANTER RODAPÉ EM TODAS AS TELAS */
-.footer-actions {
-    display: block !important;
-}
-
-/* Ajuste para telas muito grandes (opcional) */
-@media (min-width: 1200px) {
-    .footer-actions {
-        max-width: 480px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-radius: 16px 16px 0 0;
-    }
-}
-
-.app-container {
-    padding-bottom: 80px;
-}
-
-/* Ajuste para iPhone com notch */
-@supports (padding: max(0px)) {
-    .footer-actions {
-        padding-bottom: max(8px, env(safe-area-inset-bottom));
-    }
-}
-
-/* =====================================================
-   POPUP - CABEÇALHO E BOTÃO FECHAR
-   ===================================================== */
-
-.popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--color-border, #f1f5f9);
-    position: relative;
-}
-
-.popup-header h3 {
-    font-size: 1.1rem;
-    color: var(--color-text, #1e293b);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-}
-
-.popup-header .popup-total {
-    font-size: 0.8rem;
-    color: var(--color-text-muted, #64748b);
-    margin-right: 12px;
-}
-
-/* 🔥 BOTÃO FECHAR - POSIÇÃO CORRETA */
-.popup-header .menu-fechar {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--color-text-muted, #94a3b8);
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    margin-left: auto;
-}
-
-.popup-header .menu-fechar:hover {
-    background: var(--color-bg, #f1f5f9);
-    color: var(--color-text, #1e293b);
-}
-
-.popup-header .menu-fechar .material-icons {
-    font-size: 22px;
-}
-
-/* =====================================================
-   MODAL - CABEÇALHO E BOTÃO FECHAR
-   ===================================================== */
-
-.modal-content .popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-4, 16px);
-    padding-bottom: var(--space-3, 12px);
-    border-bottom: 1px solid var(--color-border, #e2e8f0);
-    position: relative;
-}
-
-.modal-content .popup-header h3 {
-    font-size: var(--text-lg, 1.125rem);
-    font-weight: var(--font-bold, 700);
-    color: var(--color-text, #1e293b);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-}
-
-.modal-content .popup-header .menu-fechar {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--color-text-muted, #94a3b8);
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    margin-left: auto;
-}
-
-.modal-content .popup-header .menu-fechar:hover {
-    background: var(--color-bg, #f1f5f9);
-    color: var(--color-text, #1e293b);
-}
-
-.modal-content .popup-header .menu-fechar .material-icons {
-    font-size: 22px;
-}
-
-/* =====================================================
-   CORREÇÕES DE CLS (Cumulative Layout Shift)
-   ===================================================== */
-
-/* 🔥 Evitar CLS no calendário */
-#calendarioContainer {
-    min-height: 400px;
-    width: 100%;
-    position: relative;
-}
-
-.calendario table {
-    width: 100%;
-    table-layout: fixed; /* ← ESSENCIAL para evitar CLS */
-    border-collapse: separate;
-    border-spacing: 4px;
-}
-
-.calendario td {
-    height: 72px;
-    min-height: 72px; /* ← Altura fixa */
-    max-height: 72px;
-    vertical-align: top;
-    padding: 4px;
-    overflow: hidden;
-}
-
-/* 🔥 Evitar CLS nos contadores */
-.contadores-container {
-    min-height: 80px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-}
-
-.contador-item {
-    min-height: 64px; /* ← Altura fixa */
-    height: 64px;
-}
-
-/* 🔥 Animações otimizadas (usando transform) */
-.contador-item:hover {
-    transform: translateY(-2px) scale(1.02);
-    transition: transform 0.2s ease;
-}
-
-.footer-btn:hover .material-icons {
-    transform: translateY(-2px) scale(1.1);
-    transition: transform 0.3s ease;
-}
-
-/* 🔥 Evitar animações de layout */
-.menu-lateral {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* ← OK */
-    /* NÃO use transition: left, top, width, height */
-}
-
-/* ✅ Usar transform em vez de left/top */
-.menu-lateral.aberto {
-    transform: translateX(0); /* ← OK */
-}
-
-/* =====================================================
-   CORREÇÕES DE CLS (Cumulative Layout Shift)
-   OTIMIZAÇÃO DE PERFORMANCE
-   ===================================================== */
-
-/* 🔥 Evitar CLS no calendário */
-#calendarioContainer {
-    min-height: 420px;
-    width: 100%;
-    position: relative;
-    display: block;
-}
-
-.calendario table {
-    width: 100%;
-    table-layout: fixed !important; /* ← ESSENCIAL para evitar CLS */
-    border-collapse: separate;
-    border-spacing: 4px;
-    margin: 0;
-}
-
-.calendario td {
-    height: 72px;
-    min-height: 72px !important; /* ← Altura fixa */
-    max-height: 72px !important;
-    vertical-align: top;
-    padding: 4px 2px;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-/* 🔥 Evitar CLS nos contadores */
-.contadores-container {
-    min-height: 80px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 16px;
-    margin-bottom: 16px;
-}
-
-.contador-item {
-    min-height: 64px !important; /* ← Altura fixa */
-    height: 64px !important;
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 4px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 2px solid transparent;
-    box-sizing: border-box;
-    will-change: transform;
-}
-
-.contador-item:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.contador-item:active {
-    transform: scale(0.95);
-}
-
-.contador-item .contador-numero {
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-/* 🔥 Otimizar animações do rodapé */
-.footer-btn .material-icons {
-    transition: transform 0.3s ease, color 0.3s ease;
-    will-change: transform;
-}
-
-.footer-btn:hover .material-icons {
-    transform: translateY(-2px) scale(1.1);
-}
-
-.footer-btn:active .material-icons {
-    transform: scale(0.9);
-}
-
-/* 🔥 Otimizar menu lateral */
-.menu-lateral {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform;
-}
-
-.menu-lateral.aberto {
-    transform: translateX(0);
-}
-
-/* 🔥 Otimizar botões das escalas */
-.botoes-equipe button {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    will-change: transform;
-    min-height: 48px;
-}
-
-.botoes-equipe button:hover {
-    transform: scale(1.05);
-}
-
-.botoes-equipe button.ativo {
-    transform: scale(1.05);
-}
-
-/* 🔥 Otimizar modais */
-.modal-overlay {
-    transition: opacity 0.3s ease;
-}
-
-.modal-content {
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    will-change: transform, opacity;
-}
-
-.modal-overlay.ativo .modal-content {
-    transform: scale(1);
-    opacity: 1;
-}
-
-/* 🔥 Otimizar popups */
-.popup-overlay {
-    transition: opacity 0.3s ease;
-}
-
-.popup-lista,
-.popup-estatisticas {
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    will-change: transform, opacity;
-}
-
-/* 🔥 Evitar repaints desnecessários */
-.calendario td {
-    will-change: background-color;
-}
-
-.calendario td:hover {
-    background: var(--color-bg, #f8fafc);
-}
-
-/* 🔥 Dimensões fixas para elementos críticos */
-.navegacao-mes {
-    min-height: 52px;
-}
-
-.header-escalas {
-    min-height: 70px;
-}
-
-/* 🔥 Otimizar responsivo */
-@media (max-width: 768px) {
-    .calendario td {
-        height: 56px;
-        min-height: 56px !important;
-        max-height: 56px !important;
-        padding: 2px 1px;
-    }
-    
-    #calendarioContainer {
-        min-height: 340px;
-    }
-    
-    .contador-item {
-        min-height: 52px !important;
-        height: 52px !important;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 1.2rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .calendario td {
-        height: 44px;
-        min-height: 44px !important;
-        max-height: 44px !important;
-        padding: 1px;
-    }
-    
-    #calendarioContainer {
-        min-height: 280px;
-    }
-    
-    .contador-item {
-        min-height: 44px !important;
-        height: 44px !important;
-        padding: 4px 2px;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 1rem;
-    }
-    
-    .contador-item .contador-label {
-        font-size: 0.45rem;
-    }
-}
-
-/* Adicionar no style.css */
-#calendarioContainer {
-    min-height: 420px;
-    width: 100%;
-}
-
-.calendario td {
-    height: 72px !important;
-    min-height: 72px !important;
-    max-height: 72px !important;
-}
-
-/* =====================================================
-   CORREÇÕES DE CLS (Cumulative Layout Shift)
-   ===================================================== */
-
-/* 🔥 GARANTIR DIMENSÕES FIXAS */
-#calendarioContainer {
-    min-height: 420px !important;
-    width: 100% !important;
-    display: block !important;
-    position: relative !important;
-}
-
-#calendarioContainer table {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    table-layout: fixed !important;
-    border-collapse: separate !important;
-    border-spacing: 4px !important;
-    margin: 0 !important;
-}
-
-#calendarioContainer td {
-    height: 72px !important;
-    min-height: 72px !important;
-    max-height: 72px !important;
-    padding: 4px 2px !important;
-    vertical-align: top !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-}
-
-/* 🔥 CONTADORES COM ALTURA FIXA */
-.contadores-container {
-    min-height: 80px !important;
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 10px !important;
-    margin-top: 16px !important;
-    margin-bottom: 16px !important;
-}
-
-.contador-item {
-    min-height: 64px !important;
-    height: 64px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 8px 4px !important;
-    border-radius: 8px !important;
-    cursor: pointer !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-    border: 2px solid transparent !important;
-    box-sizing: border-box !important;
-    will-change: transform !important;
-}
-
-.contador-item:hover {
-    transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-}
-
-.contador-item:active {
-    transform: scale(0.95) !important;
-}
-
-/* 🔥 NAVEGAÇÃO E HEADER COM ALTURA FIXA */
-.navegacao-mes {
-    min-height: 52px !important;
-}
-
-.header-escalas {
-    min-height: 70px !important;
-}
-
-/* 🔥 RESPONSIVO COM ALTURAS AJUSTADAS */
-@media (max-width: 768px) {
-    #calendarioContainer td {
-        height: 56px !important;
-        min-height: 56px !important;
-        max-height: 56px !important;
-        padding: 2px 1px !important;
-    }
-    
-    #calendarioContainer {
-        min-height: 340px !important;
-    }
-    
-    .contador-item {
-        min-height: 52px !important;
-        height: 52px !important;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 1.2rem !important;
-    }
-}
-
-@media (max-width: 480px) {
-    #calendarioContainer td {
-        height: 44px !important;
-        min-height: 44px !important;
-        max-height: 44px !important;
-        padding: 1px !important;
-    }
-    
-    #calendarioContainer {
-        min-height: 280px !important;
-    }
-    
-    .contador-item {
-        min-height: 44px !important;
-        height: 44px !important;
-        padding: 4px 2px !important;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 1rem !important;
-    }
-    
-    .contador-item .contador-label {
-        font-size: 0.45rem !important;
-    }
-}
-
-/* =====================================================
-   ÍCONES SVG - ESTILOS
-   ===================================================== */
-
+/* ============================================================
+   16. ÍCONES SVG
+   ============================================================ */
 .icon {
     width: 24px;
     height: 24px;
@@ -1841,264 +924,258 @@ body.modo-escuro .legenda-folga {
     pointer-events: none;
 }
 
-/* Tamanhos */
 .icon-xs { width: 14px; height: 14px; }
 .icon-sm { width: 18px; height: 18px; }
 .icon-md { width: 24px; height: 24px; }
 .icon-lg { width: 32px; height: 32px; }
 .icon-xl { width: 40px; height: 40px; }
-.icon-2xl { width: 48px; height: 48px; }
-
-/* Cores */
-.icon-primary { fill: #3B82F6; }
-.icon-success { fill: #10B981; }
-.icon-danger { fill: #EF4444; }
-.icon-warning { fill: #F59E0B; }
-.icon-white { fill: #FFFFFF; }
 
 /* Animações */
-.icon-spin {
-    animation: icon-spin 2s linear infinite;
-}
-
-.icon-spin-slow {
-    animation: icon-spin 4s linear infinite;
-}
-
-.icon-spin-fast {
-    animation: icon-spin 1s linear infinite;
-}
-
-.icon-pulse {
-    animation: icon-pulse 1.5s ease-in-out infinite;
-}
-
-.icon-bounce {
-    animation: icon-bounce 1.5s ease-in-out infinite;
-}
-
-.icon-float {
-    animation: icon-float 3s ease-in-out infinite;
-}
-
-.icon-swing {
-    animation: icon-swing 2s ease-in-out infinite;
-    transform-origin: top center;
-}
-
-.icon-scale {
-    animation: icon-scale 2s ease-in-out infinite;
-}
-
-.icon-flash {
-    animation: icon-flash 1.5s ease-in-out infinite;
-}
+.icon-spin { animation: icon-spin 2s linear infinite; }
+.icon-pulse { animation: icon-pulse 1.5s ease-in-out infinite; }
+.icon-bounce { animation: icon-bounce 1.5s ease-in-out infinite; }
+.icon-float { animation: icon-float 3s ease-in-out infinite; }
 
 @keyframes icon-spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
-
 @keyframes icon-pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.2); }
 }
-
 @keyframes icon-bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
 }
-
 @keyframes icon-float {
     0%, 100% { transform: translateY(0) rotate(-3deg); }
     50% { transform: translateY(-10px) rotate(3deg); }
 }
 
-@keyframes icon-swing {
-    0%, 100% { transform: rotate(-15deg); }
-    50% { transform: rotate(15deg); }
-}
-
-@keyframes icon-scale {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-}
-
-@keyframes icon-flash {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
 /* Hover */
-.icon-hover-spin:hover {
-    animation: icon-spin 0.8s linear;
-}
+.icon-hover-scale:hover { transform: scale(1.2); }
+.icon-hover-rotate:hover { transform: rotate(180deg); }
+.icon-clickable { cursor: pointer; }
+.icon-clickable:hover { opacity: 0.8; }
 
-.icon-hover-pulse:hover {
-    animation: icon-pulse 0.5s ease-in-out;
-}
-
-.icon-hover-bounce:hover {
-    animation: icon-bounce 0.6s ease-in-out;
-}
-
-.icon-hover-scale:hover {
-    transform: scale(1.2);
-}
-
-.icon-hover-rotate:hover {
-    transform: rotate(180deg);
-}
-
-.icon-hover-float:hover {
-    animation: icon-float 0.8s ease-in-out;
-}
-
-/* Clickable */
-.icon-clickable {
-    cursor: pointer;
-}
-
-.icon-clickable:hover {
-    opacity: 0.8;
-}
-
-/* =====================================================
-   ESTATÍSTICAS - LAYOUT EM CARDS
-   ===================================================== */
-
-.estatisticas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-    padding: 16px;
-}
-
-.estatistica-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: var(--color-surface, #ffffff);
-    border-radius: 12px;
-    border: 1px solid var(--color-border, #e2e8f0);
-    border-left: 4px solid var(--color-primary, #3B82F6);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    transition: all 0.2s ease;
-    min-height: 64px;
-}
-
-.estatistica-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.estatistica-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
-    width: 36px;
-    text-align: center;
-}
-
-.estatistica-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.estatistica-label {
-    display: block;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    color: var(--color-text-muted, #64748b);
-    font-weight: 600;
-    letter-spacing: 0.3px;
-}
-
-.estatistica-valor {
-    display: block;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-text, #1e293b);
-    line-height: 1.3;
-}
-
-/* ===== CORES POR TIPO ===== */
-.estatistica-card.periodo { border-left-color: #3B82F6; }
-.estatistica-card.total-dias { border-left-color: #64748b; }
-.estatistica-card.trabalhados { border-left-color: #3B82F6; }
-.estatistica-card.folga { border-left-color: #10B981; }
-.estatistica-card.feriados { border-left-color: #EF4444; }
-.estatistica-card.feriados-trab { border-left-color: #DC2626; }
-.estatistica-card.horas { border-left-color: #059669; }
-.estatistica-card.percentual { border-left-color: #8B5CF6; }
-.estatistica-card.extra { border-left-color: #F59E0B; }
-.estatistica-card.funcionarios { border-left-color: #3B82F6; }
-.estatistica-card.manha { border-left-color: #F59E0B; }
-.estatistica-card.tarde { border-left-color: #EA580C; }
-.estatistica-card.noite { border-left-color: #4F46E5; }
-
-/* =====================================================
-   MODO ESCURO
-   ===================================================== */
-
-body.modo-escuro .estatistica-card {
+/* ============================================================
+   17. MODO ESCURO
+   ============================================================ */
+[data-theme="dark"] .header-escalas {
     background: var(--color-surface, #1e293b);
     border-color: var(--color-border, #334155);
 }
 
-body.modo-escuro .estatistica-card:hover {
+[data-theme="dark"] .contador-item.total {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+[data-theme="dark"] .contador-item.manha {
+    background: #451a03;
+    border-color: #f59e0b;
+    color: #fcd34d;
+}
+[data-theme="dark"] .contador-item.tarde {
+    background: #431407;
+    border-color: #ea580c;
+    color: #fdba74;
+}
+[data-theme="dark"] .contador-item.noite {
+    background: #1e1b4b;
+    border-color: #6366f1;
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .footer-actions {
+    background: var(--color-surface, #1e293b);
+    border-top-color: var(--color-border, #334155);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .estatistica-card {
+    background: var(--color-surface, #1e293b);
+    border-color: var(--color-border, #334155);
+}
+[data-theme="dark"] .estatistica-card:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* =====================================================
-   RESPONSIVO
-   ===================================================== */
+/* Modo escuro - Status */
+body.modo-escuro .status-trabalho {
+    background: #3B82F6 !important;
+    border-color: #2563EB !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5) !important;
+}
+body.modo-escuro .status-folga {
+    background: #10B981 !important;
+    border-color: #059669 !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.5) !important;
+}
+body.modo-escuro .legenda-trabalho {
+    background: #3B82F6 !important;
+    border-color: #2563EB !important;
+}
+body.modo-escuro .legenda-folga {
+    background: #10B981 !important;
+    border-color: #059669 !important;
+}
 
+/* ============================================================
+   18. FOOTER RODAPÉ
+   ============================================================ */
+.footer {
+    text-align: center;
+    margin-top: 32px;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+/* ============================================================
+   19. RESPONSIVIDADE - UNIFICADA
+   ============================================================ */
+
+/* --- TABLET (768px) --- */
 @media (max-width: 768px) {
+    /* Calendário */
+    #calendarioContainer td {
+        height: 56px !important;
+        min-height: 56px !important;
+        max-height: 56px !important;
+        padding: 2px 1px !important;
+    }
+    #calendarioContainer { min-height: 340px !important; }
+    #calendarioContainer .dia-numero { font-size: 0.9rem !important; }
+    #calendarioContainer th { font-size: 0.6rem !important; padding: 4px 2px !important; }
+
+    /* Status */
+    .status-trabalho,
+    .status-folga {
+        font-size: 0.6rem !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+    }
+
+    /* Contadores */
+    .contadores-container { gap: 6px; }
+    .contador-item {
+        min-height: 52px !important;
+        height: 52px !important;
+        padding: 4px 2px !important;
+        border-radius: 6px;
+    }
+    .contador-item .icon { width: 16px !important; height: 16px !important; }
+    .contador-item .contador-numero { font-size: 1.2rem !important; }
+    .contador-item .contador-label { font-size: 0.45rem !important; }
+
+    /* Estatísticas */
     .estatisticas-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 8px;
         padding: 12px;
     }
-    
-    .estatistica-card {
-        padding: 12px;
-        min-height: 56px;
-    }
-    
-    .estatistica-icon {
-        font-size: 1.2rem;
-        width: 28px;
-    }
-    
-    .estatistica-valor {
-        font-size: 0.95rem;
-    }
+    .estatistica-card { padding: 12px; min-height: 56px; }
+    .estatistica-icon { font-size: 1.2rem; width: 28px; }
+    .estatistica-valor { font-size: 0.95rem; }
 }
 
+/* --- MOBILE (480px) --- */
 @media (max-width: 480px) {
+    /* Calendário */
+    #calendarioContainer td {
+        height: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
+        padding: 1px !important;
+        border-radius: 4px !important;
+    }
+    #calendarioContainer table { border-spacing: 2px !important; }
+    #calendarioContainer { min-height: 280px !important; }
+    #calendarioContainer .dia-numero { font-size: 0.75rem !important; margin-top: 0 !important; }
+    #calendarioContainer th { font-size: 0.5rem !important; padding: 3px 1px !important; }
+
+    /* Status */
+    .status-trabalho,
+    .status-folga {
+        font-size: 0.5rem !important;
+        padding: 1px 4px !important;
+        border-radius: 3px !important;
+        min-width: 18px !important;
+        text-align: center !important;
+    }
+
+    /* Contadores */
+    .contadores-container {
+        gap: 4px;
+        padding: 0 2px;
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+    .contador-item {
+        min-height: 44px !important;
+        height: 44px !important;
+        padding: 3px 1px !important;
+        border-radius: 4px;
+        border-width: 1.5px;
+    }
+    .contador-item .icon { width: 14px !important; height: 14px !important; }
+    .contador-item .contador-numero { font-size: 1rem !important; }
+    .contador-item .contador-label { font-size: 0.4rem !important; }
+
+    /* Estatísticas - 2 colunas */
     .estatisticas-grid {
         grid-template-columns: 1fr 1fr;
         gap: 6px;
         padding: 8px;
     }
-    
     .estatistica-card {
         padding: 10px;
         min-height: 48px;
         border-radius: 8px;
     }
-    
-    .estatistica-icon {
-        font-size: 1rem;
-        width: 24px;
+    .estatistica-icon { font-size: 1rem; width: 24px; }
+    .estatistica-label { font-size: 0.55rem; }
+    .estatistica-valor { font-size: 0.85rem; }
+
+    /* Rodapé */
+    .footer-btn { padding: 4px 10px; min-width: 44px; }
+    .footer-btn .material-icons { font-size: 22px; }
+    .footer-btn-label { font-size: 0.5rem; }
+}
+
+/* --- MOBILE MUITO PEQUENO (380px) --- */
+@media (max-width: 380px) {
+    .contadores-container { gap: 3px; padding: 0 1px; }
+    .contador-item {
+        min-height: 36px !important;
+        height: 36px !important;
+        padding: 2px 1px !important;
     }
-    
-    .estatistica-label {
-        font-size: 0.55rem;
+    .contador-item .icon { width: 12px !important; height: 12px !important; }
+    .contador-item .contador-numero { font-size: 0.75rem !important; }
+    .contador-item .contador-label { font-size: 0.35rem !important; }
+
+    .footer-btn { padding: 4px 10px; min-width: 44px; }
+    .footer-btn .material-icons { font-size: 22px; }
+    .footer-btn-label { font-size: 0.5rem; }
+}
+
+/* --- DESKTOP GRANDE (1200px) --- */
+@media (min-width: 1200px) {
+    .footer-actions {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 16px 16px 0 0;
     }
-    
-    .estatistica-valor {
-        font-size: 0.85rem;
+}
+
+/* ============================================================
+   20. SUPORTE SAFE-AREA (iPhone notch)
+   ============================================================ */
+@supports (padding: max(0px)) {
+    .footer-actions {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
 }
