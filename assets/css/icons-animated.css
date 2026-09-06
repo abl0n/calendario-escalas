@@ -1,29 +1,30 @@
-/* assets/css/icons-animated.css */
-
 /* =====================================================
-   ÍCONES ANIMADOS - MATERIAL ICONS
+   ANIMAÇÕES OTIMIZADAS - APENAS transform E opacity
    ===================================================== */
 
+/* 🔥 ADICIONAR will-change PARA ANIMAÇÕES SUAVES */
 .material-icons {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    will-change: transform, opacity;
 }
 
-/* ===== ANIMAÇÕES ===== */
+/* =====================================================
+   ANIMAÇÕES CONTÍNUAS
+   ===================================================== */
 
 /* 1. ROTAÇÃO */
 .mi-spin {
     animation: mi-spin 2s linear infinite;
+    will-change: transform;
 }
 
 .mi-spin-slow {
     animation: mi-spin 4s linear infinite;
+    will-change: transform;
 }
 
 .mi-spin-fast {
     animation: mi-spin 1s linear infinite;
+    will-change: transform;
 }
 
 @keyframes mi-spin {
@@ -34,6 +35,7 @@
 /* 2. PULSAR */
 .mi-pulse {
     animation: mi-pulse 1.5s ease-in-out infinite;
+    will-change: transform;
 }
 
 @keyframes mi-pulse {
@@ -42,9 +44,10 @@
     100% { transform: scale(1); }
 }
 
-/* 3. BOUNCE (Quicar) */
+/* 3. QUICAR (BOUNCE) */
 .mi-bounce {
     animation: mi-bounce 1.5s ease-in-out infinite;
+    will-change: transform;
 }
 
 @keyframes mi-bounce {
@@ -55,6 +58,7 @@
 /* 4. FLUTUAR */
 .mi-float {
     animation: mi-float 3s ease-in-out infinite;
+    will-change: transform;
 }
 
 @keyframes mi-float {
@@ -62,9 +66,10 @@
     50% { transform: translateY(-10px) rotate(3deg); }
 }
 
-/* 5. BALANÇAR */
+/* 5. BALANÇAR (SWING) */
 .mi-swing {
     animation: mi-swing 2s ease-in-out infinite;
+    will-change: transform;
     transform-origin: top center;
 }
 
@@ -73,9 +78,10 @@
     50% { transform: rotate(15deg); }
 }
 
-/* 6. ESCALA (Zoom) */
+/* 6. ESCALA (ZOOM) */
 .mi-scale {
     animation: mi-scale 2s ease-in-out infinite;
+    will-change: transform;
 }
 
 @keyframes mi-scale {
@@ -83,9 +89,10 @@
     50% { transform: scale(1.3); }
 }
 
-/* 7. FLASH (Piscar) */
+/* 7. FLASH (PISCAR) */
 .mi-flash {
     animation: mi-flash 1.5s ease-in-out infinite;
+    will-change: opacity;
 }
 
 @keyframes mi-flash {
@@ -93,9 +100,10 @@
     50% { opacity: 0.3; }
 }
 
-/* 8. DESLIZAR */
+/* 8. DESLIZAR (SLIDE) */
 .mi-slide {
     animation: mi-slide 2s ease-in-out infinite;
+    will-change: transform;
 }
 
 @keyframes mi-slide {
@@ -106,6 +114,7 @@
 /* 9. GIRAR 3D */
 .mi-rotate-3d {
     animation: mi-rotate-3d 4s ease-in-out infinite;
+    will-change: transform;
     perspective: 1000px;
 }
 
@@ -114,9 +123,10 @@
     50% { transform: rotateY(180deg); }
 }
 
-/* 10. EXPLODIR */
+/* 10. EXPLODIR (BURST) */
 .mi-burst {
     animation: mi-burst 0.8s ease-out forwards;
+    will-change: transform, opacity;
 }
 
 @keyframes mi-burst {
@@ -125,7 +135,9 @@
     100% { transform: scale(1) rotate(0); opacity: 1; }
 }
 
-/* ===== INTERAÇÕES AO PASSAR O MOUSE ===== */
+/* =====================================================
+   ANIMAÇÕES AO PASSAR O MOUSE (HOVER)
+   ===================================================== */
 
 .mi-hover-spin:hover {
     animation: mi-spin 0.8s linear;
@@ -151,7 +163,10 @@
     animation: mi-float 0.8s ease-in-out;
 }
 
-/* ===== TAMANHOS ===== */
+/* =====================================================
+   TAMANHOS
+   ===================================================== */
+
 .mi-xs { font-size: 16px; }
 .mi-sm { font-size: 20px; }
 .mi-md { font-size: 24px; }
@@ -159,22 +174,42 @@
 .mi-xl { font-size: 48px; }
 .mi-2xl { font-size: 64px; }
 
-/* ===== CORES ===== */
+/* =====================================================
+   CORES
+   ===================================================== */
+
 .mi-primary { color: #3B82F6; }
 .mi-success { color: #10B981; }
 .mi-danger { color: #EF4444; }
 .mi-warning { color: #F59E0B; }
 .mi-white { color: #FFFFFF; }
 
-/* ===== ROTAÇÃO FIXA ===== */
+/* =====================================================
+   ROTAÇÃO FIXA
+   ===================================================== */
+
 .mi-rotate-90 { transform: rotate(90deg); }
 .mi-rotate-180 { transform: rotate(180deg); }
 .mi-rotate-270 { transform: rotate(270deg); }
 
-/* ===== ESPELHAMENTO ===== */
+/* =====================================================
+   ESPELHAMENTO
+   ===================================================== */
+
 .mi-flip-h { transform: scaleX(-1); }
 .mi-flip-v { transform: scaleY(-1); }
 
-/* ===== CURSOR ===== */
+/* =====================================================
+   CURSOR
+   ===================================================== */
+
 .mi-clickable { cursor: pointer; }
 .mi-clickable:hover { opacity: 0.8; }
+
+/* =====================================================
+   PAUSA AO PASSAR O MOUSE
+   ===================================================== */
+
+.mi-pause-hover:hover {
+    animation-play-state: paused;
+}

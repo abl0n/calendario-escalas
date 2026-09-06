@@ -29,326 +29,12 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://abl0n.github.io/calendario-escalas/">
 
-    <!-- Preconnect para CDNs -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- CSS do Projeto -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="design-system/index.css">
+    <link rel="stylesheet" href="assets/css/icons-animated.css">
 
-    <!-- 🔥 MATERIAL ICONS - Otimizado com font-display -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript>
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    </noscript>
-
-    <!-- 🔥 CSS CRÍTICO INLINE (para renderização rápida) -->
-    <style>
-        /* CSS Crítico - Apenas o essencial para o layout inicial */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: #f1f5f9;
-            padding: 16px;
-            min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
-        }
-        .app-container {
-            max-width: 1024px;
-            margin: 0 auto;
-            padding-bottom: 80px;
-        }
-        .header-escalas {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-        .botoes-equipe {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-        }
-        .botoes-equipe button {
-            padding: 10px 20px;
-            border: 3px solid #3B82F6;
-            border-radius: 12px;
-            background: transparent;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 60px;
-            flex: 1;
-            max-width: 100px;
-            text-align: center;
-            color: #3B82F6;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        .botoes-equipe button.ativo {
-            background: #3B82F6;
-            color: white;
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
-        }
-        .navegacao-mes {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 12px 0;
-            gap: 8px;
-            background: #ffffff;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
-        .mes-titulo {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #1e293b;
-        }
-        .calendario {
-            background: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
-        }
-        .calendario table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-        .calendario th {
-            padding: 10px 4px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            text-align: center;
-            background: #f1f5f9;
-        }
-        .calendario td {
-            height: 72px;
-            padding: 4px;
-            vertical-align: top;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            text-align: center;
-        }
-        .calendario td:hover {
-            background: #f8fafc;
-            border-color: #3B82F6;
-        }
-        .dia-numero {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #1e293b;
-            display: block;
-        }
-        .status-dia {
-            display: inline-block;
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 4px;
-            color: #ffffff;
-            margin-top: 2px;
-        }
-        .status-trabalho {
-            background: #1D4ED8;
-            border: 1px solid #1E40AF;
-        }
-        .status-folga {
-            background: #059669;
-            border: 1px solid #047857;
-        }
-        .dia-hoje {
-            border: 2px solid #3B82F6 !important;
-            background: rgba(59, 130, 246, 0.05) !important;
-        }
-        .dia-feriado {
-            background: rgba(239, 68, 68, 0.08) !important;
-        }
-        .dia-feriado-trabalhado {
-            background: rgba(239, 68, 68, 0.18) !important;
-            border: 2px solid #ef4444 !important;
-        }
-        .dia-comemorativo {
-            background: rgba(139, 92, 246, 0.06) !important;
-        }
-        .dia-com-extra {
-            border: 2px solid #f59e0b !important;
-        }
-        .dia-outro-periodo {
-            opacity: 0.3;
-        }
-        .evento-icone {
-            font-size: 0.7rem;
-            display: block;
-        }
-        .evento-extra {
-            font-size: 0.55rem;
-            font-weight: 700;
-            color: #92400e;
-            background: rgba(245, 158, 11, 0.15);
-            border-radius: 3px;
-            padding: 0 4px;
-            display: inline-block;
-        }
-        .footer-actions {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #ffffff;
-            border-top: 2px solid #e2e8f0;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
-            z-index: 1000;
-            padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .footer-actions-inner {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 0 8px;
-        }
-        .footer-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            background: none;
-            border: none;
-            padding: 4px 16px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            min-height: 48px;
-            min-width: 56px;
-            color: #64748b;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        .footer-btn .material-icons {
-            font-size: 26px;
-            transition: transform 0.3s ease;
-        }
-        .footer-btn:active {
-            transform: scale(0.92);
-        }
-        .footer-btn-label {
-            font-size: 0.55rem;
-            font-weight: 600;
-            color: #64748b;
-            letter-spacing: 0.3px;
-        }
-        .footer-btn-primary .material-icons {
-            color: #3B82F6;
-            font-size: 30px;
-        }
-        .footer-btn-primary .footer-btn-label {
-            color: #3B82F6;
-        }
-        .footer-btn:hover .material-icons {
-            transform: translateY(-2px);
-        }
-        @media (max-width: 767px) {
-            .footer-actions { display: block; }
-        }
-        @media (min-width: 768px) {
-            .footer-actions { display: none; }
-            .app-container { padding-bottom: 20px; }
-        }
-        @media (max-width: 480px) {
-            .calendario td { height: 50px; padding: 2px; }
-            .dia-numero { font-size: 0.75rem; }
-            .status-dia { font-size: 0.5rem; padding: 1px 4px; }
-            .evento-icone { font-size: 0.55rem; }
-        }
-        /* Modo escuro */
-        body.modo-escuro {
-            background: #0f172a;
-            color: #f1f5f9;
-        }
-        body.modo-escuro .header-escalas,
-        body.modo-escuro .navegacao-mes,
-        body.modo-escuro .calendario {
-            background: #1e293b;
-            border-color: #334155;
-        }
-        body.modo-escuro .calendario td {
-            background: #1e293b;
-            border-color: #334155;
-        }
-        body.modo-escuro .calendario th {
-            background: #0f172a;
-            color: #f1f5f9;
-        }
-        body.modo-escuro .footer-actions {
-            background: #1e293b;
-            border-color: #334155;
-        }
-        body.modo-escuro .status-trabalho {
-            background: #3B82F6;
-        }
-        body.modo-escuro .status-folga {
-            background: #10B981;
-        }
-        body.modo-escuro .mes-titulo {
-            color: #f1f5f9;
-        }
-        .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            z-index: 9999;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .toast.visivel {
-            opacity: 1;
-        }
-        .toast.sucesso { background: #059669; }
-        .toast.erro { background: #dc2626; }
-        .toast.info { background: #2563eb; }
-    </style>
-
-    <!-- 🔥 CSS NÃO CRÍTICO - Carregado com delay -->
-    <link rel="preload" href="css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript>
-        <link rel="stylesheet" href="css/style.css">
-    </noscript>
-
-    <link rel="preload" href="design-system/index.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript>
-        <link rel="stylesheet" href="design-system/index.css">
-    </noscript>
-
-    <link rel="preload" href="assets/css/icons-animated.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript>
-        <link rel="stylesheet" href="assets/css/icons-animated.css">
-    </noscript>
-
-    <!-- JS Module com defer para não bloquear renderização -->
+    <!-- JS Module -->
     <script type="module" src="js/app.js" defer></script>
 </head>
 
@@ -357,16 +43,11 @@
     LOADING OVERLAY
     ============================================================ -->
     <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,0.85); z-index:9999; justify-content:center; align-items:center; flex-direction:column; gap:16px; backdrop-filter:blur(4px);">
-        <span class="material-icons mi-spin" style="font-size:48px; color:#3B82F6; animation:spin 1s linear infinite;">refresh</span>
+        <svg class="icon icon-spin" width="48" height="48" style="color:#3B82F6;">
+            <use href="assets/icons/sprite.svg#icon-sync"></use>
+        </svg>
         <div style="font-size:1.1rem; font-weight:600; color:#f1f5f9;">Carregando...</div>
     </div>
-
-    <style>
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-    </style>
 
     <!-- ============================================================
     TOAST NOTIFICATION
@@ -398,18 +79,24 @@
         <nav class="menu-lateral" id="menuLateral" role="navigation" aria-label="Menu principal">
             <div class="menu-header">
                 <h2>
-                    <span class="material-icons" style="font-size:20px; vertical-align:middle;" aria-hidden="true">settings</span>
+                    <svg class="icon" width="20" height="20">
+                        <use href="assets/icons/sprite.svg#icon-settings"></use>
+                    </svg>
                     Menu
                 </h2>
                 <button class="menu-fechar" onclick="window.fecharMenu()" aria-label="Fechar menu">
-                    <span class="material-icons" aria-hidden="true">close</span>
+                    <svg class="icon" width="24" height="24">
+                        <use href="assets/icons/sprite.svg#icon-close"></use>
+                    </svg>
                 </button>
             </div>
 
             <!-- GUIA RÁPIDO -->
             <div class="menu-guia" onclick="window.abrirGuia()" style="padding:12px 16px; margin:8px 0 16px; background:var(--color-bg, #f1f5f9); border-radius:8px; cursor:pointer; border:1px solid var(--color-border, #e2e8f0);">
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <span class="material-icons mi-float" style="font-size:24px; color:#3B82F6;" aria-hidden="true">help</span>
+                    <svg class="icon icon-float" width="24" height="24" style="color:#3B82F6;">
+                        <use href="assets/icons/sprite.svg#icon-help"></use>
+                    </svg>
                     <div>
                         <div style="font-size:0.85rem; font-weight:600; color:var(--color-text, #1e293b);">Guia Rápido</div>
                         <div style="font-size:0.65rem; color:var(--color-text-muted, #64748b);">Clique para ver dicas de uso</div>
@@ -420,7 +107,9 @@
             <!-- CADASTRAR FUNCIONÁRIO -->
             <button class="menu-item" onclick="window.abrirModalPessoa()" style="background: var(--color-primary, #3B82F6); color: white; border-radius: 8px; margin: 8px 0; width:100%; border:none; padding:12px 16px; cursor:pointer;">
                 <span class="icone" aria-hidden="true">
-                    <span class="material-icons" style="color: white;">person_add</span>
+                    <svg class="icon" width="24" height="24" style="color:white;">
+                        <use href="assets/icons/sprite.svg#icon-user-add"></use>
+                    </svg>
                 </span>
                 <span class="descricao" style="color: white; font-weight:600;">
                     Cadastrar Funcionário
@@ -434,7 +123,9 @@
             <div class="menu-periodo-config" style="padding: 12px 16px; margin: 8px 0 16px; background: var(--color-bg, #f1f5f9); border-radius: 8px;">
                 <div style="display:flex; flex-direction:column; gap:8px;">
                     <span style="font-size:0.75rem; font-weight:600; color:var(--color-text, #1e293b);">
-                        <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">date_range</span>
+                        <svg class="icon" width="16" height="16">
+                            <use href="assets/icons/sprite.svg#icon-calendar"></use>
+                        </svg>
                         Período
                     </span>
                     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
@@ -447,7 +138,9 @@
                             <input type="number" id="periodoDiaFim" class="input" value="15" min="1" max="31" style="width:55px; padding:6px 8px; text-align:center; border:1px solid var(--color-border, #e2e8f0); border-radius:4px; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b);" aria-label="Dia de fim do período">
                         </div>
                         <button class="btn btn-primary" style="padding:6px 12px; font-size:0.75rem; background:#3B82F6; color:white; border:none; border-radius:4px; cursor:pointer;" onclick="window.aplicarPeriodo()">
-                            <span class="material-icons" style="font-size:16px;" aria-hidden="true">check</span>
+                            <svg class="icon" width="16" height="16" style="color:white;">
+                                <use href="assets/icons/sprite.svg#icon-check"></use>
+                            </svg>
                             Aplicar
                         </button>
                     </div>
@@ -462,7 +155,9 @@
             <!-- TEMA -->
             <button class="menu-item toggle-tema" onclick="window.toggleTema()" aria-label="Alternar tema claro/escuro">
                 <span class="icone" aria-hidden="true">
-                    <span class="material-icons">dark_mode</span>
+                    <svg class="icon" width="24" height="24">
+                        <use href="assets/icons/sprite.svg#icon-moon"></use>
+                    </svg>
                 </span>
                 <span class="descricao">
                     Tema
@@ -476,7 +171,9 @@
             <!-- EXPORTAR -->
             <button class="menu-item" onclick="window.exportarDados()" aria-label="Exportar dados">
                 <span class="icone" aria-hidden="true">
-                    <span class="material-icons mi-hover-float">download</span>
+                    <svg class="icon icon-hover-float" width="24" height="24">
+                        <use href="assets/icons/sprite.svg#icon-download"></use>
+                    </svg>
                 </span>
                 <span class="descricao">
                     Exportar Dados
@@ -487,7 +184,9 @@
             <!-- IMPORTAR -->
             <button class="menu-item" onclick="window.importarDados()" aria-label="Importar dados">
                 <span class="icone" aria-hidden="true">
-                    <span class="material-icons mi-hover-float">upload</span>
+                    <svg class="icon icon-hover-float" width="24" height="24">
+                        <use href="assets/icons/sprite.svg#icon-upload"></use>
+                    </svg>
                 </span>
                 <span class="descricao">
                     Importar Dados
@@ -498,7 +197,9 @@
             <!-- LIMPAR DADOS -->
             <button class="menu-item" onclick="window.limparDados()" aria-label="Limpar dados">
                 <span class="icone" aria-hidden="true">
-                    <span class="material-icons mi-pulse" style="color:#EF4444;">delete</span>
+                    <svg class="icon icon-pulse" width="24" height="24" style="color:#EF4444;">
+                        <use href="assets/icons/sprite.svg#icon-delete"></use>
+                    </svg>
                 </span>
                 <span class="descricao">
                     Limpar Dados
@@ -509,7 +210,9 @@
             <!-- RESETAR -->
             <button class="menu-item" onclick="window.resetarTudo()" aria-label="Resetar tudo">
                 <span class="icone" aria-hidden="true">
-                    <span class="material-icons mi-hover-spin">sync</span>
+                    <svg class="icon icon-hover-spin" width="24" height="24">
+                        <use href="assets/icons/sprite.svg#icon-sync"></use>
+                    </svg>
                 </span>
                 <span class="descricao">
                     Resetar Tudo
@@ -522,7 +225,9 @@
             <!-- SUGERIR MELHORIA -->
             <button class="menu-item" onclick="window.abrirMelhorias()" aria-label="Sugerir melhoria">
                 <span class="icone" aria-hidden="true">
-                    <span class="material-icons mi-float" style="color:#F59E0B;">lightbulb</span>
+                    <svg class="icon icon-float" width="24" height="24" style="color:#F59E0B;">
+                        <use href="assets/icons/sprite.svg#icon-lightbulb"></use>
+                    </svg>
                 </span>
                 <span class="descricao">
                     Sugerir Melhoria
@@ -533,7 +238,9 @@
             <!-- REPORTAR BUG -->
             <button class="menu-item" onclick="window.abrirBug()" aria-label="Reportar bug">
                 <span class="icone" aria-hidden="true">
-                    <span class="material-icons mi-pulse" style="color:#EF4444;">bug_report</span>
+                    <svg class="icon icon-pulse" width="24" height="24" style="color:#EF4444;">
+                        <use href="assets/icons/sprite.svg#icon-bug"></use>
+                    </svg>
                 </span>
                 <span class="descricao">
                     Reportar Bug
@@ -555,42 +262,54 @@
         ============================================================ -->
         <div class="navegacao-mes">
             <button class="btn btn-ghost" onclick="window.mudarPeriodo(-1)" aria-label="Período anterior" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--color-text, #1e293b);">
-                <span class="material-icons" aria-hidden="true">chevron_left</span>
+                <svg class="icon" width="24" height="24">
+                    <use href="assets/icons/sprite.svg#icon-chevron-left"></use>
+                </svg>
             </button>
             <span class="mes-titulo" id="periodoNome">Junho/Julho 2026</span>
             <button class="btn btn-ghost" onclick="window.mudarPeriodo(1)" aria-label="Próximo período" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--color-text, #1e293b);">
-                <span class="material-icons" aria-hidden="true">chevron_right</span>
+                <svg class="icon" width="24" height="24">
+                    <use href="assets/icons/sprite.svg#icon-chevron-right"></use>
+                </svg>
             </button>
         </div>
 
         <!-- ============================================================
         CALENDÁRIO
         ============================================================ -->
-        <section class="calendario" id="calendarioContainer" role="grid" aria-label="Calendário de escalas"></section>
+        <section class="calendario" id="calendarioContainer" role="grid" aria-label="Calendário de escalas" style="min-height:420px;"></section>
 
         <!-- ============================================================
         CONTADORES COLORIDOS
         ============================================================ -->
-        <div class="contadores-container" id="contadoresContainer" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px; margin-bottom:16px;">
-            <div class="contador-item total" onclick="window.abrirPopup('total')" title="Ver todos os funcionários da escala" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px 8px; border-radius:8px; cursor:pointer; background:#e2e8f0; border:2px solid #94a3b8; color:#1e293b; min-height:64px;">
-                <span class="contador-icone" style="font-size:1.2rem;">👥</span>
-                <span class="contador-numero" id="numPessoasEscala" style="font-size:1.5rem; font-weight:700; line-height:1.2;">0</span>
-                <span class="contador-label" style="font-size:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; opacity:0.7;">Total</span>
+        <div class="contadores-container" id="contadoresContainer">
+            <div class="contador-item total" onclick="window.abrirPopup('total')" title="Ver todos os funcionários da escala">
+                <svg class="icon" width="24" height="24">
+                    <use href="assets/icons/sprite.svg#icon-users"></use>
+                </svg>
+                <span class="contador-numero" id="numPessoasEscala">0</span>
+                <span class="contador-label">Total</span>
             </div>
-            <div class="contador-item manha" onclick="window.abrirPopup('M')" title="Ver funcionários da manhã" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px 8px; border-radius:8px; cursor:pointer; background:#fef3c7; border:2px solid #f59e0b; color:#92400e; min-height:64px;">
-                <span class="contador-icone" style="font-size:1.2rem;">☀️</span>
-                <span class="contador-numero" id="numManha" style="font-size:1.5rem; font-weight:700; line-height:1.2;">0</span>
-                <span class="contador-label" style="font-size:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; opacity:0.7;">Manhã</span>
+            <div class="contador-item manha" onclick="window.abrirPopup('M')" title="Ver funcionários da manhã">
+                <svg class="icon" width="24" height="24" style="color:#F59E0B;">
+                    <use href="assets/icons/sprite.svg#icon-sun"></use>
+                </svg>
+                <span class="contador-numero" id="numManha">0</span>
+                <span class="contador-label">Manhã</span>
             </div>
-            <div class="contador-item tarde" onclick="window.abrirPopup('T')" title="Ver funcionários da tarde" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px 8px; border-radius:8px; cursor:pointer; background:#ffedd5; border:2px solid #ea580c; color:#7c2d12; min-height:64px;">
-                <span class="contador-icone" style="font-size:1.2rem;">🌆</span>
-                <span class="contador-numero" id="numTarde" style="font-size:1.5rem; font-weight:700; line-height:1.2;">0</span>
-                <span class="contador-label" style="font-size:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; opacity:0.7;">Tarde</span>
+            <div class="contador-item tarde" onclick="window.abrirPopup('T')" title="Ver funcionários da tarde">
+                <svg class="icon" width="24" height="24" style="color:#EA580C;">
+                    <use href="assets/icons/sprite.svg#icon-sun"></use>
+                </svg>
+                <span class="contador-numero" id="numTarde">0</span>
+                <span class="contador-label">Tarde</span>
             </div>
-            <div class="contador-item noite" onclick="window.abrirPopup('N')" title="Ver funcionários da noite" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px 8px; border-radius:8px; cursor:pointer; background:#e0e7ff; border:2px solid #4f46e5; color:#1e1b4b; min-height:64px;">
-                <span class="contador-icone" style="font-size:1.2rem;">🌙</span>
-                <span class="contador-numero" id="numNoite" style="font-size:1.5rem; font-weight:700; line-height:1.2;">0</span>
-                <span class="contador-label" style="font-size:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; opacity:0.7;">Noite</span>
+            <div class="contador-item noite" onclick="window.abrirPopup('N')" title="Ver funcionários da noite">
+                <svg class="icon" width="24" height="24" style="color:#4F46E5;">
+                    <use href="assets/icons/sprite.svg#icon-moon"></use>
+                </svg>
+                <span class="contador-numero" id="numNoite">0</span>
+                <span class="contador-label">Noite</span>
             </div>
         </div>
 
@@ -601,12 +320,16 @@
             <div class="modal-content" onclick="event.stopPropagation()" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:480px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
                 <div class="popup-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--color-border, #f1f5f9);">
                     <h3 id="popupTitulo" style="font-size:1.1rem; color:var(--color-text, #1e293b); margin:0; display:flex; align-items:center; gap:8px;">
-                        <span class="material-icons" style="font-size:20px; vertical-align:middle;" aria-hidden="true">people</span>
+                        <svg class="icon" width="20" height="20">
+                            <use href="assets/icons/sprite.svg#icon-users"></use>
+                        </svg>
                         Funcionários
                     </h3>
                     <span class="popup-total" id="popupTotal" style="font-size:0.8rem; color:var(--color-text-muted, #64748b);">Total: 0</span>
                     <button class="menu-fechar" onclick="window.fecharPopup()" aria-label="Fechar" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text-muted, #94a3b8); padding:4px 8px; border-radius:6px;">
-                        <span class="material-icons" aria-hidden="true">close</span>
+                        <svg class="icon" width="24" height="24">
+                            <use href="assets/icons/sprite.svg#icon-close"></use>
+                        </svg>
                     </button>
                 </div>
                 <div class="popup-conteudo" id="popupConteudo"></div>
@@ -620,11 +343,15 @@
             <div class="modal-content" onclick="event.stopPropagation()" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:500px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
                 <div class="popup-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--color-border, #f1f5f9);">
                     <h3 style="font-size:1.1rem; color:var(--color-text, #1e293b); margin:0; display:flex; align-items:center; gap:8px;">
-                        <span class="material-icons" style="font-size:20px; vertical-align:middle;" aria-hidden="true">bar_chart</span>
+                        <svg class="icon" width="20" height="20" style="color:#8B5CF6;">
+                            <use href="assets/icons/sprite.svg#icon-chart"></use>
+                        </svg>
                         Estatísticas Detalhadas
                     </h3>
                     <button class="menu-fechar" onclick="window.fecharEstatisticas()" aria-label="Fechar" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text-muted, #94a3b8); padding:4px 8px; border-radius:6px;">
-                        <span class="material-icons" aria-hidden="true">close</span>
+                        <svg class="icon" width="24" height="24">
+                            <use href="assets/icons/sprite.svg#icon-close"></use>
+                        </svg>
                     </button>
                 </div>
                 <div class="popup-conteudo" id="popupEstatisticasConteudo"></div>
@@ -638,11 +365,15 @@
             <div class="modal-content" onclick="event.stopPropagation()" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:480px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
                 <div class="popup-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--color-border, #f1f5f9);">
                     <h3 id="detalhesTitulo" style="font-size:1.1rem; color:var(--color-text, #1e293b); margin:0; display:flex; align-items:center; gap:8px;">
-                        <span class="material-icons" style="font-size:20px; vertical-align:middle;" aria-hidden="true">calendar_today</span>
+                        <svg class="icon" width="20" height="20">
+                            <use href="assets/icons/sprite.svg#icon-calendar"></use>
+                        </svg>
                         Detalhes do Dia
                     </h3>
                     <button class="menu-fechar" onclick="window.fecharDetalhesDia()" aria-label="Fechar" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text-muted, #94a3b8); padding:4px 8px; border-radius:6px;">
-                        <span class="material-icons" aria-hidden="true">close</span>
+                        <svg class="icon" width="24" height="24">
+                            <use href="assets/icons/sprite.svg#icon-close"></use>
+                        </svg>
                     </button>
                 </div>
                 <div class="popup-conteudo" id="detalhesConteudo"></div>
@@ -656,22 +387,30 @@
             <div class="footer-actions-inner">
                 
                 <button class="footer-btn" onclick="window.toggleMenu()" aria-label="Abrir menu">
-                    <span class="material-icons mi-hover-scale" aria-hidden="true">menu</span>
+                    <svg class="icon" width="26" height="26">
+                        <use href="assets/icons/sprite.svg#icon-menu"></use>
+                    </svg>
                     <span class="footer-btn-label">Menu</span>
                 </button>
 
                 <button class="footer-btn footer-btn-primary" onclick="window.abrirModalExtra()" aria-label="Adicionar hora extra">
-                    <span class="material-icons mi-hover-spin" aria-hidden="true">access_time</span>
+                    <svg class="icon" width="30" height="30">
+                        <use href="assets/icons/sprite.svg#icon-clock"></use>
+                    </svg>
                     <span class="footer-btn-label">H.Extra</span>
                 </button>
 
                 <button class="footer-btn" onclick="window.abrirEstatisticas()" aria-label="Ver estatísticas">
-                    <span class="material-icons mi-pulse" style="color:#8B5CF6;" aria-hidden="true">bar_chart</span>
+                    <svg class="icon icon-pulse" width="26" height="26" style="color:#8B5CF6;">
+                        <use href="assets/icons/sprite.svg#icon-chart"></use>
+                    </svg>
                     <span class="footer-btn-label">Stats</span>
                 </button>
 
                 <button class="footer-btn" onclick="window.abrirPopupADM()" aria-label="Ver funcionários administrativos">
-                    <span class="material-icons mi-hover-scale" style="color:#10B981;" aria-hidden="true">contacts</span>
+                    <svg class="icon" width="26" height="26" style="color:#10B981;">
+                        <use href="assets/icons/sprite.svg#icon-contacts"></use>
+                    </svg>
                     <span class="footer-btn-label">ADM</span>
                 </button>
 
@@ -686,14 +425,18 @@
     <div class="modal-overlay" id="modalExtra" role="dialog" aria-label="Adicionar hora extra">
         <div class="modal-content" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:480px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <h2 style="font-size:1.5rem; font-weight:700; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                <span class="material-icons" style="font-size:24px; vertical-align:middle;" aria-hidden="true">access_time</span>
+                <svg class="icon" width="24" height="24">
+                    <use href="assets/icons/sprite.svg#icon-clock"></use>
+                </svg>
                 Hora Extra
             </h2>
             <p class="sub" style="color:var(--color-text-muted, #64748b); font-size:0.875rem; margin-bottom:24px;">Adicione horas extras por dia</p>
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputDataExtra" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">calendar_today</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-calendar"></use>
+                    </svg>
                     Data
                 </label>
                 <input type="date" id="inputDataExtra" class="input" lang="pt-BR" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -701,7 +444,9 @@
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputInicioExtra" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">schedule</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-clock"></use>
+                    </svg>
                     Início
                 </label>
                 <input type="time" id="inputInicioExtra" class="input" step="60" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -709,7 +454,9 @@
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputFimExtra" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">schedule</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-clock"></use>
+                    </svg>
                     Término
                 </label>
                 <input type="time" id="inputFimExtra" class="input" step="60" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -717,18 +464,24 @@
 
             <div style="display:flex; gap:8px; margin-top:16px;">
                 <button class="btn btn-primary" onclick="window.salvarExtra()" style="flex:1; padding:12px; background:#3B82F6; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem;">
-                    <span class="material-icons" aria-hidden="true">check</span>
+                    <svg class="icon" width="20" height="20" style="color:white;">
+                        <use href="assets/icons/sprite.svg#icon-check"></use>
+                    </svg>
                     Salvar
                 </button>
                 <button class="btn btn-ghost" onclick="window.fecharModalExtra()" style="flex:1; padding:12px; background:transparent; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem; color:var(--color-text, #1e293b);">
-                    <span class="material-icons" aria-hidden="true">close</span>
+                    <svg class="icon" width="20" height="20">
+                        <use href="assets/icons/sprite.svg#icon-close"></use>
+                    </svg>
                     Cancelar
                 </button>
             </div>
 
             <div class="lista-extras" id="listaExtras" style="margin-top:20px; border-top:1px solid var(--color-border, #f1f5f9); padding-top:16px;">
                 <h3 style="font-size:0.9rem; color:var(--color-text, #1e293b); margin-bottom:12px;">
-                    <span class="material-icons" style="font-size:18px; vertical-align:middle;" aria-hidden="true">list</span>
+                    <svg class="icon" width="18" height="18">
+                        <use href="assets/icons/sprite.svg#icon-list"></use>
+                    </svg>
                     Horas Extras Registradas
                 </h3>
                 <div id="listaExtrasContainer"></div>
@@ -743,14 +496,18 @@
     <div class="modal-overlay" id="modalPessoa" role="dialog" aria-label="Cadastrar funcionário">
         <div class="modal-content" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:480px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <h2 id="modalPessoaTitulo" style="font-size:1.5rem; font-weight:700; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                <span class="material-icons" style="font-size:24px; vertical-align:middle;" aria-hidden="true">person_add</span>
+                <svg class="icon" width="24" height="24">
+                    <use href="assets/icons/sprite.svg#icon-user-add"></use>
+                </svg>
                 Cadastrar Funcionário
             </h2>
             <p class="sub" id="modalPessoaSubtitulo" style="color:var(--color-text-muted, #64748b); font-size:0.875rem; margin-bottom:24px;">Vincule o funcionário à escala e turno</p>
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputNomePessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">person</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-user"></use>
+                    </svg>
                     Nome Completo *
                 </label>
                 <input type="text" id="inputNomePessoa" class="input" placeholder="Ex: João Silva" required style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -758,7 +515,9 @@
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputCargoPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">work</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-work"></use>
+                    </svg>
                     Cargo
                 </label>
                 <input type="text" id="inputCargoPessoa" class="input" placeholder="Ex: Analista, Supervisor" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -766,7 +525,9 @@
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputEmpresaPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">business</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-business"></use>
+                    </svg>
                     Empresa
                 </label>
                 <input type="text" id="inputEmpresaPessoa" class="input" placeholder="Ex: Empresa XYZ" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -774,7 +535,9 @@
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputContatoPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">phone</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-phone"></use>
+                    </svg>
                     Contato
                 </label>
                 <input type="text" id="inputContatoPessoa" class="input" placeholder="Ex: (11) 99999-9999" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -782,7 +545,9 @@
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputEscalaPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">assignment</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-calendar"></use>
+                    </svg>
                     Escala
                 </label>
                 <select id="inputEscalaPessoa" class="input" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -795,7 +560,9 @@
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputTurnoPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">schedule</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-sun"></use>
+                    </svg>
                     Turno
                 </label>
                 <select id="inputTurnoPessoa" class="input" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -807,7 +574,9 @@
 
             <div class="campo" style="margin-bottom:16px;">
                 <label for="inputTipoPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
-                    <span class="material-icons" style="font-size:16px; vertical-align:middle;" aria-hidden="true">badge</span>
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-verified"></use>
+                    </svg>
                     Tipo
                 </label>
                 <select id="inputTipoPessoa" class="input" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
@@ -818,11 +587,15 @@
 
             <div style="display:flex; gap:8px; margin-top:16px;">
                 <button class="btn btn-primary" onclick="window.salvarPessoa()" style="flex:1; padding:12px; background:#3B82F6; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem;">
-                    <span class="material-icons" aria-hidden="true">check</span>
+                    <svg class="icon" width="20" height="20" style="color:white;">
+                        <use href="assets/icons/sprite.svg#icon-check"></use>
+                    </svg>
                     Salvar
                 </button>
                 <button class="btn btn-ghost" onclick="window.fecharModalPessoa()" style="flex:1; padding:12px; background:transparent; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem; color:var(--color-text, #1e293b);">
-                    <span class="material-icons" aria-hidden="true">close</span>
+                    <svg class="icon" width="20" height="20">
+                        <use href="assets/icons/sprite.svg#icon-close"></use>
+                    </svg>
                     Cancelar
                 </button>
             </div>

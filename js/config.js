@@ -107,6 +107,10 @@ export const coresHeaderBorda = [...coresHeaderTexto];
 // FERIADOS E DATAS COMEMORATIVAS
 // =====================================================
 
+// =====================================================
+// FERIADOS E DATAS COMEMORATIVAS - COM SVG SPRITE
+// =====================================================
+
 export const feriados = {
     '01-01': { nome: 'Confraternização Universal', tipo: 'feriado', icone: '🎆' },
     '25-01': { nome: 'Aniv. SP', tipo: 'feriado', icone: '🏙️' },
@@ -135,7 +139,6 @@ export const feriados = {
     '25-12': { nome: 'Natal', tipo: 'feriado', icone: '🎄' },
     '31-12': { nome: 'Véspera Ano Novo', tipo: 'comemorativo', icone: '🥂' }
 };
-
 // =====================================================
 // CONSTANTES GLOBAIS
 // =====================================================

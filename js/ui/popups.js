@@ -44,25 +44,25 @@ export function abrirPopup(tipo) {
         tituloTexto = `Todos os Funcionários - Escala ${escalaAtual}`;
         turnoLabel = 'Todos';
         corDestaque = '#3B82F6';
-        icone = 'people';
+        icone = 'icon-users';
     } else if (tipo === 'M') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'M');
         tituloTexto = `Manhã - Escala ${escalaAtual}`;
         turnoLabel = 'Manhã';
         corDestaque = '#F59E0B';
-        icone = 'wb_sunny';
+        icone = 'icon-sun';
     } else if (tipo === 'T') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'T');
         tituloTexto = `Tarde - Escala ${escalaAtual}`;
         turnoLabel = 'Tarde';
         corDestaque = '#EA580C';
-        icone = 'cloud';
+        icone = 'icon-sun';
     } else if (tipo === 'N') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'N');
         tituloTexto = `Noite - Escala ${escalaAtual}`;
         turnoLabel = 'Noite';
         corDestaque = '#4F46E5';
-        icone = 'bedtime';
+        icone = 'icon-moon';
     } else {
         mostrarToast('❌ Tipo de filtro inválido!', 'erro');
         return;
@@ -70,7 +70,9 @@ export function abrirPopup(tipo) {
 
     if (titulo) {
         titulo.innerHTML = `
-            <span class="material-icons" style="font-size:20px; vertical-align:middle; color:${corDestaque};">${icone}</span>
+            <svg class="icon" width="20" height="20" style="color:${corDestaque};">
+                <use href="assets/icons/sprite.svg#${icone}"></use>
+            </svg>
             ${tituloTexto}
         `;
     }
@@ -81,7 +83,9 @@ export function abrirPopup(tipo) {
         if (pessoasFiltradas.length === 0) {
             conteudo.innerHTML = `
                 <div style="text-align:center; padding: 40px 20px; color: var(--color-text-muted, #64748b);">
-                    <span class="material-icons" style="font-size:48px; opacity:0.3;">${icone}</span>
+                    <svg class="icon" width="48" height="48" style="opacity:0.3; color:${corDestaque};">
+                        <use href="assets/icons/sprite.svg#${icone}"></use>
+                    </svg>
                     <p style="margin-top:12px; font-size:0.95rem;">
                         ${tipo === 'total' ? 'Nenhum funcionário cadastrado nesta escala.' : `Nenhum funcionário no turno ${turnoLabel}.`}
                     </p>
@@ -89,7 +93,6 @@ export function abrirPopup(tipo) {
                 </div>
             `;
         } else {
-            // 🔥 MESMO PADRÃO DA LISTA ADM
             const coresTurnos = {
                 'M': { bg: '#FEF3C7', text: '#92400E', badge: '#F59E0B' },
                 'T': { bg: '#FFEDD5', text: '#7C2D12', badge: '#EA580C' },
@@ -107,7 +110,14 @@ export function abrirPopup(tipo) {
                     font-weight: 600;
                     font-size: 0.85rem;
                     margin-bottom: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
                 ">
+                    <svg class="icon" width="18" height="18" style="color:white;">
+                        <use href="assets/icons/sprite.svg#${icone}"></use>
+                    </svg>
                     ${tituloTexto} (${pessoasFiltradas.length})
                 </div>
             `;
@@ -131,19 +141,27 @@ export function abrirPopup(tipo) {
                                 ${p.nome}
                             </span>
                             ${p.cargo ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">work</span>
+                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                                    <use href="assets/icons/sprite.svg#icon-work"></use>
+                                </svg>
                                 ${p.cargo}
                             </span>` : ''}
                             ${p.empresa ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">business</span>
+                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                                    <use href="assets/icons/sprite.svg#icon-business"></use>
+                                </svg>
                                 ${p.empresa}
                             </span>` : ''}
                             ${p.contato ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">phone</span>
+                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                                    <use href="assets/icons/sprite.svg#icon-phone"></use>
+                                </svg>
                                 ${p.contato}
                             </span>` : ''}
                             ${p.tipo === 'ADM' ? `<span style="font-size:0.65rem; color: #10B981; font-weight:600;">
-                                <span class="material-icons" style="font-size:12px; vertical-align:middle;">verified</span>
+                                <svg class="icon" width="12" height="12" style="vertical-align:middle;">
+                                    <use href="assets/icons/sprite.svg#icon-verified"></use>
+                                </svg>
                                 ADM
                             </span>` : ''}
                         </div>
@@ -170,7 +188,9 @@ export function abrirPopup(tipo) {
                                     onmouseenter="this.style.background='var(--color-bg, #f1f5f9)'"
                                     onmouseleave="this.style.background='transparent'"
                                     title="Editar">
-                                    <span class="material-icons" style="font-size:18px;">edit</span>
+                                    <svg class="icon" width="18" height="18">
+                                        <use href="assets/icons/sprite.svg#icon-edit"></use>
+                                    </svg>
                                 </button>
                                 <button onclick="window.removerPessoa('${p.id}')" 
                                     style="
@@ -185,7 +205,9 @@ export function abrirPopup(tipo) {
                                     onmouseenter="this.style.background='#FEE2E2'"
                                     onmouseleave="this.style.background='transparent'"
                                     title="Excluir">
-                                    <span class="material-icons" style="font-size:18px;">delete</span>
+                                    <svg class="icon" width="18" height="18">
+                                        <use href="assets/icons/sprite.svg#icon-delete"></use>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -204,7 +226,14 @@ export function abrirPopup(tipo) {
                     text-align: center;
                     font-weight: 600;
                     font-size: 0.9rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
                 ">
+                    <svg class="icon" width="18" height="18" style="color:white;">
+                        <use href="assets/icons/sprite.svg#${icone}"></use>
+                    </svg>
                     Total: ${pessoasFiltradas.length} funcionário${pessoasFiltradas.length > 1 ? 's' : ''}
                 </div>
             `;

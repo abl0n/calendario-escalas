@@ -230,46 +230,59 @@ function renderizarBotoesEquipe() {
     if (!container) return;
     container.innerHTML = '';
     
-    // 🔥 EMOJIS PARA CADA ESCALA
-    const emojisEscalas = {
-        1: '📅',  // Calendário
-        2: '📅',  // Calendário com data
-        3: '📅',  // Calendário espiral
-        4: '📅'   // Prancheta
+    // 🔥 CORES FORTES PARA CADA ESCALA
+    const coresEscalas = {
+        1: { bg: '#3B82F6', hover: '#1D4ED8', text: '#FFFFFF' },
+        2: { bg: '#EF4444', hover: '#B91C1C', text: '#FFFFFF' },
+        3: { bg: '#8B5CF6', hover: '#6D28D9', text: '#FFFFFF' },
+        4: { bg: '#F59E0B', hover: '#B45309', text: '#FFFFFF' }
     };
     
-    // Cores fortes para cada escala
-    const coresEscalas = {
-        1: { bg: '#3B82F6', hover: '#1D4ED8', text: '#FFFFFF' },     // Azul forte
-        2: { bg: '#EF4444', hover: '#B91C1C', text: '#FFFFFF' },     // Vermelho forte
-        3: { bg: '#8B5CF6', hover: '#6D28D9', text: '#FFFFFF' },     // Roxo forte
-        4: { bg: '#F59E0B', hover: '#B45309', text: '#FFFFFF' }      // Amarelo forte
+    // 🔥 ÍCONES SVG PARA CADA ESCALA
+    const iconesEscalas = {
+        1: 'icon-calendar',
+        2: 'icon-calendar-month',
+        3: 'icon-calendar',
+        4: 'icon-calendar'
     };
     
     equipes.forEach(equipe => {
         const btn = document.createElement('button');
         const isSelected = equipeSelecionada && equipe.id === equipeSelecionada.id;
         const cores = coresEscalas[equipe.id] || coresEscalas[1];
-        const emoji = emojisEscalas[equipe.id] || '📅';
+        const icone = iconesEscalas[equipe.id] || 'icon-calendar';
         
-        // 🔥 BOTÃO COM EMOJI + NÚMERO
-        btn.innerHTML = `${emoji} ${equipe.id}`;
-        btn.setAttribute('aria-label', `Selecionar escala ${equipe.id}`);
+        // 🔥 VERIFICAR SE É ADM
+        const isADM = equipe.tipo === 'ADM';
+        const admBadge = isADM ? `<span class="adm-badge" style="font-size:0.5rem; background:#10B981; color:white; padding:1px 6px; border-radius:4px; margin-left:2px;">ADM</span>` : '';
+        
+        // 🔥 BOTÃO COM SVG + NÚMERO + BADGE ADM
+        btn.innerHTML = `
+            <svg class="icon" width="20" height="20" style="fill: ${isSelected ? '#FFFFFF' : cores.bg}; transition: fill 0.3s ease;">
+                <use href="assets/icons/sprite.svg#${icone}"></use>
+            </svg>
+            <span>${equipe.id}</span>
+            ${admBadge}
+        `;
+        
+        btn.setAttribute('aria-label', `Selecionar escala ${equipe.id}${isADM ? ' - ADM' : ''}`);
+        btn.setAttribute('role', 'tab');
+        btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
         
         // Estilos base
         btn.style.cssText = `
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: 3px solid ${cores.bg};
             border-radius: 12px;
             background: ${isSelected ? cores.bg : 'transparent'};
             color: ${isSelected ? cores.text : cores.bg};
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             min-width: 60px;
             flex: 1;
-            max-width: 100px;
+            max-width: ${isADM ? '120px' : '100px'};
             text-align: center;
             font-family: var(--font-family, system-ui, sans-serif);
             box-shadow: ${isSelected ? `0 4px 15px ${cores.bg}40` : 'none'};
@@ -279,27 +292,35 @@ function renderizarBotoesEquipe() {
             align-items: center;
             justify-content: center;
             gap: 6px;
+            will-change: transform, box-shadow, background;
         `;
         
         // Hover
-        btn.onmouseenter = () => {
+        btn.addEventListener('mouseenter', () => {
             if (!isSelected) {
                 btn.style.background = cores.bg + '20';
                 btn.style.transform = 'scale(1.05)';
                 btn.style.boxShadow = `0 4px 12px ${cores.bg}30`;
+                const svg = btn.querySelector('svg');
+                if (svg) svg.style.fill = cores.bg;
             }
-        };
+        });
         
-        btn.onmouseleave = () => {
+        btn.addEventListener('mouseleave', () => {
             if (!isSelected) {
                 btn.style.background = 'transparent';
                 btn.style.transform = 'scale(1)';
                 btn.style.boxShadow = 'none';
+                const svg = btn.querySelector('svg');
+                if (svg) svg.style.fill = cores.bg;
             }
-        };
+        });
         
         // Clique
-        btn.onclick = () => selecionarEquipe(equipe);
+        btn.addEventListener('click', () => {
+            selecionarEquipe(equipe);
+        });
+        
         container.appendChild(btn);
     });
 }
@@ -396,9 +417,13 @@ function abrirPopupADM() {
     const todasPessoas = getPessoas();
     const pessoasADM = todasPessoas.filter(p => p.tipo === 'ADM');
 
-    // 🔥 REMOVER ÍCONE - APENAS TEXTO
     if (titulo) {
-        titulo.textContent = '🏢 Funcionários Administrativos';
+        titulo.innerHTML = `
+            <svg class="icon" width="20" height="20" style="color:#10B981;">
+                <use href="assets/icons/sprite.svg#icon-contacts"></use>
+            </svg>
+            Funcionários Administrativos
+        `;
     }
 
     pessoasADM.sort((a, b) => a.nome.localeCompare(b.nome));
@@ -407,7 +432,9 @@ function abrirPopupADM() {
         if (pessoasADM.length === 0) {
             conteudo.innerHTML = `
                 <div style="text-align:center; padding: 40px 20px; color: var(--color-text-muted, #64748b);">
-                    <span style="font-size:48px;">🏢</span>
+                    <svg class="icon" width="48" height="48" style="opacity:0.3; color:#10B981;">
+                        <use href="assets/icons/sprite.svg#icon-contacts"></use>
+                    </svg>
                     <p style="margin-top:12px; font-size:0.95rem;">
                         Nenhum funcionário administrativo cadastrado.
                     </p>
@@ -432,8 +459,15 @@ function abrirPopupADM() {
                     font-weight: 600;
                     font-size: 0.85rem;
                     margin-bottom: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
                 ">
-                    🏢 Administrativos (${pessoasADM.length})
+                    <svg class="icon" width="18" height="18" style="color:white;">
+                        <use href="assets/icons/sprite.svg#icon-contacts"></use>
+                    </svg>
+                    Administrativos (${pessoasADM.length})
                 </div>
             `;
             
@@ -456,19 +490,27 @@ function abrirPopupADM() {
                                 ${p.nome}
                             </span>
                             ${p.cargo ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">work</span>
+                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                                    <use href="assets/icons/sprite.svg#icon-work"></use>
+                                </svg>
                                 ${p.cargo}
                             </span>` : ''}
                             ${p.empresa ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">business</span>
+                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                                    <use href="assets/icons/sprite.svg#icon-business"></use>
+                                </svg>
                                 ${p.empresa}
                             </span>` : ''}
                             ${p.contato ? `<span style="font-size:0.75rem; color: var(--color-text-muted, #64748b);">
-                                <span class="material-icons" style="font-size:14px; vertical-align:middle;">phone</span>
+                                <svg class="icon" width="14" height="14" style="vertical-align:middle;">
+                                    <use href="assets/icons/sprite.svg#icon-phone"></use>
+                                </svg>
                                 ${p.contato}
                             </span>` : ''}
                             <span style="font-size:0.65rem; color: #10B981; font-weight:600;">
-                                <span class="material-icons" style="font-size:12px; vertical-align:middle;">verified</span>
+                                <svg class="icon" width="12" height="12" style="vertical-align:middle;">
+                                    <use href="assets/icons/sprite.svg#icon-verified"></use>
+                                </svg>
                                 ADM
                             </span>
                         </div>
@@ -495,7 +537,9 @@ function abrirPopupADM() {
                                     onmouseenter="this.style.background='var(--color-bg, #f1f5f9)'"
                                     onmouseleave="this.style.background='transparent'"
                                     title="Editar">
-                                    <span class="material-icons" style="font-size:18px;">edit</span>
+                                    <svg class="icon" width="18" height="18">
+                                        <use href="assets/icons/sprite.svg#icon-edit"></use>
+                                    </svg>
                                 </button>
                                 <button onclick="window.removerPessoa('${p.id}')" 
                                     style="
@@ -510,7 +554,9 @@ function abrirPopupADM() {
                                     onmouseenter="this.style.background='#FEE2E2'"
                                     onmouseleave="this.style.background='transparent'"
                                     title="Excluir">
-                                    <span class="material-icons" style="font-size:18px;">delete</span>
+                                    <svg class="icon" width="18" height="18">
+                                        <use href="assets/icons/sprite.svg#icon-delete"></use>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -529,7 +575,14 @@ function abrirPopupADM() {
                     text-align: center;
                     font-weight: 600;
                     font-size: 0.9rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
                 ">
+                    <svg class="icon" width="18" height="18" style="color:white;">
+                        <use href="assets/icons/sprite.svg#icon-contacts"></use>
+                    </svg>
                     Total: ${pessoasADM.length} funcionário${pessoasADM.length > 1 ? 's' : ''} ADM
                 </div>
             `;
@@ -766,58 +819,127 @@ function abrirEstatisticas() {
         N: pessoasEscala.filter(p => p.turno === 'N').length
     };
 
+    // 🔥 NOVO LAYOUT EM CARDS
     conteudo.innerHTML = `
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">calendar_today</span> Período</span>
-            <span class="valor">${formatarDataPeriodo(periodo.inicio)} a ${formatarDataPeriodo(periodo.fim)}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">bar_chart</span> Total de Dias</span>
-            <span class="valor">${diasNoPeriodo}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">work</span> Dias Trabalhados</span>
-            <span class="valor trabalho">${trabalhos}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">beach_access</span> Dias de Folga</span>
-            <span class="valor folga">${folgas}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">event_busy</span> Feriados</span>
-            <span class="valor feriado">${feriadosCount}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">warning</span> Feriados Trab.</span>
-            <span class="valor feriado">${feriadosTrabalhadosCount}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">timer</span> Horas Efetivas</span>
-            <span class="valor" style="color:#059669;">${formatarMinutos(minutosTrabalhados)}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">percent</span> % Trabalhado</span>
-            <span class="valor" style="color:#8B5CF6;">${percentual}%</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label"><span class="material-icons" style="font-size:16px; vertical-align:middle;">access_time</span> H.Extra Período</span>
-            <span class="valor" style="color:#f59e0b;">${formatarMinutos(totalExtrasMin)}</span>
-        </div>
-        <div class="estatistica-detalhada-item" style="border-top: 1px solid var(--color-border); margin-top: 4px; padding-top: 12px;">
-            <span class="label" style="font-weight:700;"><span class="material-icons" style="font-size:16px; vertical-align:middle;">people</span> Funcionários</span>
-            <span class="valor" style="color:var(--color-primary);">${pessoasEscala.length}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label" style="padding-left:16px;"><span class="material-icons" style="font-size:16px; vertical-align:middle;">wb_sunny</span> Manhã</span>
-            <span class="valor manha">${turnos.M}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label" style="padding-left:16px;"><span class="material-icons" style="font-size:16px; vertical-align:middle;">cloud</span> Tarde</span>
-            <span class="valor tarde">${turnos.T}</span>
-        </div>
-        <div class="estatistica-detalhada-item">
-            <span class="label" style="padding-left:16px;"><span class="material-icons" style="font-size:16px; vertical-align:middle;">bedtime</span> Noite</span>
-            <span class="valor noite">${turnos.N}</span>
+        <div class="estatisticas-grid">
+            
+            <!-- Período -->
+            <div class="estatistica-card periodo">
+                <div class="estatistica-icon">📅</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Período</span>
+                    <span class="estatistica-valor">${formatarDataPeriodo(periodo.inicio)} a ${formatarDataPeriodo(periodo.fim)}</span>
+                </div>
+            </div>
+            
+            <!-- Total de Dias -->
+            <div class="estatistica-card total-dias">
+                <div class="estatistica-icon">📊</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Total de Dias</span>
+                    <span class="estatistica-valor">${diasNoPeriodo}</span>
+                </div>
+            </div>
+            
+            <!-- Dias Trabalhados -->
+            <div class="estatistica-card trabalhados">
+                <div class="estatistica-icon">💼</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Dias Trabalhados</span>
+                    <span class="estatistica-valor" style="color:#3B82F6;">${trabalhos}</span>
+                </div>
+            </div>
+            
+            <!-- Dias de Folga -->
+            <div class="estatistica-card folga">
+                <div class="estatistica-icon">🏖️</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Dias de Folga</span>
+                    <span class="estatistica-valor" style="color:#10B981;">${folgas}</span>
+                </div>
+            </div>
+            
+            <!-- Feriados -->
+            <div class="estatistica-card feriados">
+                <div class="estatistica-icon">📅</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Feriados</span>
+                    <span class="estatistica-valor" style="color:#EF4444;">${feriadosCount}</span>
+                </div>
+            </div>
+            
+            <!-- Feriados Trabalhados -->
+            <div class="estatistica-card feriados-trab">
+                <div class="estatistica-icon">⚠️</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Feriados Trab.</span>
+                    <span class="estatistica-valor" style="color:#DC2626;">${feriadosTrabalhadosCount}</span>
+                </div>
+            </div>
+            
+            <!-- Horas Efetivas -->
+            <div class="estatistica-card horas">
+                <div class="estatistica-icon">⏱️</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Horas Efetivas</span>
+                    <span class="estatistica-valor" style="color:#059669;">${formatarMinutos(minutosTrabalhados)}</span>
+                </div>
+            </div>
+            
+            <!-- % Trabalhado -->
+            <div class="estatistica-card percentual">
+                <div class="estatistica-icon">📊</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">% Trabalhado</span>
+                    <span class="estatistica-valor" style="color:#8B5CF6;">${percentual}%</span>
+                </div>
+            </div>
+            
+            <!-- H.Extra Período -->
+            <div class="estatistica-card extra">
+                <div class="estatistica-icon">⏰</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">H.Extra Período</span>
+                    <span class="estatistica-valor" style="color:#F59E0B;">${formatarMinutos(totalExtrasMin)}</span>
+                </div>
+            </div>
+            
+            <!-- Funcionários -->
+            <div class="estatistica-card funcionarios">
+                <div class="estatistica-icon">👥</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Funcionários</span>
+                    <span class="estatistica-valor">${pessoasEscala.length}</span>
+                </div>
+            </div>
+            
+            <!-- Manhã -->
+            <div class="estatistica-card manha">
+                <div class="estatistica-icon">☀️</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Manhã</span>
+                    <span class="estatistica-valor" style="color:#F59E0B;">${turnos.M}</span>
+                </div>
+            </div>
+            
+            <!-- Tarde -->
+            <div class="estatistica-card tarde">
+                <div class="estatistica-icon">🌆</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Tarde</span>
+                    <span class="estatistica-valor" style="color:#EA580C;">${turnos.T}</span>
+                </div>
+            </div>
+            
+            <!-- Noite -->
+            <div class="estatistica-card noite">
+                <div class="estatistica-icon">🌙</div>
+                <div class="estatistica-info">
+                    <span class="estatistica-label">Noite</span>
+                    <span class="estatistica-valor" style="color:#4F46E5;">${turnos.N}</span>
+                </div>
+            </div>
+            
         </div>
     `;
 
@@ -1097,8 +1219,13 @@ function abrirBug() {
     window.open(`mailto:adri0mt@uni9.edu.br?subject=${encodeURIComponent('🐛 Reporte de Bug - Calendário de Escalas')}`, '_blank');
 }
 
+
 // =====================================================
-// INIT
+// OTIMIZAÇÃO DE CARREGAMENTO
+// =====================================================
+
+// =====================================================
+// INIT - VERSÃO OTIMIZADA COM requestIdleCallback
 // =====================================================
 
 function init() {
@@ -1106,20 +1233,35 @@ function init() {
     console.log('👥 Pessoas carregadas:', pessoas);
     console.log('📋 Equipe selecionada:', equipeSelecionada);
     
+    // 🔥 1. Carregar crítico primeiro (renderização imediata)
     initTema();
     initModais();
     initPopups(equipeSelecionada);
 
-    carregarConfigPeriodoUI();
-
+    // 🔥 2. Renderizar elementos visíveis imediatamente
     renderizarBotoesEquipe();
     renderizarCalendario();
-    renderizarLegendaFeriados();
-    atualizarPeriodoInfo();
-    renderizarListaExtras();
     atualizarContadores();
+    atualizarPeriodoInfo();
 
-    // Event listeners para fechar modais
+    // 🔥 3. Carregar o resto com requestIdleCallback (não bloqueia)
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            console.log('🔄 Carregando elementos não críticos...');
+            carregarConfigPeriodoUI();
+            renderizarLegendaFeriados();
+            renderizarListaExtras();
+        }, { timeout: 2000 });
+    } else {
+        // Fallback para navegadores que não suportam requestIdleCallback
+        setTimeout(() => {
+            carregarConfigPeriodoUI();
+            renderizarLegendaFeriados();
+            renderizarListaExtras();
+        }, 100);
+    }
+
+    // 🔥 4. Event listeners para fechar modais
     const modalExtra = document.getElementById('modalExtra');
     const modalPessoa = document.getElementById('modalPessoa');
     
@@ -1135,11 +1277,19 @@ function init() {
         });
     }
 
+    // 🔥 5. Service Worker (carregar depois do conteúdo)
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        requestIdleCallback(() => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => console.log('✅ Service Worker registrado com sucesso!'))
+                .catch(error => console.log('⚠️ Falha ao registrar Service Worker:', error));
+        });
+    }
+
     console.log('✅ Calendário inicializado!');
     console.log('📅 Período atual:', getNomePeriodo(getPeriodoPorIndex(periodoIndex)));
     console.log('👥 Funcionários:', pessoas.length);
 }
-
 // =====================================================
 // EXPORTA FUNÇÕES PARA O GLOBAL (window)
 // =====================================================

@@ -1483,3 +1483,687 @@ body.modo-escuro .legenda-folga {
 .modal-content .popup-header .menu-fechar .material-icons {
     font-size: 22px;
 }
+
+/* =====================================================
+   CORREÇÕES DE CLS (Cumulative Layout Shift)
+   ===================================================== */
+
+/* 🔥 Evitar CLS no calendário */
+#calendarioContainer {
+    min-height: 400px;
+    width: 100%;
+    position: relative;
+}
+
+.calendario table {
+    width: 100%;
+    table-layout: fixed; /* ← ESSENCIAL para evitar CLS */
+    border-collapse: separate;
+    border-spacing: 4px;
+}
+
+.calendario td {
+    height: 72px;
+    min-height: 72px; /* ← Altura fixa */
+    max-height: 72px;
+    vertical-align: top;
+    padding: 4px;
+    overflow: hidden;
+}
+
+/* 🔥 Evitar CLS nos contadores */
+.contadores-container {
+    min-height: 80px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.contador-item {
+    min-height: 64px; /* ← Altura fixa */
+    height: 64px;
+}
+
+/* 🔥 Animações otimizadas (usando transform) */
+.contador-item:hover {
+    transform: translateY(-2px) scale(1.02);
+    transition: transform 0.2s ease;
+}
+
+.footer-btn:hover .material-icons {
+    transform: translateY(-2px) scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+/* 🔥 Evitar animações de layout */
+.menu-lateral {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* ← OK */
+    /* NÃO use transition: left, top, width, height */
+}
+
+/* ✅ Usar transform em vez de left/top */
+.menu-lateral.aberto {
+    transform: translateX(0); /* ← OK */
+}
+
+/* =====================================================
+   CORREÇÕES DE CLS (Cumulative Layout Shift)
+   OTIMIZAÇÃO DE PERFORMANCE
+   ===================================================== */
+
+/* 🔥 Evitar CLS no calendário */
+#calendarioContainer {
+    min-height: 420px;
+    width: 100%;
+    position: relative;
+    display: block;
+}
+
+.calendario table {
+    width: 100%;
+    table-layout: fixed !important; /* ← ESSENCIAL para evitar CLS */
+    border-collapse: separate;
+    border-spacing: 4px;
+    margin: 0;
+}
+
+.calendario td {
+    height: 72px;
+    min-height: 72px !important; /* ← Altura fixa */
+    max-height: 72px !important;
+    vertical-align: top;
+    padding: 4px 2px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* 🔥 Evitar CLS nos contadores */
+.contadores-container {
+    min-height: 80px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.contador-item {
+    min-height: 64px !important; /* ← Altura fixa */
+    height: 64px !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+    will-change: transform;
+}
+
+.contador-item:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.contador-item:active {
+    transform: scale(0.95);
+}
+
+.contador-item .contador-numero {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* 🔥 Otimizar animações do rodapé */
+.footer-btn .material-icons {
+    transition: transform 0.3s ease, color 0.3s ease;
+    will-change: transform;
+}
+
+.footer-btn:hover .material-icons {
+    transform: translateY(-2px) scale(1.1);
+}
+
+.footer-btn:active .material-icons {
+    transform: scale(0.9);
+}
+
+/* 🔥 Otimizar menu lateral */
+.menu-lateral {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.menu-lateral.aberto {
+    transform: translateX(0);
+}
+
+/* 🔥 Otimizar botões das escalas */
+.botoes-equipe button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    will-change: transform;
+    min-height: 48px;
+}
+
+.botoes-equipe button:hover {
+    transform: scale(1.05);
+}
+
+.botoes-equipe button.ativo {
+    transform: scale(1.05);
+}
+
+/* 🔥 Otimizar modais */
+.modal-overlay {
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    will-change: transform, opacity;
+}
+
+.modal-overlay.ativo .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* 🔥 Otimizar popups */
+.popup-overlay {
+    transition: opacity 0.3s ease;
+}
+
+.popup-lista,
+.popup-estatisticas {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    will-change: transform, opacity;
+}
+
+/* 🔥 Evitar repaints desnecessários */
+.calendario td {
+    will-change: background-color;
+}
+
+.calendario td:hover {
+    background: var(--color-bg, #f8fafc);
+}
+
+/* 🔥 Dimensões fixas para elementos críticos */
+.navegacao-mes {
+    min-height: 52px;
+}
+
+.header-escalas {
+    min-height: 70px;
+}
+
+/* 🔥 Otimizar responsivo */
+@media (max-width: 768px) {
+    .calendario td {
+        height: 56px;
+        min-height: 56px !important;
+        max-height: 56px !important;
+        padding: 2px 1px;
+    }
+    
+    #calendarioContainer {
+        min-height: 340px;
+    }
+    
+    .contador-item {
+        min-height: 52px !important;
+        height: 52px !important;
+    }
+    
+    .contador-item .contador-numero {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .calendario td {
+        height: 44px;
+        min-height: 44px !important;
+        max-height: 44px !important;
+        padding: 1px;
+    }
+    
+    #calendarioContainer {
+        min-height: 280px;
+    }
+    
+    .contador-item {
+        min-height: 44px !important;
+        height: 44px !important;
+        padding: 4px 2px;
+    }
+    
+    .contador-item .contador-numero {
+        font-size: 1rem;
+    }
+    
+    .contador-item .contador-label {
+        font-size: 0.45rem;
+    }
+}
+
+/* Adicionar no style.css */
+#calendarioContainer {
+    min-height: 420px;
+    width: 100%;
+}
+
+.calendario td {
+    height: 72px !important;
+    min-height: 72px !important;
+    max-height: 72px !important;
+}
+
+/* =====================================================
+   CORREÇÕES DE CLS (Cumulative Layout Shift)
+   ===================================================== */
+
+/* 🔥 GARANTIR DIMENSÕES FIXAS */
+#calendarioContainer {
+    min-height: 420px !important;
+    width: 100% !important;
+    display: block !important;
+    position: relative !important;
+}
+
+#calendarioContainer table {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 4px !important;
+    margin: 0 !important;
+}
+
+#calendarioContainer td {
+    height: 72px !important;
+    min-height: 72px !important;
+    max-height: 72px !important;
+    padding: 4px 2px !important;
+    vertical-align: top !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* 🔥 CONTADORES COM ALTURA FIXA */
+.contadores-container {
+    min-height: 80px !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+}
+
+.contador-item {
+    min-height: 64px !important;
+    height: 64px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 4px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    border: 2px solid transparent !important;
+    box-sizing: border-box !important;
+    will-change: transform !important;
+}
+
+.contador-item:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.contador-item:active {
+    transform: scale(0.95) !important;
+}
+
+/* 🔥 NAVEGAÇÃO E HEADER COM ALTURA FIXA */
+.navegacao-mes {
+    min-height: 52px !important;
+}
+
+.header-escalas {
+    min-height: 70px !important;
+}
+
+/* 🔥 RESPONSIVO COM ALTURAS AJUSTADAS */
+@media (max-width: 768px) {
+    #calendarioContainer td {
+        height: 56px !important;
+        min-height: 56px !important;
+        max-height: 56px !important;
+        padding: 2px 1px !important;
+    }
+    
+    #calendarioContainer {
+        min-height: 340px !important;
+    }
+    
+    .contador-item {
+        min-height: 52px !important;
+        height: 52px !important;
+    }
+    
+    .contador-item .contador-numero {
+        font-size: 1.2rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #calendarioContainer td {
+        height: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
+        padding: 1px !important;
+    }
+    
+    #calendarioContainer {
+        min-height: 280px !important;
+    }
+    
+    .contador-item {
+        min-height: 44px !important;
+        height: 44px !important;
+        padding: 4px 2px !important;
+    }
+    
+    .contador-item .contador-numero {
+        font-size: 1rem !important;
+    }
+    
+    .contador-item .contador-label {
+        font-size: 0.45rem !important;
+    }
+}
+
+/* =====================================================
+   ÍCONES SVG - ESTILOS
+   ===================================================== */
+
+.icon {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    fill: currentColor;
+    transition: transform 0.3s ease, color 0.3s ease;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+/* Tamanhos */
+.icon-xs { width: 14px; height: 14px; }
+.icon-sm { width: 18px; height: 18px; }
+.icon-md { width: 24px; height: 24px; }
+.icon-lg { width: 32px; height: 32px; }
+.icon-xl { width: 40px; height: 40px; }
+.icon-2xl { width: 48px; height: 48px; }
+
+/* Cores */
+.icon-primary { fill: #3B82F6; }
+.icon-success { fill: #10B981; }
+.icon-danger { fill: #EF4444; }
+.icon-warning { fill: #F59E0B; }
+.icon-white { fill: #FFFFFF; }
+
+/* Animações */
+.icon-spin {
+    animation: icon-spin 2s linear infinite;
+}
+
+.icon-spin-slow {
+    animation: icon-spin 4s linear infinite;
+}
+
+.icon-spin-fast {
+    animation: icon-spin 1s linear infinite;
+}
+
+.icon-pulse {
+    animation: icon-pulse 1.5s ease-in-out infinite;
+}
+
+.icon-bounce {
+    animation: icon-bounce 1.5s ease-in-out infinite;
+}
+
+.icon-float {
+    animation: icon-float 3s ease-in-out infinite;
+}
+
+.icon-swing {
+    animation: icon-swing 2s ease-in-out infinite;
+    transform-origin: top center;
+}
+
+.icon-scale {
+    animation: icon-scale 2s ease-in-out infinite;
+}
+
+.icon-flash {
+    animation: icon-flash 1.5s ease-in-out infinite;
+}
+
+@keyframes icon-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes icon-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes icon-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+@keyframes icon-float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+@keyframes icon-swing {
+    0%, 100% { transform: rotate(-15deg); }
+    50% { transform: rotate(15deg); }
+}
+
+@keyframes icon-scale {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+}
+
+@keyframes icon-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Hover */
+.icon-hover-spin:hover {
+    animation: icon-spin 0.8s linear;
+}
+
+.icon-hover-pulse:hover {
+    animation: icon-pulse 0.5s ease-in-out;
+}
+
+.icon-hover-bounce:hover {
+    animation: icon-bounce 0.6s ease-in-out;
+}
+
+.icon-hover-scale:hover {
+    transform: scale(1.2);
+}
+
+.icon-hover-rotate:hover {
+    transform: rotate(180deg);
+}
+
+.icon-hover-float:hover {
+    animation: icon-float 0.8s ease-in-out;
+}
+
+/* Clickable */
+.icon-clickable {
+    cursor: pointer;
+}
+
+.icon-clickable:hover {
+    opacity: 0.8;
+}
+
+/* =====================================================
+   ESTATÍSTICAS - LAYOUT EM CARDS
+   ===================================================== */
+
+.estatisticas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 16px;
+}
+
+.estatistica-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--color-surface, #ffffff);
+    border-radius: 12px;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-left: 4px solid var(--color-primary, #3B82F6);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    transition: all 0.2s ease;
+    min-height: 64px;
+}
+
+.estatistica-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.estatistica-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+}
+
+.estatistica-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.estatistica-label {
+    display: block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #64748b);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.estatistica-valor {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, #1e293b);
+    line-height: 1.3;
+}
+
+/* ===== CORES POR TIPO ===== */
+.estatistica-card.periodo { border-left-color: #3B82F6; }
+.estatistica-card.total-dias { border-left-color: #64748b; }
+.estatistica-card.trabalhados { border-left-color: #3B82F6; }
+.estatistica-card.folga { border-left-color: #10B981; }
+.estatistica-card.feriados { border-left-color: #EF4444; }
+.estatistica-card.feriados-trab { border-left-color: #DC2626; }
+.estatistica-card.horas { border-left-color: #059669; }
+.estatistica-card.percentual { border-left-color: #8B5CF6; }
+.estatistica-card.extra { border-left-color: #F59E0B; }
+.estatistica-card.funcionarios { border-left-color: #3B82F6; }
+.estatistica-card.manha { border-left-color: #F59E0B; }
+.estatistica-card.tarde { border-left-color: #EA580C; }
+.estatistica-card.noite { border-left-color: #4F46E5; }
+
+/* =====================================================
+   MODO ESCURO
+   ===================================================== */
+
+body.modo-escuro .estatistica-card {
+    background: var(--color-surface, #1e293b);
+    border-color: var(--color-border, #334155);
+}
+
+body.modo-escuro .estatistica-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* =====================================================
+   RESPONSIVO
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .estatisticas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .estatistica-card {
+        padding: 12px;
+        min-height: 56px;
+    }
+    
+    .estatistica-icon {
+        font-size: 1.2rem;
+        width: 28px;
+    }
+    
+    .estatistica-valor {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .estatisticas-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 8px;
+    }
+    
+    .estatistica-card {
+        padding: 10px;
+        min-height: 48px;
+        border-radius: 8px;
+    }
+    
+    .estatistica-icon {
+        font-size: 1rem;
+        width: 24px;
+    }
+    
+    .estatistica-label {
+        font-size: 0.55rem;
+    }
+    
+    .estatistica-valor {
+        font-size: 0.85rem;
+    }
+}
