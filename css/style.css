@@ -651,63 +651,167 @@ body.modo-escuro .legenda-folga {
 .contadores-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 8px;
     margin-top: 16px;
     margin-bottom: 16px;
+    padding: 0 2px;
 }
 
 .contador-item {
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 12px 8px;
-    border-radius: var(--radius-md, 8px);
+    padding: 6px 2px !important;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     border: 2px solid transparent;
-    background: var(--color-surface, #ffffff);
-    min-height: 64px;
+    min-height: 56px !important;
+    height: auto !important;
+    box-sizing: border-box;
+    will-change: transform;
+    overflow: hidden;
+    width: 100%;
+    gap: 1px;
 }
 
-.contador-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0,0,0,0.1));
+/* ===== ÍCONES ===== */
+.contador-item .icon {
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0;
+    display: block;
 }
 
-.contador-item:active {
-    transform: scale(0.95);
-}
-
-.contador-item .contador-icone {
-    font-size: 1.2rem;
-}
-
+/* ===== NÚMERO ===== */
 .contador-item .contador-numero {
-    font-size: 1.5rem;
-    font-weight: var(--font-bold, 700);
-    line-height: 1.2;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    margin: 0;
+    padding: 0;
+    display: block;
 }
 
+/* ===== LABEL ===== */
 .contador-item .contador-label {
-    font-size: 0.6rem;
-    font-weight: var(--font-semibold, 600);
+    font-size: 0.5rem !important;
+    font-weight: 600 !important;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    opacity: 0.7;
+    letter-spacing: 0.2px;
+    opacity: 0.8;
+    margin: 0;
+    padding: 0;
+    line-height: 1.1;
+    display: block;
 }
 
-/* Cores dos contadores */
+/* =====================================================
+   RESPONSIVO - TABLET (768px)
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .contadores-container {
+        gap: 6px;
+        padding: 0 2px;
+    }
+    
+    .contador-item {
+        min-height: 48px !important;
+        padding: 4px 2px !important;
+        border-radius: 6px;
+    }
+    
+    .contador-item .icon {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    
+    .contador-item .contador-numero {
+        font-size: 1rem !important;
+    }
+    
+    .contador-item .contador-label {
+        font-size: 0.45rem !important;
+        letter-spacing: 0.1px;
+    }
+}
+
+/* =====================================================
+   RESPONSIVO - MOBILE PEQUENO (480px)
+   ===================================================== */
+
+@media (max-width: 480px) {
+    .contadores-container {
+        gap: 4px;
+        padding: 0 2px;
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .contador-item {
+        min-height: 40px !important;
+        padding: 3px 1px !important;
+        border-radius: 4px;
+        border-width: 1.5px;
+    }
+    
+    .contador-item .icon {
+        width: 14px !important;
+        height: 14px !important;
+    }
+    
+    .contador-item .contador-numero {
+        font-size: 0.85rem !important;
+        font-weight: 700 !important;
+    }
+    
+    .contador-item .contador-label {
+        font-size: 0.4rem !important;
+        letter-spacing: 0px;
+        font-weight: 600;
+    }
+}
+
+/* =====================================================
+   RESPONSIVO - MOBILE MUITO PEQUENO (380px)
+   ===================================================== */
+
+@media (max-width: 380px) {
+    .contadores-container {
+        gap: 3px;
+        padding: 0 1px;
+    }
+    
+    .contador-item {
+        min-height: 36px !important;
+        padding: 2px 1px !important;
+        border-radius: 4px;
+    }
+    
+    .contador-item .icon {
+        width: 12px !important;
+        height: 12px !important;
+    }
+    
+    .contador-item .contador-numero {
+        font-size: 0.75rem !important;
+    }
+    
+    .contador-item .contador-label {
+        font-size: 0.35rem !important;
+    }
+}
+
+/* =====================================================
+   CORES DOS CONTADORES
+   ===================================================== */
+
 .contador-item.total {
     background: #e2e8f0;
     border-color: #94a3b8;
     color: #1e293b;
-}
-
-[data-theme="dark"] .contador-item.total {
-    background: #334155;
-    border-color: #475569;
-    color: #f1f5f9;
 }
 
 .contador-item.manha {
@@ -716,28 +820,38 @@ body.modo-escuro .legenda-folga {
     color: #92400e;
 }
 
-[data-theme="dark"] .contador-item.manha {
-    background: #451a03;
-    border-color: #f59e0b;
-    color: #fcd34d;
-}
-
 .contador-item.tarde {
     background: #ffedd5;
     border-color: #ea580c;
     color: #7c2d12;
 }
 
-[data-theme="dark"] .contador-item.tarde {
-    background: #431407;
-    border-color: #ea580c;
-    color: #fdba74;
-}
-
 .contador-item.noite {
     background: #e0e7ff;
     border-color: #4f46e5;
     color: #1e1b4b;
+}
+
+/* =====================================================
+   MODO ESCURO
+   ===================================================== */
+
+[data-theme="dark"] .contador-item.total {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .contador-item.manha {
+    background: #451a03;
+    border-color: #f59e0b;
+    color: #fcd34d;
+}
+
+[data-theme="dark"] .contador-item.tarde {
+    background: #431407;
+    border-color: #ea580c;
+    color: #fdba74;
 }
 
 [data-theme="dark"] .contador-item.noite {
@@ -747,195 +861,16 @@ body.modo-escuro .legenda-folga {
 }
 
 /* =====================================================
-   RODAPÉ - MENU DE AÇÕES (MOBILE)
+   HOVER E TOQUE
    ===================================================== */
 
-.footer-actions {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--color-surface, #ffffff);
-    border-top: 1px solid var(--color-border, #e2e8f0);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
-    z-index: 100;
-    padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+.contador-item:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="dark"] .footer-actions {
-    background: var(--color-surface, #1e293b);
-    border-top-color: var(--color-border, #334155);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.footer-actions-inner {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 0 8px;
-}
-
-.footer-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    background: none;
-    border: none;
-    padding: 4px 16px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    min-height: 48px;
-    min-width: 56px;
-    position: relative;
-    color: var(--color-text-muted, #64748b);
-}
-
-.footer-btn .material-icons {
-    font-size: 26px;
-    transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.footer-btn:active {
-    transform: scale(0.92);
-}
-
-.footer-btn-label {
-    font-size: 0.55rem;
-    font-weight: 600;
-    color: var(--color-text-muted, #64748b);
-    letter-spacing: 0.3px;
-    transition: color 0.3s ease;
-}
-
-.footer-btn-primary .material-icons {
-    color: var(--color-primary, #3B82F6);
-}
-
-.footer-btn-primary .footer-btn-label {
-    color: var(--color-primary, #3B82F6);
-}
-
-.footer-btn-primary .material-icons {
-    font-size: 30px;
-}
-
-.footer-btn:hover {
-    background: var(--color-bg, #f1f5f9);
-}
-
-.footer-btn:hover .material-icons {
-    transform: translateY(-2px);
-}
-
-.footer-btn-primary:hover .material-icons {
-    color: var(--color-primary-hover, #2563eb);
-}
-
-/* =====================================================
-   RESPONSIVO - MOBILE
-   ===================================================== */
-
-.app-container {
-    padding-bottom: 80px;
-}
-
-@media (min-width: 768px) {
-    .footer-actions {
-        display: none;
-    }
-    
-    .app-container {
-        padding-bottom: 20px;
-    }
-    
-    .contadores-container {
-        grid-template-columns: repeat(4, 1fr);
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-
-@media (max-width: 767px) {
-    .footer-actions {
-        display: block;
-    }
-    
-    .contadores-container {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 6px;
-    }
-    
-    .contador-item {
-        padding: 8px 4px;
-        min-height: 56px;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 1.2rem;
-    }
-    
-    .contador-item .contador-label {
-        font-size: 0.5rem;
-    }
-    
-    .botoes-equipe button {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-        min-width: 50px;
-        max-width: 80px;
-    }
-}
-
-@supports (padding: max(0px)) {
-    .footer-actions {
-        padding-bottom: max(8px, env(safe-area-inset-bottom));
-    }
-}
-
-@media (max-width: 380px) {
-    .footer-btn {
-        padding: 4px 10px;
-        min-width: 44px;
-    }
-    
-    .footer-btn .material-icons {
-        font-size: 22px;
-    }
-    
-    .footer-btn-label {
-        font-size: 0.5rem;
-    }
-    
-    .contadores-container {
-        gap: 4px;
-    }
-    
-    .contador-item .contador-numero {
-        font-size: 1rem;
-    }
-}
-
-.footer-actions {
-    animation: footerSlideUp 0.3s ease-out;
-}
-
-@keyframes footerSlideUp {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+.contador-item:active {
+    transform: scale(0.95);
 }
 
 /* =====================================================

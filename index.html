@@ -279,39 +279,39 @@
         ============================================================ -->
         <section class="calendario" id="calendarioContainer" role="grid" aria-label="Calendário de escalas" style="min-height:420px;"></section>
 
-        <!-- ============================================================
-        CONTADORES COLORIDOS
-        ============================================================ -->
-        <div class="contadores-container" id="contadoresContainer">
-            <div class="contador-item total" onclick="window.abrirPopup('total')" title="Ver todos os funcionários da escala">
-                <svg class="icon" width="24" height="24">
-                    <use href="assets/icons/sprite.svg#icon-users"></use>
-                </svg>
-                <span class="contador-numero" id="numPessoasEscala">0</span>
-                <span class="contador-label">Total</span>
-            </div>
-            <div class="contador-item manha" onclick="window.abrirPopup('M')" title="Ver funcionários da manhã">
-                <svg class="icon" width="24" height="24" style="color:#F59E0B;">
-                    <use href="assets/icons/sprite.svg#icon-sun"></use>
-                </svg>
-                <span class="contador-numero" id="numManha">0</span>
-                <span class="contador-label">Manhã</span>
-            </div>
-            <div class="contador-item tarde" onclick="window.abrirPopup('T')" title="Ver funcionários da tarde">
-                <svg class="icon" width="24" height="24" style="color:#EA580C;">
-                    <use href="assets/icons/sprite.svg#icon-sun"></use>
-                </svg>
-                <span class="contador-numero" id="numTarde">0</span>
-                <span class="contador-label">Tarde</span>
-            </div>
-            <div class="contador-item noite" onclick="window.abrirPopup('N')" title="Ver funcionários da noite">
-                <svg class="icon" width="24" height="24" style="color:#4F46E5;">
-                    <use href="assets/icons/sprite.svg#icon-moon"></use>
-                </svg>
-                <span class="contador-numero" id="numNoite">0</span>
-                <span class="contador-label">Noite</span>
-            </div>
-        </div>
+<!-- ============================================================
+CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
+============================================================ -->
+<div class="contadores-container" id="contadoresContainer">
+    <div class="contador-item total" onclick="window.abrirPopup('total')" title="Ver todos os funcionários">
+        <svg class="icon" width="20" height="20">
+            <use href="assets/icons/sprite.svg#icon-users"></use>
+        </svg>
+        <span class="contador-numero" id="numPessoasEscala">18</span>
+        <span class="contador-label">Total</span>
+    </div>
+    <div class="contador-item manha" onclick="window.abrirPopup('M')" title="Ver funcionários da manhã">
+        <svg class="icon" width="20" height="20" style="color:#F59E0B;">
+            <use href="assets/icons/sprite.svg#icon-sun"></use>
+        </svg>
+        <span class="contador-numero" id="numManha">0</span>
+        <span class="contador-label">Manhã</span>
+    </div>
+    <div class="contador-item tarde" onclick="window.abrirPopup('T')" title="Ver funcionários da tarde">
+        <svg class="icon" width="20" height="20" style="color:#EA580C;">
+            <use href="assets/icons/sprite.svg#icon-sun"></use>
+        </svg>
+        <span class="contador-numero" id="numTarde">0</span>
+        <span class="contador-label">Tarde</span>
+    </div>
+    <div class="contador-item noite" onclick="window.abrirPopup('N')" title="Ver funcionários da noite">
+        <svg class="icon" width="20" height="20" style="color:#4F46E5;">
+            <use href="assets/icons/sprite.svg#icon-moon"></use>
+        </svg>
+        <span class="contador-numero" id="numNoite">0</span>
+        <span class="contador-label">Noite</span>
+    </div>
+</div>
 
         <!-- ============================================================
         POPUP LISTA DE FUNCIONÁRIOS

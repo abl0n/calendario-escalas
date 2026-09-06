@@ -1363,7 +1363,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 // =====================================================
-// POPUP DETALHES DO DIA
+// POPUP DETALHES DO DIA - COM SVG SPRITE
 // =====================================================
 
 function abrirDetalhesDia(dataStr) {
@@ -1386,7 +1386,7 @@ function abrirDetalhesDia(dataStr) {
     // Status do dia
     const status = obterStatusDia(equipeSelecionada, data);
     const statusTexto = status === 1 ? 'Trabalho' : 'Folga';
-    const statusIcone = status === 1 ? 'work' : 'beach_access';
+    const statusIcone = status === 1 ? 'icon-work' : 'icon-beach';
     const statusCor = status === 1 ? '#3B82F6' : '#10B981';
     
     // Feriado/Comemorativo
@@ -1441,7 +1441,6 @@ function abrirDetalhesDia(dataStr) {
     // Pessoas escaladas no dia
     let pessoasHtml = '';
     const pessoasDoDia = pessoas.filter(p => {
-        // Verificar se a pessoa está escalada neste dia
         const escala = equipeSelecionada?.escalas?.find(e => e.data === dataStr && e.pessoaId === p.id);
         return escala !== undefined;
     });
@@ -1468,18 +1467,23 @@ function abrirDetalhesDia(dataStr) {
     // Equipe selecionada
     const equipeNome = equipeSelecionada?.nome || `Escala ${equipeSelecionada?.id}`;
     
-    // Montar HTML do popup
+    // 🔥 TÍTULO COM SVG SPRITE
     titulo.innerHTML = `
-        <span class="material-icons" style="font-size:20px; vertical-align:middle;">calendar_today</span>
+        <svg class="icon" width="20" height="20" style="color:var(--color-primary, #3B82F6);">
+            <use href="assets/icons/sprite.svg#icon-calendar"></use>
+        </svg>
         ${dataFormatada} - ${nomeDia}
     `;
     
+    // 🔥 CONTEÚDO COM SVG SPRITE
     conteudo.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:12px;">
             <!-- Status -->
             <div class="detalhe-item" style="border-left-color: ${statusCor};">
                 <span class="detalhe-icone">
-                    <span class="material-icons" style="font-size:24px; color: ${statusCor};">${statusIcone}</span>
+                    <svg class="icon" width="24" height="24" style="color: ${statusCor};">
+                        <use href="assets/icons/sprite.svg#${statusIcone}"></use>
+                    </svg>
                 </span>
                 <div>
                     <div class="detalhe-label">Status</div>
@@ -1502,7 +1506,9 @@ function abrirDetalhesDia(dataStr) {
             
             ${!feriadoHtml && !extrasHtml && pessoasDoDia.length === 0 ? `
                 <div style="text-align:center; padding: 20px 0; color: var(--color-text-muted);">
-                    <span class="material-icons" style="font-size:32px;">info</span>
+                    <svg class="icon" width="32" height="32" style="opacity:0.3;">
+                        <use href="assets/icons/sprite.svg#icon-info"></use>
+                    </svg>
                     <p style="margin-top:8px;">Nenhuma informação adicional para este dia.</p>
                 </div>
             ` : ''}
