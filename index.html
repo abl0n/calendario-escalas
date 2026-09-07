@@ -31,7 +31,6 @@
 
     <!-- CSS do Projeto -->
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="design-system/index.css">
     <link rel="stylesheet" href="assets/css/icons-animated.css">
 
     <!-- JS Module -->
@@ -39,15 +38,8 @@
 </head>
 
 <body>
-    <!-- ============================================================
-    LOADING OVERLAY
-    ============================================================ -->
-    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,0.85); z-index:9999; justify-content:center; align-items:center; flex-direction:column; gap:16px; backdrop-filter:blur(4px);">
-        <svg class="icon icon-spin" width="48" height="48" style="color:#3B82F6;">
-            <use href="assets/icons/sprite.svg#icon-sync"></use>
-        </svg>
-        <div style="font-size:1.1rem; font-weight:600; color:#f1f5f9;">Carregando...</div>
-    </div>
+
+
 
     <!-- ============================================================
     TOAST NOTIFICATION
@@ -92,69 +84,63 @@
             </div>
 
             <!-- GUIA RÁPIDO -->
-            <div class="menu-guia" onclick="window.abrirGuia()" style="padding:12px 16px; margin:8px 0 16px; background:var(--color-bg, #f1f5f9); border-radius:8px; cursor:pointer; border:1px solid var(--color-border, #e2e8f0);">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <svg class="icon icon-float" width="24" height="24" style="color:#3B82F6;">
-                        <use href="assets/icons/sprite.svg#icon-help"></use>
-                    </svg>
-                    <div>
-                        <div style="font-size:0.85rem; font-weight:600; color:var(--color-text, #1e293b);">Guia Rápido</div>
-                        <div style="font-size:0.65rem; color:var(--color-text-muted, #64748b);">Clique para ver dicas de uso</div>
-                    </div>
+            <div class="menu-guia" onclick="window.abrirGuia()">
+                <svg class="icon icon-float" width="24" height="24">
+                    <use href="assets/icons/sprite.svg#icon-help"></use>
+                </svg>
+                <div>
+                    <div class="guia-titulo">Guia Rápido</div>
+                    <div class="guia-subtitulo">Clique para ver dicas de uso</div>
                 </div>
             </div>
 
             <!-- CADASTRAR FUNCIONÁRIO -->
-            <button class="menu-item" onclick="window.abrirModalPessoa()" style="background: var(--color-primary, #3B82F6); color: white; border-radius: 8px; margin: 8px 0; width:100%; border:none; padding:12px 16px; cursor:pointer;">
-                <span class="icone" aria-hidden="true">
-                    <svg class="icon" width="24" height="24" style="color:white;">
+            <button class="menu-item menu-item-destaque" onclick="window.abrirModalPessoa()">
+                <span class="icone">
+                    <svg class="icon" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-user-add"></use>
                     </svg>
                 </span>
-                <span class="descricao" style="color: white; font-weight:600;">
+                <span class="descricao">
                     Cadastrar Funcionário
-                    <small style="color: rgba(255,255,255,0.7); display:block; font-weight:400;">Adicionar novo funcionário</small>
+                    <small>Adicionar novo funcionário</small>
                 </span>
             </button>
 
             <div class="menu-divider" role="separator"></div>
 
             <!-- CONFIGURAÇÃO DO PERÍODO -->
-            <div class="menu-periodo-config" style="padding: 12px 16px; margin: 8px 0 16px; background: var(--color-bg, #f1f5f9); border-radius: 8px;">
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <span style="font-size:0.75rem; font-weight:600; color:var(--color-text, #1e293b);">
+            <div class="menu-periodo-config">
+                <span class="periodo-label">
+                    <svg class="icon" width="16" height="16">
+                        <use href="assets/icons/sprite.svg#icon-calendar"></use>
+                    </svg>
+                    Período
+                </span>
+                <div class="periodo-inputs">
+                    <div class="input-group">
+                        <label for="periodoDiaInicio">Início</label>
+                        <input type="number" id="periodoDiaInicio" class="input" value="16" min="1" max="31" aria-label="Dia de início do período">
+                    </div>
+                    <div class="input-group">
+                        <label for="periodoDiaFim">Fim</label>
+                        <input type="number" id="periodoDiaFim" class="input" value="15" min="1" max="31" aria-label="Dia de fim do período">
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="window.aplicarPeriodo()">
                         <svg class="icon" width="16" height="16">
-                            <use href="assets/icons/sprite.svg#icon-calendar"></use>
+                            <use href="assets/icons/sprite.svg#icon-check"></use>
                         </svg>
-                        Período
-                    </span>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                        <div style="display:flex; align-items:center; gap:4px;">
-                            <label for="periodoDiaInicio" style="font-size:0.65rem; color:var(--color-text-muted, #64748b);">Início</label>
-                            <input type="number" id="periodoDiaInicio" class="input" value="16" min="1" max="31" style="width:55px; padding:6px 8px; text-align:center; border:1px solid var(--color-border, #e2e8f0); border-radius:4px; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b);" aria-label="Dia de início do período">
-                        </div>
-                        <div style="display:flex; align-items:center; gap:4px;">
-                            <label for="periodoDiaFim" style="font-size:0.65rem; color:var(--color-text-muted, #64748b);">Fim</label>
-                            <input type="number" id="periodoDiaFim" class="input" value="15" min="1" max="31" style="width:55px; padding:6px 8px; text-align:center; border:1px solid var(--color-border, #e2e8f0); border-radius:4px; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b);" aria-label="Dia de fim do período">
-                        </div>
-                        <button class="btn btn-primary" style="padding:6px 12px; font-size:0.75rem; background:#3B82F6; color:white; border:none; border-radius:4px; cursor:pointer;" onclick="window.aplicarPeriodo()">
-                            <svg class="icon" width="16" height="16" style="color:white;">
-                                <use href="assets/icons/sprite.svg#icon-check"></use>
-                            </svg>
-                            Aplicar
-                        </button>
-                    </div>
-                    <div style="font-size:0.55rem; color:var(--color-text-muted, #64748b);">
-                        Ex: Início 16, Fim 15 → 16/08 a 15/09
-                    </div>
+                        Aplicar
+                    </button>
                 </div>
+                <div class="periodo-exemplo">Ex: Início 16, Fim 15 → 16/08 a 15/09</div>
             </div>
 
             <div class="menu-divider" role="separator"></div>
 
             <!-- TEMA -->
             <button class="menu-item toggle-tema" onclick="window.toggleTema()" aria-label="Alternar tema claro/escuro">
-                <span class="icone" aria-hidden="true">
+                <span class="icone">
                     <svg class="icon" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-moon"></use>
                     </svg>
@@ -170,7 +156,7 @@
 
             <!-- EXPORTAR -->
             <button class="menu-item" onclick="window.exportarDados()" aria-label="Exportar dados">
-                <span class="icone" aria-hidden="true">
+                <span class="icone">
                     <svg class="icon icon-hover-float" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-download"></use>
                     </svg>
@@ -183,7 +169,7 @@
 
             <!-- IMPORTAR -->
             <button class="menu-item" onclick="window.importarDados()" aria-label="Importar dados">
-                <span class="icone" aria-hidden="true">
+                <span class="icone">
                     <svg class="icon icon-hover-float" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-upload"></use>
                     </svg>
@@ -196,8 +182,8 @@
 
             <!-- LIMPAR DADOS -->
             <button class="menu-item" onclick="window.limparDados()" aria-label="Limpar dados">
-                <span class="icone" aria-hidden="true">
-                    <svg class="icon icon-pulse" width="24" height="24" style="color:#EF4444;">
+                <span class="icone">
+                    <svg class="icon icon-pulse" width="24" height="24" style="color:var(--color-danger)">
                         <use href="assets/icons/sprite.svg#icon-delete"></use>
                     </svg>
                 </span>
@@ -209,7 +195,7 @@
 
             <!-- RESETAR -->
             <button class="menu-item" onclick="window.resetarTudo()" aria-label="Resetar tudo">
-                <span class="icone" aria-hidden="true">
+                <span class="icone">
                     <svg class="icon icon-hover-spin" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-sync"></use>
                     </svg>
@@ -224,8 +210,8 @@
 
             <!-- SUGERIR MELHORIA -->
             <button class="menu-item" onclick="window.abrirMelhorias()" aria-label="Sugerir melhoria">
-                <span class="icone" aria-hidden="true">
-                    <svg class="icon icon-float" width="24" height="24" style="color:#F59E0B;">
+                <span class="icone">
+                    <svg class="icon icon-float" width="24" height="24" style="color:var(--color-warning)">
                         <use href="assets/icons/sprite.svg#icon-lightbulb"></use>
                     </svg>
                 </span>
@@ -237,8 +223,8 @@
 
             <!-- REPORTAR BUG -->
             <button class="menu-item" onclick="window.abrirBug()" aria-label="Reportar bug">
-                <span class="icone" aria-hidden="true">
-                    <svg class="icon icon-pulse" width="24" height="24" style="color:#EF4444;">
+                <span class="icone">
+                    <svg class="icon icon-pulse" width="24" height="24" style="color:var(--color-danger)">
                         <use href="assets/icons/sprite.svg#icon-bug"></use>
                     </svg>
                 </span>
@@ -251,9 +237,9 @@
             <div class="menu-divider" role="separator"></div>
 
             <!-- VERSÃO -->
-            <div style="padding: 8px 14px; font-size: 0.7rem; color: var(--color-text-muted, #64748b); text-align: center;">
+            <div class="menu-version">
                 Versão 1.0.0
-                <span class="badge-version" style="background:var(--color-bg, #f1f5f9); padding:2px 8px; border-radius:12px;">Beta</span>
+                <span class="badge-version">Beta</span>
             </div>
         </nav>
 
@@ -261,13 +247,13 @@
         NAVEGAÇÃO DO CALENDÁRIO
         ============================================================ -->
         <div class="navegacao-mes">
-            <button class="btn btn-ghost" onclick="window.mudarPeriodo(-1)" aria-label="Período anterior" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--color-text, #1e293b);">
+            <button class="btn btn-ghost btn-icon" onclick="window.mudarPeriodo(-1)" aria-label="Período anterior">
                 <svg class="icon" width="24" height="24">
                     <use href="assets/icons/sprite.svg#icon-chevron-left"></use>
                 </svg>
             </button>
             <span class="mes-titulo" id="periodoNome">Junho/Julho 2026</span>
-            <button class="btn btn-ghost" onclick="window.mudarPeriodo(1)" aria-label="Próximo período" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--color-text, #1e293b);">
+            <button class="btn btn-ghost btn-icon" onclick="window.mudarPeriodo(1)" aria-label="Próximo período">
                 <svg class="icon" width="24" height="24">
                     <use href="assets/icons/sprite.svg#icon-chevron-right"></use>
                 </svg>
@@ -277,56 +263,56 @@
         <!-- ============================================================
         CALENDÁRIO
         ============================================================ -->
-        <section class="calendario" id="calendarioContainer" role="grid" aria-label="Calendário de escalas" style="min-height:420px;"></section>
+        <section class="calendario" id="calendarioContainer" role="grid" aria-label="Calendário de escalas"></section>
 
-<!-- ============================================================
-CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
-============================================================ -->
-<div class="contadores-container" id="contadoresContainer">
-    <div class="contador-item total" onclick="window.abrirPopup('total')" title="Ver todos os funcionários">
-        <svg class="icon" width="20" height="20">
-            <use href="assets/icons/sprite.svg#icon-users"></use>
-        </svg>
-        <span class="contador-numero" id="numPessoasEscala">18</span>
-        <span class="contador-label">Total</span>
-    </div>
-    <div class="contador-item manha" onclick="window.abrirPopup('M')" title="Ver funcionários da manhã">
-        <svg class="icon" width="20" height="20" style="color:#F59E0B;">
-            <use href="assets/icons/sprite.svg#icon-sun"></use>
-        </svg>
-        <span class="contador-numero" id="numManha">0</span>
-        <span class="contador-label">Manhã</span>
-    </div>
-    <div class="contador-item tarde" onclick="window.abrirPopup('T')" title="Ver funcionários da tarde">
-        <svg class="icon" width="20" height="20" style="color:#EA580C;">
-            <use href="assets/icons/sprite.svg#icon-sun"></use>
-        </svg>
-        <span class="contador-numero" id="numTarde">0</span>
-        <span class="contador-label">Tarde</span>
-    </div>
-    <div class="contador-item noite" onclick="window.abrirPopup('N')" title="Ver funcionários da noite">
-        <svg class="icon" width="20" height="20" style="color:#4F46E5;">
-            <use href="assets/icons/sprite.svg#icon-moon"></use>
-        </svg>
-        <span class="contador-numero" id="numNoite">0</span>
-        <span class="contador-label">Noite</span>
-    </div>
-</div>
+        <!-- ============================================================
+        CONTADORES
+        ============================================================ -->
+        <div class="contadores-container" id="contadoresContainer">
+            <div class="contador-item total" onclick="window.abrirPopup('total')" title="Ver todos os funcionários">
+                <svg class="icon" width="20" height="20">
+                    <use href="assets/icons/sprite.svg#icon-users"></use>
+                </svg>
+                <span class="contador-numero" id="numPessoasEscala">0</span>
+                <span class="contador-label">Total</span>
+            </div>
+            <div class="contador-item manha" onclick="window.abrirPopup('M')" title="Ver funcionários da manhã">
+                <svg class="icon" width="20" height="20" style="color:var(--color-warning)">
+                    <use href="assets/icons/sprite.svg#icon-sun"></use>
+                </svg>
+                <span class="contador-numero" id="numManha">0</span>
+                <span class="contador-label">Manhã</span>
+            </div>
+            <div class="contador-item tarde" onclick="window.abrirPopup('T')" title="Ver funcionários da tarde">
+                <svg class="icon" width="20" height="20" style="color:#EA580C;">
+                    <use href="assets/icons/sprite.svg#icon-sun"></use>
+                </svg>
+                <span class="contador-numero" id="numTarde">0</span>
+                <span class="contador-label">Tarde</span>
+            </div>
+            <div class="contador-item noite" onclick="window.abrirPopup('N')" title="Ver funcionários da noite">
+                <svg class="icon" width="20" height="20" style="color:#4F46E5;">
+                    <use href="assets/icons/sprite.svg#icon-moon"></use>
+                </svg>
+                <span class="contador-numero" id="numNoite">0</span>
+                <span class="contador-label">Noite</span>
+            </div>
+        </div>
 
         <!-- ============================================================
         POPUP LISTA DE FUNCIONÁRIOS
         ============================================================ -->
         <div class="modal-overlay" id="popupOverlay" onclick="window.fecharPopup()" role="dialog" aria-label="Lista de funcionários">
-            <div class="modal-content" onclick="event.stopPropagation()" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:480px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                <div class="popup-header" style="display:flex;align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--color-border, #f1f5f9);">
-                    <h3 id="popupTitulo" style="font-size:1.1rem; color:var(--color-text, #1e293b); margin:0; display:flex; align-items:center; gap:8px;">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="popup-header">
+                    <h3 id="popupTitulo">
                         <svg class="icon" width="20" height="20">
                             <use href="assets/icons/sprite.svg#icon-users"></use>
                         </svg>
                         Funcionários
                     </h3>
-                    <span class="popup-total" id="popupTotal" style="font-size:0.8rem; color:var(--color-text-muted, #64748b);">Total: 0</span>
-                    <button class="menu-fechar" onclick="window.fecharPopup()" aria-label="Fechar" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text-muted, #94a3b8); padding:4px 8px; border-radius:6px;">
+                    <span class="popup-total" id="popupTotal">Total: 0</span>
+                    <button class="menu-fechar" onclick="window.fecharPopup()" aria-label="Fechar">
                         <svg class="icon" width="24" height="24">
                             <use href="assets/icons/sprite.svg#icon-close"></use>
                         </svg>
@@ -340,15 +326,15 @@ CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
         POPUP ESTATÍSTICAS
         ============================================================ -->
         <div class="modal-overlay" id="popupEstatisticas" onclick="window.fecharEstatisticas()" role="dialog" aria-label="Estatísticas detalhadas">
-            <div class="modal-content" onclick="event.stopPropagation()" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:500px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                <div class="popup-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--color-border, #f1f5f9);">
-                    <h3 style="font-size:1.1rem; color:var(--color-text, #1e293b); margin:0; display:flex; align-items:center; gap:8px;">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="popup-header">
+                    <h3>
                         <svg class="icon" width="20" height="20" style="color:#8B5CF6;">
                             <use href="assets/icons/sprite.svg#icon-chart"></use>
                         </svg>
                         Estatísticas Detalhadas
                     </h3>
-                    <button class="menu-fechar" onclick="window.fecharEstatisticas()" aria-label="Fechar" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text-muted, #94a3b8); padding:4px 8px; border-radius:6px;">
+                    <button class="menu-fechar" onclick="window.fecharEstatisticas()" aria-label="Fechar">
                         <svg class="icon" width="24" height="24">
                             <use href="assets/icons/sprite.svg#icon-close"></use>
                         </svg>
@@ -362,15 +348,15 @@ CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
         POPUP DETALHES DO DIA
         ============================================================ -->
         <div class="modal-overlay" id="popupDetalhesDia" role="dialog" aria-label="Detalhes do dia">
-            <div class="modal-content" onclick="event.stopPropagation()" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:480px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                <div class="popup-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--color-border, #f1f5f9);">
-                    <h3 id="detalhesTitulo" style="font-size:1.1rem; color:var(--color-text, #1e293b); margin:0; display:flex; align-items:center; gap:8px;">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="popup-header">
+                    <h3 id="detalhesTitulo">
                         <svg class="icon" width="20" height="20">
                             <use href="assets/icons/sprite.svg#icon-calendar"></use>
                         </svg>
                         Detalhes do Dia
                     </h3>
-                    <button class="menu-fechar" onclick="window.fecharDetalhesDia()" aria-label="Fechar" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text-muted, #94a3b8); padding:4px 8px; border-radius:6px;">
+                    <button class="menu-fechar" onclick="window.fecharDetalhesDia()" aria-label="Fechar">
                         <svg class="icon" width="24" height="24">
                             <use href="assets/icons/sprite.svg#icon-close"></use>
                         </svg>
@@ -423,53 +409,53 @@ CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
     MODAL HORA EXTRA
     ============================================================ -->
     <div class="modal-overlay" id="modalExtra" role="dialog" aria-label="Adicionar hora extra">
-        <div class="modal-content" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:480px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-            <h2 style="font-size:1.5rem; font-weight:700; color:var(--color-text, #1e293b); margin-bottom:4px;">
+        <div class="modal-content">
+            <h2>
                 <svg class="icon" width="24" height="24">
                     <use href="assets/icons/sprite.svg#icon-clock"></use>
                 </svg>
                 Hora Extra
             </h2>
-            <p class="sub" style="color:var(--color-text-muted, #64748b); font-size:0.875rem; margin-bottom:24px;">Adicione horas extras por dia</p>
+            <p class="sub">Adicione horas extras por dia</p>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputDataExtra" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputDataExtra">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-calendar"></use>
                     </svg>
                     Data
                 </label>
-                <input type="date" id="inputDataExtra" class="input" lang="pt-BR" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <input type="date" id="inputDataExtra" class="input" lang="pt-BR">
             </div>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputInicioExtra" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputInicioExtra">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-clock"></use>
                     </svg>
                     Início
                 </label>
-                <input type="time" id="inputInicioExtra" class="input" step="60" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <input type="time" id="inputInicioExtra" class="input" step="60">
             </div>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputFimExtra" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputFimExtra">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-clock"></use>
                     </svg>
                     Término
                 </label>
-                <input type="time" id="inputFimExtra" class="input" step="60" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <input type="time" id="inputFimExtra" class="input" step="60">
             </div>
 
-            <div style="display:flex; gap:8px; margin-top:16px;">
-                <button class="btn btn-primary" onclick="window.salvarExtra()" style="flex:1; padding:12px; background:#3B82F6; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem;">
-                    <svg class="icon" width="20" height="20" style="color:white;">
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="window.salvarExtra()">
+                    <svg class="icon" width="20" height="20">
                         <use href="assets/icons/sprite.svg#icon-check"></use>
                     </svg>
                     Salvar
                 </button>
-                <button class="btn btn-ghost" onclick="window.fecharModalExtra()" style="flex:1; padding:12px; background:transparent; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem; color:var(--color-text, #1e293b);">
+                <button class="btn btn-ghost" onclick="window.fecharModalExtra()">
                     <svg class="icon" width="20" height="20">
                         <use href="assets/icons/sprite.svg#icon-close"></use>
                     </svg>
@@ -477,15 +463,15 @@ CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
                 </button>
             </div>
 
-            <div class="lista-extras" id="listaExtras" style="margin-top:20px; border-top:1px solid var(--color-border, #f1f5f9); padding-top:16px;">
-                <h3 style="font-size:0.9rem; color:var(--color-text, #1e293b); margin-bottom:12px;">
+            <div class="lista-extras" id="listaExtras">
+                <h3>
                     <svg class="icon" width="18" height="18">
                         <use href="assets/icons/sprite.svg#icon-list"></use>
                     </svg>
                     Horas Extras Registradas
                 </h3>
                 <div id="listaExtrasContainer"></div>
-                <div class="total-extra-modal" id="totalExtraModal" style="background:#fef3c7; padding:12px; border-radius:8px; text-align:center; margin-top:12px; font-weight:700; color:#92400e; font-size:1rem;">Total: 0h</div>
+                <div class="total-extra-modal" id="totalExtraModal">Total: 0h</div>
             </div>
         </div>
     </div>
@@ -494,63 +480,63 @@ CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
     MODAL PESSOA
     ============================================================ -->
     <div class="modal-overlay" id="modalPessoa" role="dialog" aria-label="Cadastrar funcionário">
-        <div class="modal-content" style="background:var(--color-surface, #ffffff); border-radius:16px; max-width:480px; width:90%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-            <h2 id="modalPessoaTitulo" style="font-size:1.5rem; font-weight:700; color:var(--color-text, #1e293b); margin-bottom:4px;">
+        <div class="modal-content">
+            <h2 id="modalPessoaTitulo">
                 <svg class="icon" width="24" height="24">
                     <use href="assets/icons/sprite.svg#icon-user-add"></use>
                 </svg>
                 Cadastrar Funcionário
             </h2>
-            <p class="sub" id="modalPessoaSubtitulo" style="color:var(--color-text-muted, #64748b); font-size:0.875rem; margin-bottom:24px;">Vincule o funcionário à escala e turno</p>
+            <p class="sub" id="modalPessoaSubtitulo">Vincule o funcionário à escala e turno</p>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputNomePessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputNomePessoa">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-user"></use>
                     </svg>
                     Nome Completo *
                 </label>
-                <input type="text" id="inputNomePessoa" class="input" placeholder="Ex: João Silva" required style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <input type="text" id="inputNomePessoa" class="input" placeholder="Ex: João Silva" required>
             </div>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputCargoPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputCargoPessoa">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-work"></use>
                     </svg>
                     Cargo
                 </label>
-                <input type="text" id="inputCargoPessoa" class="input" placeholder="Ex: Analista, Supervisor" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <input type="text" id="inputCargoPessoa" class="input" placeholder="Ex: Analista, Supervisor">
             </div>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputEmpresaPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputEmpresaPessoa">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-business"></use>
                     </svg>
                     Empresa
                 </label>
-                <input type="text" id="inputEmpresaPessoa" class="input" placeholder="Ex: Empresa XYZ" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <input type="text" id="inputEmpresaPessoa" class="input" placeholder="Ex: Empresa XYZ">
             </div>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputContatoPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputContatoPessoa">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-phone"></use>
                     </svg>
                     Contato
                 </label>
-                <input type="text" id="inputContatoPessoa" class="input" placeholder="Ex: (11) 99999-9999" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <input type="text" id="inputContatoPessoa" class="input" placeholder="Ex: (11) 99999-9999">
             </div>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputEscalaPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputEscalaPessoa">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-calendar"></use>
                     </svg>
                     Escala
                 </label>
-                <select id="inputEscalaPessoa" class="input" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <select id="inputEscalaPessoa" class="input">
                     <option value="1">📅 Escala 1</option>
                     <option value="2">📆 Escala 2</option>
                     <option value="3">🗓️ Escala 3</option>
@@ -558,41 +544,41 @@ CONTADORES COLORIDOS (ABAIXO DO CALENDÁRIO)
                 </select>
             </div>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputTurnoPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputTurnoPessoa">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-sun"></use>
                     </svg>
                     Turno
                 </label>
-                <select id="inputTurnoPessoa" class="input" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <select id="inputTurnoPessoa" class="input">
                     <option value="M">☀️ Manhã</option>
                     <option value="T">🌆 Tarde</option>
                     <option value="N">🌙 Noite</option>
                 </select>
             </div>
 
-            <div class="campo" style="margin-bottom:16px;">
-                <label for="inputTipoPessoa" style="display:block; font-weight:600; font-size:0.875rem; color:var(--color-text, #1e293b); margin-bottom:4px;">
+            <div class="campo">
+                <label for="inputTipoPessoa">
                     <svg class="icon" width="16" height="16">
                         <use href="assets/icons/sprite.svg#icon-verified"></use>
                     </svg>
                     Tipo
                 </label>
-                <select id="inputTipoPessoa" class="input" style="width:100%; padding:10px 12px; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-size:1rem; background:var(--color-surface, #ffffff); color:var(--color-text, #1e293b); height:44px;">
+                <select id="inputTipoPessoa" class="input">
                     <option value="OPERACIONAL">🔧 Operacional</option>
                     <option value="ADM">🏢 Administrativo</option>
                 </select>
             </div>
 
-            <div style="display:flex; gap:8px; margin-top:16px;">
-                <button class="btn btn-primary" onclick="window.salvarPessoa()" style="flex:1; padding:12px; background:#3B82F6; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem;">
-                    <svg class="icon" width="20" height="20" style="color:white;">
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="window.salvarPessoa()">
+                    <svg class="icon" width="20" height="20">
                         <use href="assets/icons/sprite.svg#icon-check"></use>
                     </svg>
                     Salvar
                 </button>
-                <button class="btn btn-ghost" onclick="window.fecharModalPessoa()" style="flex:1; padding:12px; background:transparent; border:2px solid var(--color-border, #e2e8f0); border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem; color:var(--color-text, #1e293b);">
+                <button class="btn btn-ghost" onclick="window.fecharModalPessoa()">
                     <svg class="icon" width="20" height="20">
                         <use href="assets/icons/sprite.svg#icon-close"></use>
                     </svg>

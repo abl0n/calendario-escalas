@@ -5,13 +5,23 @@
 export function toggleMenu() {
     const menu = document.getElementById('menuLateral');
     const overlay = document.getElementById('menuOverlay');
-    if (menu) menu.classList.toggle('aberto');
-    if (overlay) overlay.classList.toggle('ativo');
+    
+    if (!menu || !overlay) {
+        console.error('❌ Menu ou overlay não encontrados!');
+        return;
+    }
+    
+    menu.classList.toggle('ativo');
+    overlay.classList.toggle('ativo');
+    
+    // 🔥 Forçar reflow para animação suave
+    void menu.offsetWidth;
 }
 
 export function fecharMenu() {
     const menu = document.getElementById('menuLateral');
     const overlay = document.getElementById('menuOverlay');
-    if (menu) menu.classList.remove('aberto');
+    
+    if (menu) menu.classList.remove('ativo');
     if (overlay) overlay.classList.remove('ativo');
 }

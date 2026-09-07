@@ -2,12 +2,14 @@
 // CONFIGURAÇÕES - Calendário de Escalas
 // =====================================================
 
+import { CORES_ESCALAS, CORES_CALENDARIO, PALETA } from './constants/cores.js';
+
 // ===== ESCALAS PADRÃO =====
 export const escalasPadrao = [
     {
         id: 1,
         nome: "Escala 1",
-        cor: "#3B82F6",
+        cor: CORES_ESCALAS[1].bg,
         semana1: "T T F T T T F",
         semana2: "F T T F T T T",
         semana3: "T F T T T F F",
@@ -16,7 +18,7 @@ export const escalasPadrao = [
     {
         id: 2,
         nome: "Escala 2",
-        cor: "#EF4444",
+        cor: CORES_ESCALAS[2].bg,
         semana1: "T F T T T F F",
         semana2: "F T T T F T T",
         semana3: "T T F T T T F",
@@ -25,7 +27,7 @@ export const escalasPadrao = [
     {
         id: 3,
         nome: "Escala 3",
-        cor: "#8B5CF6",
+        cor: CORES_ESCALAS[3].bg,
         semana1: "F T T F T T T",
         semana2: "T F T T T F F",
         semana3: "F T T T F T T",
@@ -34,7 +36,7 @@ export const escalasPadrao = [
     {
         id: 4,
         nome: "Escala 4",
-        cor: "#F59E0B",
+        cor: CORES_ESCALAS[4].bg,
         semana1: "F T T T F T T",
         semana2: "T T F T T T F",
         semana3: "F T T F T T T",
@@ -43,72 +45,17 @@ export const escalasPadrao = [
 ];
 
 // =====================================================
-// CORES DO CALENDÁRIO
+// CORES DO HEADER - UNIFICADAS
 // =====================================================
 
-export const coresMeses = [
-    '#f3e8ff', // Janeiro
-    '#fce4ec', // Fevereiro
-    '#e8f0fe', // Março
-    '#e3f2fd', // Abril
-    '#fff8e1', // Maio
-    '#fce4ec', // Junho
-    '#fff8e1', // Julho
-    '#f3e5f5', // Agosto
-    '#fff8e1', // Setembro
-    '#fce4ec', // Outubro
-    '#e3f2fd', // Novembro
-    '#fce4ec'  // Dezembro
-];
-
-export const coresDestaque = [
-    '#7c3aed', // Janeiro
-    '#db2777', // Fevereiro
-    '#1e40af', // Março
-    '#2563eb', // Abril
-    '#ca8a04', // Maio
-    '#dc2626', // Junho
-    '#ca8a04', // Julho
-    '#7c3aed', // Agosto
-    '#ca8a04', // Setembro
-    '#db2777', // Outubro
-    '#2563eb', // Novembro
-    '#dc2626'  // Dezembro
-];
+export const coresMeses = Array(12).fill(PALETA.grayLight);
+export const coresDestaque = Array(12).fill(PALETA.primary);
+export const coresHeaderFundo = Array(12).fill(CORES_CALENDARIO.header.background);
+export const coresHeaderTexto = Array(12).fill(CORES_CALENDARIO.header.text);
+export const coresHeaderBorda = Array(12).fill(CORES_CALENDARIO.header.border);
 
 // =====================================================
-// CORES DO HEADER (CAMPANHAS DE SAÚDE)
-// =====================================================
-
-export const coresHeaderFundo = [
-    '#f3e8ff', // Janeiro - Saúde Mental
-    '#fce4ec', // Fevereiro - Lúpus/Alzheimer
-    '#e8f0fe', // Março - Câncer Colorretal
-    '#e3f2fd', // Abril - Autismo
-    '#fff8e1', // Maio - Segurança no Trânsito
-    '#fce4ec', // Junho - Doação de Sangue
-    '#fff8e1', // Julho - Hepatites Virais
-    '#f3e5f5', // Agosto - Violência Contra Mulher
-    '#fff8e1', // Setembro - Prevenção ao Suicídio
-    '#fce4ec', // Outubro - Câncer de Mama
-    '#e3f2fd', // Novembro - Câncer de Próstata/Diabetes
-    '#fce4ec'  // Dezembro - HIV/Aids
-];
-
-export const coresHeaderTexto = [
-    '#7c3aed', '#db2777', '#1e40af', '#2563eb', 
-    '#ca8a04', '#dc2626', '#ca8a04', '#7c3aed', 
-    '#ca8a04', '#db2777', '#2563eb', '#dc2626'
-];
-
-export const coresHeaderBorda = [...coresHeaderTexto];
-
-// =====================================================
-// FERIADOS E DATAS COMEMORATIVAS
-// =====================================================
-
-// =====================================================
-// FERIADOS E DATAS COMEMORATIVAS - COM SVG SPRITE
+// FERIADOS
 // =====================================================
 
 export const feriados = {
@@ -139,14 +86,8 @@ export const feriados = {
     '25-12': { nome: 'Natal', tipo: 'feriado', icone: '🎄' },
     '31-12': { nome: 'Véspera Ano Novo', tipo: 'comemorativo', icone: '🥂' }
 };
-// =====================================================
-// CONSTANTES GLOBAIS
-// =====================================================
 
-export const DATA_REFERENCIA = new Date(2026, 6, 5); // 05/07/2026
+// ===== CONSTANTES GLOBAIS =====
+export const DATA_REFERENCIA = new Date(2026, 6, 5);
 export const HORAS_POR_DIA = 9;
 export const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-export const MESES = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-];
