@@ -414,8 +414,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 64px;
-    padding: 6px 2px;
+    min-height: 56px;              /* ← Altura mínima, não fixa */
+    height: auto;                  /* ← Altura automática */
+    padding: 6px 4px;
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -424,6 +425,9 @@ body {
     background: var(--color-surface);
     box-shadow: var(--shadow-sm);
     will-change: transform;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;              /* ← Impede estouro */
 }
 
 .contador-item:hover {
@@ -437,22 +441,22 @@ body {
 
 /* 🔥 CORES DE FUNDO DOS CONTADORES */
 .contador-item.total {
-    background: #F1F5F9;
+    background: #FFFFFF;
     color: #1E293B;
 }
 
 .contador-item.manha {
-    background: #F1F5F9;
+    background: #FFFFFF;
     color: #78350F;
 }
 
 .contador-item.tarde {
-   background: #F1F5F9;
+   background: #FFFFFF;
     color: #7C2D12;
 }
 
 .contador-item.noite {
-   background: #F1F5F9;
+   background: #FFFFFF;
     color: #1E3A8A;
 }
 
@@ -517,6 +521,104 @@ body {
 .contador-item.escala-5:hover {
     border-color: #059669 !important;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* ============================================================
+   RESPONSIVO - TABLET (768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .contadores-container {
+        gap: 6px;
+        padding: 0 4px;
+    }
+
+    .contador-item {
+        min-height: 48px;
+        padding: 4px 2px;
+        border-width: 2px;
+    }
+
+    .contador-item .icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .contador-item .contador-numero {
+        font-size: 1rem;
+    }
+
+    .contador-item .contador-label {
+        font-size: 0.4rem;
+        letter-spacing: 0.1px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVO - MOBILE (480px)
+   ============================================================ */
+
+@media (max-width: 480px) {
+    .contadores-container {
+        gap: 4px;
+        padding: 0 2px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .contador-item {
+        min-height: 40px;
+        padding: 3px 1px;
+        border-radius: 4px;
+        border-width: 1.5px;
+    }
+
+    .contador-item .icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    .contador-item .contador-numero {
+        font-size: 0.85rem;
+        line-height: 1;
+    }
+
+    .contador-item .contador-label {
+        font-size: 0.35rem;
+        letter-spacing: 0px;
+        white-space: nowrap;
+    }
+}
+
+/* ============================================================
+   RESPONSIVO - MOBILE MUITO PEQUENO (380px)
+   ============================================================ */
+
+@media (max-width: 380px) {
+    .contadores-container {
+        gap: 3px;
+        padding: 0 1px;
+    }
+
+    .contador-item {
+        min-height: 34px;
+        padding: 2px 1px;
+        border-width: 1px;
+    }
+
+    .contador-item .icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .contador-item .contador-numero {
+        font-size: 0.7rem;
+    }
+
+    .contador-item .contador-label {
+        font-size: 0.3rem;
+        letter-spacing: 0px;
+    }
 }
 
 /* ============================================================
