@@ -1,12 +1,14 @@
-// =====================================================
-// POPUPS - Exibição de Listagens e Filtros Flutuantes
-// =====================================================
+// 📁 ui/popups.js - VERSÃO COMPLETA COM TODAS AS EXPORTAÇÕES
 
 import { getPessoas } from '../core/pessoas.js';
 import { mostrarToast } from '../utils/helpers.js';
-import { CORES_TURNOS, PALETA } from '../constants/cores.js';
+import { CORES_TURNOS } from '../constants/cores.js';
 
 let equipeSelecionada = null;
+
+// =====================================================
+// EXPORTAÇÕES - TODAS AS FUNÇÕES
+// =====================================================
 
 export function initPopups(equipe) {
     equipeSelecionada = equipe;
@@ -17,44 +19,7 @@ export function atualizarEquipePopup(equipe) {
 }
 
 // =====================================================
-// CONFIGURAÇÃO DE CORES DOS POPUPS
-// =====================================================
-
-const CONFIG_POPUP = {
-    total: {
-        titulo: 'Todos os Funcionários',
-        cor: PALETA.primary,
-        icone: 'icon-users',
-        label: 'Total'
-    },
-    M: {
-        titulo: 'Manhã',
-        cor: PALETA.warning,
-        icone: 'icon-sun',
-        label: 'Manhã'
-    },
-    T: {
-        titulo: 'Tarde',
-        cor: '#EA580C',
-        icone: 'icon-sun',
-        label: 'Tarde'
-    },
-    N: {
-        titulo: 'Noite',
-        cor: '#3B82F6',
-        icone: 'icon-moon',
-        label: 'Noite'
-    },
-    ADM: {
-        titulo: 'Administrativos',
-        cor: PALETA.success,
-        icone: 'icon-contacts',
-        label: 'ADM'
-    }
-};
-
-// =====================================================
-// FUNÇÃO PRINCIPAL - ABRIR POPUP
+// ABRIR POPUP - FUNÇÃO PRINCIPAL
 // =====================================================
 
 export function abrirPopup(tipo) {
@@ -73,347 +38,128 @@ export function abrirPopup(tipo) {
         return;
     }
 
-    // 🔥 CONFIGURAÇÃO DO POPUP
+    const todasPessoas = getPessoas();
+    const escalaAtual = equipeSelecionada.id;
+
+    let pessoasFiltradas = todasPessoas.filter(p => Number(p.escalaId) === Number(escalaAtual));
+    let tituloTexto = '';
+    let turnoLabel = '';
+    let corDestaque = '';
+    let icone = '';
+
+    const CONFIG_POPUP = {
+        total: { cor: '#2563EB', icone: 'icon-users', label: 'Total' },
+        M: { cor: '#F59E0B', icone: 'icon-sun', label: 'Manhã' },
+        T: { cor: '#EA580C', icone: 'icon-sun', label: 'Tarde' },
+        N: { cor: '#3B82F6', icone: 'icon-moon', label: 'Noite' }
+    };
+
     const config = CONFIG_POPUP[tipo];
     if (!config) {
         mostrarToast('❌ Tipo de filtro inválido!', 'erro');
         return;
     }
 
-    const todasPessoas = getPessoas();
-    const escalaAtual = equipeSelecionada.id;
-
-    // 🔥 FILTRAR PESSOAS
-    let pessoasFiltradas = todasPessoas.filter(p => Number(p.escalaId) === Number(escalaAtual));
-
     if (tipo === 'M') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'M');
+        tituloTexto = `Manhã - Escala ${escalaAtual}`;
     } else if (tipo === 'T') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'T');
+        tituloTexto = `Tarde - Escala ${escalaAtual}`;
     } else if (tipo === 'N') {
         pessoasFiltradas = pessoasFiltradas.filter(p => p.turno === 'N');
-    } else if (tipo === 'ADM') {
-        pessoasFiltradas = pessoasFiltradas.filter(p => p.tipo === 'ADM');
+        tituloTexto = `Noite - Escala ${escalaAtual}`;
+    } else {
+        pessoasFiltradas = pessoasFiltradas;
+        tituloTexto = `Todos os Funcionários - Escala ${escalaAtual}`;
     }
 
-    // 🔥 ORDENAR POR NOME
-    pessoasFiltradas.sort((a, b) => a.nome.localeCompare(b.nome));
+    corDestaque = config.cor;
+    icone = config.icone;
 
-    // 🔥 TÍTULO DO POPUP
-    const tituloTexto = tipo === 'total' 
-        ? `${config.titulo} - Escala ${escalaAtual}`
-        : `${config.titulo} - Escala ${escalaAtual}`;
+    pessoasFiltradas.sort((a, b) => a.nome.localeCompare(b.nome));
 
     if (titulo) {
         titulo.innerHTML = `
-            <svg class="icon" width="20" height="20" style="color:${config.cor};">
-                <use href="assets/icons/sprite.svg#${config.icone}"></use>
+            <svg class="icon" width="20" height="20" style="color:${corDestaque};">
+                <use href="assets/icons/sprite.svg#${icone}"></use>
             </svg>
             ${tituloTexto}
         `;
     }
 
-    // 🔥 CONTEÚDO DO POPUP
     if (conteudo) {
         if (pessoasFiltradas.length === 0) {
             conteudo.innerHTML = `
-                <div style="
-                    text-align: center; 
-                    padding: 60px 20px; 
-                    color: var(--color-text-muted, #64748b);
-                ">
-                    <svg class="icon" width="64" height="64" style="
-                        opacity: 0.2; 
-                        color: ${config.cor};
-                        margin-bottom: 16px;
-                    ">
-                        <use href="assets/icons/sprite.svg#${config.icone}"></use>
+                <div style="text-align:center; padding: 40px 20px; color: var(--color-text-muted, #64748b);">
+                    <svg class="icon" width="48" height="48" style="opacity:0.3; color:${corDestaque};">
+                        <use href="assets/icons/sprite.svg#${icone}"></use>
                     </svg>
-                    <p style="font-size: 1.1rem; font-weight: 500;">
-                        Nenhum funcionário encontrado
+                    <p style="margin-top:12px; font-size:0.95rem;">
+                        Nenhum funcionário encontrado.
                     </p>
-                    <p style="font-size: 0.85rem; margin-top: 8px;">
-                        ${tipo === 'total' 
-                            ? 'Clique em "Cadastrar Funcionário" no menu para adicionar.'
-                            : `Nenhum funcionário no turno ${config.label}.`}
-                    </p>
+                    <small style="font-size:0.75rem;">Clique em "Cadastrar Funcionário" no menu para adicionar.</small>
                 </div>
             `;
         } else {
-            // 🔥 CABEÇALHO DO POPUP
             let html = `
-                <div style="
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                ">
-                <div style="
-                    padding: 12px 16px;
-                    background: ${config.cor};
-                    border-radius: 10px;
-                    color: white;
-                    text-align: center;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                ">
-                    <svg class="icon" width="20" height="20" style="color:white;">
-                        <use href="assets/icons/sprite.svg#${config.icone}"></use>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="padding: 8px 16px; background: ${corDestaque}; border-radius: 8px; color: white; text-align: center; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg class="icon" width="18" height="18" style="color:white;">
+                        <use href="assets/icons/sprite.svg#${icone}"></use>
                     </svg>
-                    ${tituloTexto} 
-                    <span style="
-                        background: rgba(255,255,255,0.2);
-                        padding: 2px 12px;
-                        border-radius: 20px;
-                        font-size: 0.8rem;
-                    ">${pessoasFiltradas.length}</span>
+                    ${tituloTexto} (${pessoasFiltradas.length})
                 </div>
             `;
 
-            // 🔥 LISTA DE FUNCIONÁRIOS
             pessoasFiltradas.forEach(p => {
                 const turnoCor = CORES_TURNOS[p.turno] || CORES_TURNOS['M'];
                 const isADM = p.tipo === 'ADM';
-
+                
                 html += `
-                    <div style="
-                        display: flex;
-                        flex-direction: column;
-                        padding: 16px 18px;
-                        background: var(--color-surface, #ffffff);
-                        border-radius: 12px;
-                        border: 1px solid var(--color-border, #e2e8f0);
-                        border-left: 5px solid ${isADM ? PALETA.success : turnoCor.badge};
-                        transition: all 0.2s ease;
-                        gap: 6px;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-                    ">
-                        <!-- Nome -->
-                        <div style="
-                            display: flex;
-                            align-items: center;
-                            justify-content: space-between;
-                            gap: 12px;
-                        ">
-                            <span style="
-                                font-weight: 600;
-                                font-size: 1rem;
-                                color: var(--color-text, #1e293b);
-                            ">${p.nome}</span>
-                            
-                            <!-- Badge ADM -->
-                            ${isADM ? `
-                                <span style="
-                                    font-size: 0.55rem;
-                                    font-weight: 700;
-                                    background: ${PALETA.success};
-                                    color: white;
-                                    padding: 2px 10px;
-                                    border-radius: 12px;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 4px;
-                                    flex-shrink: 0;
-                                ">
-                                    <svg class="icon" width="12" height="12" style="color:white;">
-                                        <use href="assets/icons/sprite.svg#icon-verified"></use>
-                                    </svg>
-                                    ADM
-                                </span>
-                            ` : ''}
+                    <div style="display: flex; flex-direction: column; padding: 14px 16px; background: var(--color-surface, #ffffff); border-radius: 10px; border: 1px solid var(--color-border, #e2e8f0); border-left: 4px solid ${isADM ? '#10B981' : turnoCor.badge}; transition: all 0.2s ease; gap: 4px;">
+                        <div style="font-weight:600; font-size:1rem; color: var(--color-text, #1e293b);">
+                            ${p.nome}
                         </div>
-
-                        <!-- Cargo -->
-                        ${p.cargo ? `
-                            <div style="
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                font-size: 0.8rem;
-                                color: var(--color-text-muted, #64748b);
-                            ">
-                                <svg class="icon" width="14" height="14">
-                                    <use href="assets/icons/sprite.svg#icon-work"></use>
-                                </svg>
-                                ${p.cargo}
-                            </div>
-                        ` : ''}
-
-                        <!-- Empresa -->
-                        ${p.empresa ? `
-                            <div style="
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                font-size: 0.8rem;
-                                color: var(--color-text-muted, #64748b);
-                            ">
-                                <svg class="icon" width="14" height="14">
-                                    <use href="assets/icons/sprite.svg#icon-business"></use>
-                                </svg>
-                                ${p.empresa}
-                            </div>
-                        ` : ''}
-
-                        <!-- Contato -->
-                        ${p.contato ? `
-                            <div style="
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                font-size: 0.8rem;
-                                color: var(--color-text-muted, #64748b);
-                            ">
-                                <svg class="icon" width="14" height="14">
-                                    <use href="assets/icons/sprite.svg#icon-phone"></use>
-                                </svg>
-                                ${p.contato}
-                            </div>
-                        ` : ''}
-
-                        <!-- Badges de Escala e Turno -->
-                        <div style="
-                            display: flex;
-                            gap: 6px;
-                            align-items: center;
-                            margin-top: 4px;
-                            flex-wrap: wrap;
-                        ">
-                            <span style="
-                                font-size: 0.6rem;
-                                font-weight: 700;
-                                padding: 2px 12px;
-                                border-radius: 12px;
-                                background: ${turnoCor.bg};
-                                color: ${turnoCor.text};
-                            ">
-                                E${p.escalaId} • ${turnoCor.icone} ${turnoCor.nome}
-                            </span>
-                            
-                            ${isADM ? `
-                                <span style="
-                                    font-size: 0.6rem;
-                                    font-weight: 600;
-                                    padding: 2px 10px;
-                                    border-radius: 12px;
-                                    background: ${PALETA.success}15;
-                                    color: ${PALETA.success};
-                                    border: 1px solid ${PALETA.success}30;
-                                ">
-                                    🏢 Administrativo
-                                </span>
-                            ` : `
-                                <span style="
-                                    font-size: 0.6rem;
-                                    font-weight: 600;
-                                    padding: 2px 10px;
-                                    border-radius: 12px;
-                                    background: var(--color-bg, #f1f5f9);
-                                    color: var(--color-text-muted, #64748b);
-                                    border: 1px solid var(--color-border, #e2e8f0);
-                                ">
-                                    🔧 Operacional
-                                </span>
-                            `}
+                        ${p.cargo ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color: var(--color-text-muted, #64748b);">
+                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-work"></use></svg> ${p.cargo}
+                        </div>` : ''}
+                        ${p.empresa ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color: var(--color-text-muted, #64748b);">
+                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-business"></use></svg> ${p.empresa}
+                        </div>` : ''}
+                        ${p.contato ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color: var(--color-text-muted, #64748b);">
+                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-phone"></use></svg> ${p.contato}
+                        </div>` : ''}
+                        <div style="display:flex; gap:6px; align-items:center; margin-top:2px; flex-wrap:wrap;">
+                            ${isADM ? `<span style="font-size:0.6rem; background: #10B981; color: white; padding:2px 10px; border-radius:12px; font-weight:600; display:flex; align-items:center; gap:4px;">
+                                <svg class="icon" width="12" height="12" style="color:white;"><use href="assets/icons/sprite.svg#icon-verified"></use></svg> ADM
+                            </span>` : ''}
+                            <span style="font-size:0.6rem; font-weight:700; padding:2px 10px; border-radius:12px; background: ${turnoCor.bg}; color: ${turnoCor.text};">E${p.escalaId}-${p.turno}</span>
                         </div>
-
-                        <!-- Ações -->
-                        <div style="
-                            display: flex;
-                            justify-content: flex-end;
-                            gap: 8px;
-                            margin-top: 8px;
-                            padding-top: 10px;
-                            border-top: 1px solid var(--color-border, #e2e8f0);
-                        ">
-                            <button onclick="window.editarFuncionario('${p.id}')" 
-                                style="
-                                    background: none;
-                                    border: none;
-                                    cursor: pointer;
-                                    padding: 6px 14px;
-                                    border-radius: 8px;
-                                    color: ${PALETA.primary};
-                                    transition: all 0.2s;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 6px;
-                                    font-size: 0.8rem;
-                                    font-weight: 500;
-                                    background: ${PALETA.primary}08;
-                                "
-                                onmouseenter="this.style.background='${PALETA.primary}20'"
-                                onmouseleave="this.style.background='${PALETA.primary}08'"
-                                title="Editar funcionário">
-                                <svg class="icon" width="16" height="16">
-                                    <use href="assets/icons/sprite.svg#icon-edit"></use>
-                                </svg>
-                                Editar
+                        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px; padding-top:8px; border-top:1px solid var(--color-border, #e2e8f0);">
+                            <button onclick="window.editarFuncionario('${p.id}')" style="background: none; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; color: var(--color-primary, #3B82F6); transition: background 0.2s; display:flex; align-items:center; gap:4px; font-size:0.8rem;" onmouseenter="this.style.background='var(--color-bg, #f1f5f9)'" onmouseleave="this.style.background='transparent'" title="Editar">
+                                <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-edit"></use></svg>
                             </button>
-                            <button onclick="window.removerPessoa('${p.id}')" 
-                                style="
-                                    background: none;
-                                    border: none;
-                                    cursor: pointer;
-                                    padding: 6px 14px;
-                                    border-radius: 8px;
-                                    color: ${PALETA.danger};
-                                    transition: all 0.2s;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 6px;
-                                    font-size: 0.8rem;
-                                    font-weight: 500;
-                                    background: ${PALETA.danger}08;
-                                "
-                                onmouseenter="this.style.background='${PALETA.danger}20'"
-                                onmouseleave="this.style.background='${PALETA.danger}08'"
-                                title="Excluir funcionário">
-                                <svg class="icon" width="16" height="16">
-                                    <use href="assets/icons/sprite.svg#icon-delete"></use>
-                                </svg>
-                                Excluir
+                            <button onclick="window.removerPessoa('${p.id}')" style="background: none; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; color: #EF4444; transition: background 0.2s; display:flex; align-items:center; gap:4px; font-size:0.8rem;" onmouseenter="this.style.background='#FEE2E2'" onmouseleave="this.style.background='transparent'" title="Excluir">
+                                <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-delete"></use></svg>
                             </button>
                         </div>
                     </div>
                 `;
             });
 
-            // 🔥 RODAPÉ DO POPUP
             html += `
-                <div style="
-                    margin-top: 8px;
-                    padding: 14px 18px;
-                    background: ${config.cor};
-                    border-radius: 12px;
-                    color: white;
-                    text-align: center;
-                    font-weight: 600;
-                    font-size: 0.95rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                ">
-                    <svg class="icon" width="20" height="20" style="color:white;">
-                        <use href="assets/icons/sprite.svg#${config.icone}"></use>
-                    </svg>
+                </div>
+                <div style="margin-top: 16px; padding: 12px 16px; background: ${corDestaque}; border-radius: 10px; color: white; text-align: center; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg class="icon" width="18" height="18" style="color:white;"><use href="assets/icons/sprite.svg#${icone}"></use></svg>
                     Total: ${pessoasFiltradas.length} funcionário${pessoasFiltradas.length > 1 ? 's' : ''}
                 </div>
             `;
-
             conteudo.innerHTML = html;
         }
     }
 
-    // 🔥 TOTAL
-    if (total) {
-        total.textContent = `Total: ${pessoasFiltradas.length}`;
-    }
-
+    if (total) total.textContent = `Total: ${pessoasFiltradas.length}`;
     overlay.classList.add('ativo');
 }
 
@@ -429,11 +175,10 @@ export function fecharPopup() {
 }
 
 // =====================================================
-// POPUP ADMINISTRATIVO (ESPECÍFICO)
+// POPUP ADM - ADMINISTRATIVOS & COMERCIAIS
 // =====================================================
 
 export function abrirPopupADM() {
-    // Usa o mesmo sistema, mas com filtro ADM
     const overlay = document.getElementById('popupOverlay');
     const titulo = document.getElementById('popupTitulo');
     const conteudo = document.getElementById('popupConteudo');
@@ -444,228 +189,88 @@ export function abrirPopupADM() {
         return;
     }
 
-    const config = CONFIG_POPUP.ADM;
     const todasPessoas = getPessoas();
-    const pessoasFiltradas = todasPessoas.filter(p => p.tipo === 'ADM');
+    const pessoasFiltradas = todasPessoas.filter(p => 
+        p.tipo === 'ADM' || Number(p.escalaId) === 5
+    );
 
     pessoasFiltradas.sort((a, b) => a.nome.localeCompare(b.nome));
 
     if (titulo) {
         titulo.innerHTML = `
-            <svg class="icon" width="20" height="20" style="color:${config.cor};">
-                <use href="assets/icons/sprite.svg#${config.icone}"></use>
+            <svg class="icon" width="20" height="20" style="color:#10B981;">
+                <use href="assets/icons/sprite.svg#icon-contacts"></use>
             </svg>
-            ${config.titulo}
+            Administrativos
         `;
     }
 
     if (conteudo) {
         if (pessoasFiltradas.length === 0) {
             conteudo.innerHTML = `
-                <div style="
-                    text-align: center; 
-                    padding: 60px 20px; 
-                    color: var(--color-text-muted, #64748b);
-                ">
-                    <svg class="icon" width="64" height="64" style="
-                        opacity: 0.2; 
-                        color: ${config.cor};
-                        margin-bottom: 16px;
-                    ">
-                        <use href="assets/icons/sprite.svg#${config.icone}"></use>
+                <div style="text-align:center; padding:40px 20px; color:var(--color-text-muted);">
+                    <svg class="icon" width="48" height="48" style="opacity:0.3; color:#10B981;">
+                        <use href="assets/icons/sprite.svg#icon-contacts"></use>
                     </svg>
-                    <p style="font-size: 1.1rem; font-weight: 500;">
-                        Nenhum funcionário administrativo
-                    </p>
-                    <p style="font-size: 0.85rem; margin-top: 8px;">
-                        Selecione "ADM" no campo "Tipo" ao cadastrar um funcionário.
-                    </p>
+                    <p style="margin-top:12px; font-size:0.95rem;">Nenhum funcionário administrativo ou comercial cadastrado.</p>
+                    <small style="font-size:0.75rem;">Para adicionar, selecione "ADM" no campo "Tipo" ou "Comercial" na escala.</small>
                 </div>
             `;
         } else {
             let html = `
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                <div style="
-                    padding: 12px 16px;
-                    background: ${config.cor};
-                    border-radius: 10px;
-                    color: white;
-                    text-align: center;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                ">
-                    <svg class="icon" width="20" height="20" style="color:white;">
-                        <use href="assets/icons/sprite.svg#${config.icone}"></use>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="padding:8px 16px; background:#10B981; border-radius:8px; color:white; text-align:center; font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <svg class="icon" width="18" height="18" style="color:white;">
+                        <use href="assets/icons/sprite.svg#icon-contacts"></use>
                     </svg>
-                    Administrativos (${pessoasFiltradas.length})
+                    Administrativos & Comerciais (${pessoasFiltradas.length})
                 </div>
             `;
 
             pessoasFiltradas.forEach(p => {
-                const turnoCor = CORES_TURNOS[p.turno] || CORES_TURNOS['M'];
+                const cores = CORES_TURNOS[p.turno] || CORES_TURNOS['M'];
+                const isADM = p.tipo === 'ADM';
+                const isComercial = Number(p.escalaId) === 5;
+                
+                let badgeTipo = '';
+                if (isADM) {
+                    badgeTipo = `<span style="font-size:0.6rem; background:#10B981; color:white; padding:2px 10px; border-radius:12px; font-weight:600; display:flex; align-items:center; gap:4px;">
+                        <svg class="icon" width="12" height="12" style="color:white;">
+                            <use href="assets/icons/sprite.svg#icon-verified"></use>
+                        </svg>
+                        ADM
+                    </span>`;
+                } else if (isComercial) {
+                    badgeTipo = `<span style="font-size:0.6rem; background:#F59E0B; color:#1E293B; padding:2px 10px; border-radius:12px; font-weight:600; display:flex; align-items:center; gap:4px;">
+                        <svg class="icon" width="12" height="12" style="color:#1E293B;">
+                            <use href="assets/icons/sprite.svg#icon-business"></use>
+                        </svg>
+                        Comercial
+                    </span>`;
+                }
 
                 html += `
-                    <div style="
-                        display: flex;
-                        flex-direction: column;
-                        padding: 16px 18px;
-                        background: var(--color-surface, #ffffff);
-                        border-radius: 12px;
-                        border: 1px solid var(--color-border, #e2e8f0);
-                        border-left: 5px solid ${PALETA.success};
-                        transition: all 0.2s ease;
-                        gap: 6px;
-                    ">
-                        <div style="
-                            display: flex;
-                            align-items: center;
-                            justify-content: space-between;
-                        ">
-                            <span style="
-                                font-weight: 600;
-                                font-size: 1rem;
-                                color: var(--color-text, #1e293b);
-                            ">${p.nome}</span>
-                            <span style="
-                                font-size: 0.55rem;
-                                font-weight: 700;
-                                background: ${PALETA.success};
-                                color: white;
-                                padding: 2px 10px;
-                                border-radius: 12px;
-                            ">
-                                🏢 ADM
-                            </span>
+                    <div style="display:flex; flex-direction:column; padding:14px 16px; background:var(--color-surface); border-radius:10px; border:1px solid var(--color-border); border-left:4px solid ${isADM ? '#10B981' : '#F59E0B'}; gap:4px;">
+                        <div style="font-weight:600; font-size:1rem; color:var(--color-text);">${p.nome}</div>
+                        ${p.cargo ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--color-text-muted);">
+                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-work"></use></svg> ${p.cargo}
+                        </div>` : ''}
+                        ${p.empresa ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--color-text-muted);">
+                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-business"></use></svg> ${p.empresa}
+                        </div>` : ''}
+                        ${p.contato ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--color-text-muted);">
+                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-phone"></use></svg> ${p.contato}
+                        </div>` : ''}
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
+                            ${badgeTipo}
+                            <span class="badge-turno ${p.turno}">E${p.escalaId}-${p.turno}</span>
                         </div>
-
-                        ${p.cargo ? `
-                            <div style="
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                font-size: 0.8rem;
-                                color: var(--color-text-muted, #64748b);
-                            ">
-                                <svg class="icon" width="14" height="14">
-                                    <use href="assets/icons/sprite.svg#icon-work"></use>
-                                </svg>
-                                ${p.cargo}
-                            </div>
-                        ` : ''}
-
-                        ${p.empresa ? `
-                            <div style="
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                font-size: 0.8rem;
-                                color: var(--color-text-muted, #64748b);
-                            ">
-                                <svg class="icon" width="14" height="14">
-                                    <use href="assets/icons/sprite.svg#icon-business"></use>
-                                </svg>
-                                ${p.empresa}
-                            </div>
-                        ` : ''}
-
-                        ${p.contato ? `
-                            <div style="
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                font-size: 0.8rem;
-                                color: var(--color-text-muted, #64748b);
-                            ">
-                                <svg class="icon" width="14" height="14">
-                                    <use href="assets/icons/sprite.svg#icon-phone"></use>
-                                </svg>
-                                ${p.contato}
-                            </div>
-                        ` : ''}
-
-                        <div style="display:flex; gap:6px; align-items:center; margin-top:4px; flex-wrap:wrap;">
-                            <span style="
-                                font-size:0.6rem;
-                                font-weight:700;
-                                padding:2px 12px;
-                                border-radius:12px;
-                                background: ${turnoCor.bg};
-                                color: ${turnoCor.text};
-                            ">
-                                E${p.escalaId} • ${turnoCor.icone} ${turnoCor.nome}
-                            </span>
-                            <span style="
-                                font-size:0.6rem;
-                                font-weight:600;
-                                padding:2px 10px;
-                                border-radius:12px;
-                                background: ${PALETA.success}15;
-                                color: ${PALETA.success};
-                                border: 1px solid ${PALETA.success}30;
-                            ">
-                                ✅ Administrativo
-                            </span>
-                        </div>
-
-                        <div style="
-                            display: flex;
-                            justify-content: flex-end;
-                            gap: 8px;
-                            margin-top: 8px;
-                            padding-top: 10px;
-                            border-top: 1px solid var(--color-border, #e2e8f0);
-                        ">
-                            <button onclick="window.editarFuncionario('${p.id}')" 
-                                style="
-                                    background: none;
-                                    border: none;
-                                    cursor: pointer;
-                                    padding: 6px 14px;
-                                    border-radius: 8px;
-                                    color: ${PALETA.primary};
-                                    transition: all 0.2s;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 6px;
-                                    font-size: 0.8rem;
-                                    font-weight: 500;
-                                    background: ${PALETA.primary}08;
-                                "
-                                onmouseenter="this.style.background='${PALETA.primary}20'"
-                                onmouseleave="this.style.background='${PALETA.primary}08'"
-                                title="Editar funcionário">
-                                <svg class="icon" width="16" height="16">
-                                    <use href="assets/icons/sprite.svg#icon-edit"></use>
-                                </svg>
-                                Editar
+                        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px; padding-top:8px; border-top:1px solid var(--color-border);">
+                            <button onclick="window.editarFuncionario('${p.id}')" class="btn-icon-edit" title="Editar">
+                                <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-edit"></use></svg>
                             </button>
-                            <button onclick="window.removerPessoa('${p.id}')" 
-                                style="
-                                    background: none;
-                                    border: none;
-                                    cursor: pointer;
-                                    padding: 6px 14px;
-                                    border-radius: 8px;
-                                    color: ${PALETA.danger};
-                                    transition: all 0.2s;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 6px;
-                                    font-size: 0.8rem;
-                                    font-weight: 500;
-                                    background: ${PALETA.danger}08;
-                                "
-                                onmouseenter="this.style.background='${PALETA.danger}20'"
-                                onmouseleave="this.style.background='${PALETA.danger}08'"
-                                title="Excluir funcionário">
-                                <svg class="icon" width="16" height="16">
-                                    <use href="assets/icons/sprite.svg#icon-delete"></use>
-                                </svg>
-                                Excluir
+                            <button onclick="window.removerPessoa('${p.id}')" class="btn-icon-delete" title="Excluir">
+                                <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-delete"></use></svg>
                             </button>
                         </div>
                     </div>
@@ -673,34 +278,16 @@ export function abrirPopupADM() {
             });
 
             html += `
-                <div style="
-                    margin-top: 8px;
-                    padding: 14px 18px;
-                    background: ${config.cor};
-                    border-radius: 12px;
-                    color: white;
-                    text-align: center;
-                    font-weight: 600;
-                    font-size: 0.95rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                ">
-                    <svg class="icon" width="20" height="20" style="color:white;">
-                        <use href="assets/icons/sprite.svg#${config.icone}"></use>
-                    </svg>
+                </div>
+                <div style="margin-top:16px; padding:12px 16px; background:#10B981; border-radius:10px; color:white; text-align:center; font-weight:600; font-size:0.9rem; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <svg class="icon" width="18" height="18" style="color:white;"><use href="assets/icons/sprite.svg#icon-contacts"></use></svg>
                     Total: ${pessoasFiltradas.length} funcionário${pessoasFiltradas.length > 1 ? 's' : ''}
                 </div>
             `;
-
             conteudo.innerHTML = html;
         }
     }
 
-    if (total) {
-        total.textContent = `ADM: ${pessoasFiltradas.length}`;
-    }
-
+    if (total) total.textContent = `Total: ${pessoasFiltradas.length}`;
     overlay.classList.add('ativo');
 }

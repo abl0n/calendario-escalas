@@ -42,7 +42,14 @@ import {
 import { toggleMenu, fecharMenu } from './ui/menu.js';
 import { initTema, toggleTema, aplicarTema } from './ui/tema.js';
 import { abrirModalPessoa, fecharModalPessoa, abrirModalExtra, fecharModalExtra, initModais } from './ui/modais.js';
-import { abrirPopup, fecharPopup, initPopups, atualizarEquipePopup } from './ui/popups.js';
+
+import { 
+    initPopups, 
+    atualizarEquipePopup, 
+    abrirPopup,
+    fecharPopup,
+    abrirPopupADM
+} from './ui/popups.js';
 
 import {
     carregarEscalasStorage, salvarEscalasStorage,
@@ -309,6 +316,14 @@ function renderizarBotoesEquipe() {
 
 function selecionarEquipe(equipe) {
     equipeSelecionada = equipe;
+     // 🔥 ATUALIZAR ESTATÍSTICAS
+    import('./core/estatisticas.js').then(module => {
+        if (module.initEstatisticas) {
+            module.initEstatisticas(equipe);
+            console.log('📊 Estatísticas atualizadas para:', equipe);
+        }
+    });
+
     if (typeof atualizarEquipePopup === 'function') atualizarEquipePopup(equipe);
     renderizarBotoesEquipe();
     renderizarCalendario();
@@ -318,7 +333,7 @@ function selecionarEquipe(equipe) {
 }
 
 // =====================================================
-// CONTADORES
+// CONTADORES - COM BORDAS DA ESCALA SELECIONADA
 // =====================================================
 
 function atualizarContadores() {
@@ -326,10 +341,24 @@ function atualizarContadores() {
     const turnos = { M: 0, T: 0, N: 0 };
     pessoasEscala.forEach(p => turnos[p.turno] = (turnos[p.turno] || 0) + 1);
 
+    // 🔥 Atualizar números
     if (DOM.numPessoasEscala) DOM.numPessoasEscala.textContent = pessoasEscala.length;
     if (DOM.numManha) DOM.numManha.textContent = turnos.M;
     if (DOM.numTarde) DOM.numTarde.textContent = turnos.T;
     if (DOM.numNoite) DOM.numNoite.textContent = turnos.N;
+
+    // 🔥 ATUALIZAR BORDAS DOS CONTADORES - APENAS CLASSES
+    const escalaId = equipeSelecionada?.id || 1;
+    const cores = CORES_ESCALAS[escalaId];
+    
+    if (cores) {
+        const contadores = document.querySelectorAll('.contador-item');
+        contadores.forEach(contador => {
+            contador.classList.remove('escala-1', 'escala-2', 'escala-3', 'escala-4', 'escala-5');
+            contador.classList.add(`escala-${escalaId}`);
+            // ❌ NÃO usar style.border - mantém as cores de fundo e ícones
+        });
+    }
 }
 
 // =====================================================
@@ -382,100 +411,6 @@ function mudarPeriodo(delta) {
     renderizarCalendario();
     renderizarLegendaFeriados();
     atualizarPeriodoInfo();
-}
-
-// =====================================================
-// POPUP ADM
-// =====================================================
-
-function abrirPopupADM() {
-    const overlay = document.getElementById('popupOverlay');
-    const titulo = document.getElementById('popupTitulo');
-    const conteudo = document.getElementById('popupConteudo');
-    const total = document.getElementById('popupTotal');
-
-    if (!overlay) {
-        console.error('❌ Elemento overlay do popup não encontrado!');
-        return;
-    }
-
-    const pessoasADM = getPessoas().filter(p => p.tipo === 'ADM');
-
-    if (titulo) {
-        titulo.innerHTML = `
-            <svg class="icon" width="20" height="20" style="color:#10B981;">
-                <use href="assets/icons/sprite.svg#icon-contacts"></use>
-            </svg>
-            Administrativos
-        `;
-    }
-
-    pessoasADM.sort((a, b) => a.nome.localeCompare(b.nome));
-
-    if (conteudo) {
-        if (pessoasADM.length === 0) {
-            conteudo.innerHTML = `
-                <div style="text-align:center; padding:40px 20px; color:var(--color-text-muted);">
-                    <svg class="icon" width="48" height="48" style="opacity:0.3; color:#10B981;">
-                        <use href="assets/icons/sprite.svg#icon-contacts"></use>
-                    </svg>
-                    <p style="margin-top:12px; font-size:0.95rem;">Nenhum funcionário administrativo cadastrado.</p>
-                    <small style="font-size:0.75rem;">Para adicionar, selecione "ADM" no campo "Tipo" ao cadastrar.</small>
-                </div>
-            `;
-        } else {
-            let html = `<div style="display:flex; flex-direction:column; gap:8px;">
-                <div style="padding:8px 16px; background:#10B981; border-radius:8px; color:white; text-align:center; font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <svg class="icon" width="18" height="18" style="color:white;">
-                        <use href="assets/icons/sprite.svg#icon-contacts"></use>
-                    </svg>
-                    Administrativos (${pessoasADM.length})
-                </div>
-            `;
-
-            pessoasADM.forEach(p => {
-                const cores = CORES_TURNOS[p.turno] || CORES_TURNOS['M'];
-                html += `
-                    <div style="display:flex; flex-direction:column; padding:14px 16px; background:var(--color-surface); border-radius:10px; border:1px solid var(--color-border); border-left:4px solid #10B981; gap:4px;">
-                        <div style="font-weight:600; font-size:1rem; color:var(--color-text);">${p.nome}</div>
-                        ${p.cargo ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--color-text-muted);">
-                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-work"></use></svg> ${p.cargo}
-                        </div>` : ''}
-                        ${p.empresa ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--color-text-muted);">
-                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-business"></use></svg> ${p.empresa}
-                        </div>` : ''}
-                        ${p.contato ? `<div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--color-text-muted);">
-                            <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-phone"></use></svg> ${p.contato}
-                        </div>` : ''}
-                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
-                            <span class="badge-adm">ADM</span>
-                            <span class="badge-turno ${p.turno}">E${p.escalaId}-${p.turno}</span>
-                        </div>
-                        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px; padding-top:8px; border-top:1px solid var(--color-border);">
-                            <button onclick="window.editarFuncionario('${p.id}')" class="btn-icon-edit" title="Editar">
-                                <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-edit"></use></svg>
-                            </button>
-                            <button onclick="window.removerPessoa('${p.id}')" class="btn-icon-delete" title="Excluir">
-                                <svg class="icon" width="16" height="16"><use href="assets/icons/sprite.svg#icon-delete"></use></svg>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            html += `
-                </div>
-                <div style="margin-top:16px; padding:12px 16px; background:#10B981; border-radius:10px; color:white; text-align:center; font-weight:600; font-size:0.9rem; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <svg class="icon" width="18" height="18" style="color:white;"><use href="assets/icons/sprite.svg#icon-contacts"></use></svg>
-                    Total: ${pessoasADM.length} funcionário${pessoasADM.length > 1 ? 's' : ''} ADM
-                </div>
-            `;
-            conteudo.innerHTML = html;
-        }
-    }
-
-    if (total) total.textContent = `ADM: ${pessoasADM.length}`;
-    overlay.classList.add('ativo');
 }
 
 // =====================================================
@@ -604,10 +539,7 @@ function removerPessoa(id) {
     console.log('🗑️ Tentando remover funcionário ID:', id);
     console.log('📋 Pessoas atuais:', pessoas);
     
-    // 🔥 Converter para número para garantir comparação correta
     const idNumero = Number(id);
-    
-    // 🔥 Buscar o funcionário antes de deletar
     const pessoa = pessoas.find(p => Number(p.id) === idNumero);
     
     if (!pessoa) {
@@ -618,58 +550,17 @@ function removerPessoa(id) {
 
     console.log('✅ Funcionário encontrado:', pessoa);
 
-    // 🔥 Confirmar com nome do funcionário
     if (confirm(`Tem certeza que deseja remover "${pessoa.nome}" da escala ${pessoa.escalaId}?`)) {
-        // 🔥 Filtrar usando comparação de números
         const novasPessoas = pessoas.filter(p => Number(p.id) !== idNumero);
-        
         console.log(`📊 Antes: ${pessoas.length} funcionários`);
         console.log(`📊 Depois: ${novasPessoas.length} funcionários`);
-        
-        // 🔥 Atualizar array
         pessoas = novasPessoas;
-        
-        // 🔥 Salvar no storage
         salvarPessoasStorage(pessoas);
-        
-        // 🔥 Recarregar dados
-        if (typeof recarregarPessoas === 'function') {
-            recarregarPessoas();
-        }
-        
-        // 🔥 Atualizar contadores
+        if (typeof recarregarPessoas === 'function') recarregarPessoas();
         atualizarContadores();
-        
-        // 🔥 Fechar popup
         fecharPopup();
-        
-        // 🔥 Reabrir popup com dados atualizados (se estava aberto)
-        const overlay = document.getElementById('popupOverlay');
-        if (overlay && overlay.classList.contains('ativo')) {
-            // Determinar qual popup recarregar
-            const titulo = document.getElementById('popupTitulo');
-            if (titulo) {
-                const texto = titulo.textContent;
-                if (texto.includes('Administrativos')) {
-                    abrirPopupADM();
-                } else if (texto.includes('Manhã')) {
-                    abrirPopup('M');
-                } else if (texto.includes('Tarde')) {
-                    abrirPopup('T');
-                } else if (texto.includes('Noite')) {
-                    abrirPopup('N');
-                } else {
-                    abrirPopup('total');
-                }
-            }
-        }
-        
-        // 🔥 Recarregar calendário (caso tenha algum marcador)
         renderizarCalendario();
-        
-        // 🔥 Mensagem de sucesso
         mostrarToast(`🗑️ "${pessoa.nome}" removido com sucesso!`, 'sucesso');
-        
         console.log('✅ Funcionário removido com sucesso!');
     }
 }
@@ -688,84 +579,68 @@ function editarFuncionario(id) {
 }
 
 // =====================================================
-// ESTATÍSTICAS
+// ESTATÍSTICAS - FUNÇÃO PARA ABRIR
 // =====================================================
 
 function abrirEstatisticas() {
-    const overlay = DOM.popupEstatisticas;
-    const conteudo = DOM.popupEstatisticasConteudo;
-    if (!overlay || !conteudo) return;
-
-    const periodo = getPeriodoPorIndex(periodoIndex);
-    const diasNoPeriodo = getDiasNoPeriodo(periodo);
-
-    let trabalhos = 0, folgas = 0, feriadosCount = 0, feriadosTrabalhadosCount = 0, horasTrabalhadas = 0;
-    const dataAtual = new Date(periodo.inicio);
-
-    while (dataAtual <= periodo.fim) {
-        const status = obterStatusDia(equipeSelecionada, dataAtual);
-        const dia = dataAtual.getDate();
-        const mes = dataAtual.getMonth() + 1;
-        const dataComemorativa = getDataComemorativa(dia, mes);
-
-        if (dataComemorativa?.tipo === 'feriado') {
-            feriadosCount++;
-            if (status === 1) feriadosTrabalhadosCount++;
-        }
-
-        if (status === 1) { trabalhos++; horasTrabalhadas += 9; }
-        else { folgas++; }
-        dataAtual.setDate(dataAtual.getDate() + 1);
+    const overlay = document.getElementById('popupEstatisticas');
+    const conteudo = document.getElementById('popupEstatisticasConteudo');
+    
+    console.log('🔍 abrirEstatisticas chamada!');
+    
+    if (!overlay || !conteudo) {
+        console.error('❌ Elementos não encontrados!');
+        return;
     }
 
-    const minutosTrabalhados = horasParaMinutos(horasTrabalhadas);
-    const totalExtrasPeriodo = horasExtras.filter(item => {
-        const data = new Date(item.data + 'T00:00:00');
-        return data >= periodo.inicio && data <= periodo.fim;
-    }).reduce((acc, item) => acc + item.horas, 0);
-    const totalExtrasMin = horasParaMinutos(totalExtrasPeriodo);
-    const percentual = diasNoPeriodo > 0 ? Math.round((trabalhos / diasNoPeriodo) * 100) : 0;
-
-    const pessoasEscala = pessoas.filter(p => p.escalaId === equipeSelecionada?.id);
-    const turnos = {
-        M: pessoasEscala.filter(p => p.turno === 'M').length,
-        T: pessoasEscala.filter(p => p.turno === 'T').length,
-        N: pessoasEscala.filter(p => p.turno === 'N').length
-    };
-
+    // 🔥 LOADING
     conteudo.innerHTML = `
-        <div class="estatisticas-grid">
-            ${[
-                { icon: '📅', label: 'Período', value: `${formatarDataPeriodo(periodo.inicio)} a ${formatarDataPeriodo(periodo.fim)}`, cls: 'periodo' },
-                { icon: '📊', label: 'Total de Dias', value: diasNoPeriodo, cls: 'total-dias' },
-                { icon: '💼', label: 'Dias Trabalhados', value: trabalhos, cls: 'trabalhados', color: '#3B82F6' },
-                { icon: '🏖️', label: 'Dias de Folga', value: folgas, cls: 'folga', color: '#10B981' },
-                { icon: '📅', label: 'Feriados', value: feriadosCount, cls: 'feriados', color: '#EF4444' },
-                { icon: '⚠️', label: 'Feriados Trab.', value: feriadosTrabalhadosCount, cls: 'feriados-trab', color: '#DC2626' },
-                { icon: '⏱️', label: 'Horas Efetivas', value: formatarMinutos(minutosTrabalhados), cls: 'horas', color: '#059669' },
-                { icon: '📊', label: '% Trabalhado', value: `${percentual}%`, cls: 'percentual', color: '#8B5CF6' },
-                { icon: '⏰', label: 'H.Extra Período', value: formatarMinutos(totalExtrasMin), cls: 'extra', color: '#F59E0B' },
-                { icon: '👥', label: 'Funcionários', value: pessoasEscala.length, cls: 'funcionarios' },
-                { icon: '☀️', label: 'Manhã', value: turnos.M, cls: 'manha', color: '#F59E0B' },
-                { icon: '🌆', label: 'Tarde', value: turnos.T, cls: 'tarde', color: '#EA580C' },
-                { icon: '🌙', label: 'Noite', value: turnos.N, cls: 'noite', color: '#4F46E5' }
-            ].map(item => `
-                <div class="estatistica-card ${item.cls}">
-                    <div class="estatistica-icon">${item.icon}</div>
-                    <div class="estatistica-info">
-                        <span class="estatistica-label">${item.label}</span>
-                        <span class="estatistica-valor" style="${item.color ? `color:${item.color}` : ''}">${item.value}</span>
-                    </div>
-                </div>
-            `).join('')}
+        <div style="text-align:center; padding:40px; color:var(--color-text-muted);">
+            <svg class="icon mi-spin" width="32" height="32" style="color:var(--color-primary);">
+                <use href="assets/icons/sprite.svg#icon-sync"></use>
+            </svg>
+            <p style="margin-top:12px;">Carregando estatísticas...</p>
         </div>
     `;
-
     overlay.classList.add('ativo');
+
+    // 🔥 IMPORT DINÂMICO
+    import('./core/estatisticas.js')
+        .then(module => {
+            console.log('✅ Módulo carregado!');
+            console.log('📦 Funções disponíveis:', Object.keys(module));
+            
+            if (typeof module.renderizarEstatisticas === 'function') {
+                module.renderizarEstatisticas(conteudo, periodoIndex);
+                console.log('✅ Estatísticas renderizadas!');
+            } else {
+                console.error('❌ renderizarEstatisticas não é uma função');
+                conteudo.innerHTML = `
+                    <div style="text-align:center; padding:40px; color:var(--color-danger);">
+                        <p>❌ Erro: Função não encontrada</p>
+                        <small style="color:var(--color-text-muted);">O módulo não exporta renderizarEstatisticas</small>
+                    </div>
+                `;
+            }
+        })
+        .catch(err => {
+            console.error('❌ Erro ao carregar módulo:', err);
+            conteudo.innerHTML = `
+                <div style="text-align:center; padding:40px; color:var(--color-danger);">
+                    <p>❌ Erro ao carregar estatísticas</p>
+                    <small style="color:var(--color-text-muted);">${err.message}</small>
+                    <br>
+                    <small style="color:var(--color-text-muted); font-size:0.7rem;">Verifique se o arquivo core/estatisticas.js existe</small>
+                </div>
+            `;
+        });
 }
 
 function fecharEstatisticas() {
-    if (DOM.popupEstatisticas) DOM.popupEstatisticas.classList.remove('ativo');
+    const overlay = document.getElementById('popupEstatisticas');
+    if (overlay) {
+        overlay.classList.remove('ativo');
+    }
 }
 
 // =====================================================
@@ -1124,7 +999,61 @@ function fecharDetalhesDia() {
 }
 
 // =====================================================
-// INIT
+// EXPORTA FUNÇÕES PARA O GLOBAL (window)
+// =====================================================
+
+window.toggleMenu = toggleMenu;
+window.fecharMenu = fecharMenu;
+window.toggleTema = toggleTema;
+window.abrirModalPessoa = abrirModalPessoa;
+window.fecharModalPessoa = fecharModalPessoa;
+window.abrirModalExtra = abrirModalExtra;
+window.fecharModalExtra = fecharModalExtra;
+window.abrirPopup = abrirPopup;
+window.fecharPopup = fecharPopup;
+window.abrirPopupADM = abrirPopupADM;
+window.abrirEstatisticas = abrirEstatisticas;
+window.fecharEstatisticas = fecharEstatisticas;
+window.mudarPeriodo = mudarPeriodo;
+window.selecionarEquipe = selecionarEquipe;
+window.salvarExtra = salvarExtra;
+window.removerExtra = removerExtra;
+window.renderizarListaExtras = renderizarListaExtras;
+window.salvarPessoa = salvarPessoa;
+window.removerPessoa = removerPessoa;
+window.editarFuncionario = editarFuncionario;
+window.aplicarPeriodo = aplicarPeriodo;
+window.carregarConfigPeriodoUI = carregarConfigPeriodoUI;
+window.exportarDados = exportarDados;
+window.importarDados = importarDados;
+window.limparDados = limparDados;
+window.resetarTudo = resetarTudo;
+window.abrirMelhorias = abrirMelhorias;
+window.abrirBug = abrirBug;
+window.abrirGuia = abrirGuia;
+window.recarregarPessoas = recarregarPessoas;
+window.abrirDetalhesDia = abrirDetalhesDia;
+window.fecharDetalhesDia = fecharDetalhesDia;
+
+console.log('✅ Funções exportadas para o window!');
+
+// =====================================================
+// ATALHOS DE TECLADO
+// =====================================================
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        fecharMenu();
+        fecharModalExtra();
+        fecharModalPessoa();
+        fecharPopup();
+        fecharEstatisticas();
+        fecharDetalhesDia();
+    }
+});
+
+// =====================================================
+// INICIALIZAÇÃO
 // =====================================================
 
 function init() {
@@ -1135,6 +1064,15 @@ function init() {
     initTema();
     initModais();
     initPopups(equipeSelecionada);
+
+
+     // 🔥 ADICIONAR ESTA LINHA - INICIALIZAR ESTATÍSTICAS
+    import('./core/estatisticas.js').then(module => {
+        if (module.initEstatisticas) {
+            module.initEstatisticas(equipeSelecionada);
+            console.log('📊 Estatísticas inicializadas com:', equipeSelecionada);
+        }
+    });
 
     renderizarBotoesEquipe();
     renderizarCalendario();
@@ -1175,59 +1113,6 @@ function init() {
     console.log('📅 Período atual:', getNomePeriodo(getPeriodoPorIndex(periodoIndex)));
     console.log('👥 Funcionários:', pessoas.length);
 }
-
-// =====================================================
-// EXPORTA FUNÇÕES PARA O GLOBAL (window)
-// =====================================================
-
-window.toggleMenu = toggleMenu;
-window.fecharMenu = fecharMenu;
-window.toggleTema = toggleTema;
-window.abrirModalPessoa = abrirModalPessoa;
-window.fecharModalPessoa = fecharModalPessoa;
-window.abrirModalExtra = abrirModalExtra;
-window.fecharModalExtra = fecharModalExtra;
-window.abrirPopup = abrirPopup;
-window.fecharPopup = fecharPopup;
-window.abrirEstatisticas = abrirEstatisticas;
-window.fecharEstatisticas = fecharEstatisticas;
-window.mudarPeriodo = mudarPeriodo;
-window.selecionarEquipe = selecionarEquipe;
-window.salvarExtra = salvarExtra;
-window.removerExtra = removerExtra;
-window.renderizarListaExtras = renderizarListaExtras;
-window.salvarPessoa = salvarPessoa;
-window.removerPessoa = removerPessoa;
-window.editarFuncionario = editarFuncionario;
-window.aplicarPeriodo = aplicarPeriodo;
-window.carregarConfigPeriodoUI = carregarConfigPeriodoUI;
-window.exportarDados = exportarDados;
-window.importarDados = importarDados;
-window.limparDados = limparDados;
-window.resetarTudo = resetarTudo;
-window.abrirMelhorias = abrirMelhorias;
-window.abrirBug = abrirBug;
-window.abrirGuia = abrirGuia;
-window.recarregarPessoas = recarregarPessoas;
-window.abrirDetalhesDia = abrirDetalhesDia;
-window.fecharDetalhesDia = fecharDetalhesDia;
-window.abrirPopupADM = abrirPopupADM;
-
-console.log('✅ Funções exportadas para o window!');
-
-// =====================================================
-// ATALHOS DE TECLADO
-// =====================================================
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        fecharMenu();
-        fecharModalExtra();
-        fecharModalPessoa();
-        fecharPopup();
-        fecharEstatisticas();
-    }
-});
 
 // =====================================================
 // INICIALIZAÇÃO

@@ -221,7 +221,11 @@ body {
     margin: 0;
 }
 
-/* 🔥 HEADER DO CALENDÁRIO - UNIFICADO */
+/* ============================================================
+   HEADER DO CALENDÁRIO - DOMINGO EM VERMELHO
+   ============================================================ */
+
+/* 🔥 Todos os dias da semana - Azul */
 #calendarioContainer th {
     width: 14.28%;
     padding: 12px 4px;
@@ -230,15 +234,30 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     border-radius: var(--radius-md) var(--radius-md) 0 0;
-    background: var(--color-primary) !important;
+    background: var(--color-primary, #2563EB) !important;
     color: #FFFFFF !important;
-    border-bottom: 3px solid var(--color-primary-dark) !important;
+    border-bottom: 3px solid var(--color-primary-dark, #1E40AF) !important;
     letter-spacing: 0.5px;
     transition: none;
 }
 
+/* 🔥 DOMINGO - Vermelho com letras brancas */
+#calendarioContainer th:first-child {
+    background: #DC2626 !important;      /* Vermelho */
+    color: #FFFFFF !important;
+    border-bottom: 3px solid #B91C1C !important; /* Vermelho escuro */
+}
+
+/* 🔥 Hover do DOMINGO */
+#calendarioContainer th:first-child:hover {
+    background: #B91C1C !important;      /* Vermelho escuro no hover */
+    transform: translateY(-1px);
+    transition: transform 0.2s ease;
+}
+
+/* 🔥 Hover dos outros dias */
 #calendarioContainer th:hover {
-    background: var(--color-primary-hover) !important;
+    background: var(--color-primary-hover, #1D4ED8) !important;
     transform: translateY(-1px);
     transition: transform 0.2s ease;
 }
@@ -380,6 +399,7 @@ body {
    6. CONTADORES
    ============================================================ */
 
+
 .contadores-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -398,8 +418,8 @@ body {
     padding: 6px 2px;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid var(--color-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 3px solid var(--color-border, #e2e8f0);
     gap: 1px;
     background: var(--color-surface);
     box-shadow: var(--shadow-sm);
@@ -409,13 +429,34 @@ body {
 .contador-item:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: var(--shadow-md);
-    border-color: var(--color-primary);
 }
 
 .contador-item:active {
     transform: scale(0.95);
 }
 
+/* 🔥 CORES DE FUNDO DOS CONTADORES (MANTIDAS) */
+.contador-item.total {
+    background: #F1F5F9;
+    color: #1E293B;
+}
+
+.contador-item.manha {
+    background: #FEF9C3;
+    color: #78350F;
+}
+
+.contador-item.tarde {
+    background: #FFEDD5;
+    color: #7C2D12;
+}
+
+.contador-item.noite {
+    background: #DBEAFE;
+    color: #1E3A8A;
+}
+
+/* 🔥 ÍCONES NOS CONTADORES */
 .contador-item .icon {
     width: 18px;
     height: 18px;
@@ -437,28 +478,45 @@ body {
     line-height: 1.1;
 }
 
-.contador-item.total {
-    background: #F1F5F9;
-    border-color: #94A3B8;
-    color: #1E293B;
+/* 🔥 BORDAS DINÂMICAS POR ESCALA - APENAS A BORDA MUDA */
+.contador-item.escala-1 {
+    border-color: #2563EB !important;
+}
+.contador-item.escala-1:hover {
+    border-color: #1D4ED8 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
 }
 
-.contador-item.manha {
-    background: #FEF9C3;
-    border-color: #F59E0B;
-    color: #78350F;
+.contador-item.escala-2 {
+    border-color: #DC2626 !important;
+}
+.contador-item.escala-2:hover {
+    border-color: #B91C1C !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
 }
 
-.contador-item.tarde {
-    background: #FFEDD5;
-    border-color: #EA580C;
-    color: #7C2D12;
+.contador-item.escala-3 {
+    border-color: #8B5CF6 !important;
+}
+.contador-item.escala-3:hover {
+    border-color: #6D28D9 !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
 }
 
-.contador-item.noite {
-    background: #DBEAFE;
-    border-color: #3B82F6;
-    color: #1E3A8A;
+.contador-item.escala-4 {
+    border-color: #F59E0B !important;
+}
+.contador-item.escala-4:hover {
+    border-color: #D97706 !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3) !important;
+}
+
+.contador-item.escala-5 {
+    border-color: #10B981 !important;
+}
+.contador-item.escala-5:hover {
+    border-color: #059669 !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
 }
 
 /* ============================================================
@@ -832,10 +890,25 @@ body.modo-escuro .modal-content {
     border-color: var(--color-border);
 }
 
+/* ============================================================
+   TEMA ESCURO - HEADER
+   ============================================================ */
+
 body.modo-escuro #calendarioContainer th {
-    background: var(--color-primary-hover) !important;
+    background: var(--color-primary-hover, #1D4ED8) !important;
     color: #FFFFFF !important;
-    border-bottom: 3px solid var(--color-primary-dark) !important;
+    border-bottom: 3px solid var(--color-primary-dark, #1E40AF) !important;
+}
+
+/* 🔥 DOMINGO no tema escuro - Vermelho mantido */
+body.modo-escuro #calendarioContainer th:first-child {
+    background: #DC2626 !important;
+    color: #FFFFFF !important;
+    border-bottom: 3px solid #991B1B !important;
+}
+
+body.modo-escuro #calendarioContainer th:first-child:hover {
+    background: #B91C1C !important;
 }
 
 body.modo-escuro #calendarioContainer th:hover {
