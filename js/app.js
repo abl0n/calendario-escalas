@@ -1,5 +1,5 @@
 // =====================================================
-// APP - Inicialização principal (OTIMIZADO)
+// APP - Inicialização principal (CORRIGIDO)
 // =====================================================
 
 import { 
@@ -123,8 +123,16 @@ function getTotalExtras() {
     return horasExtras.reduce((acc, item) => acc + (item.horas || 0), 0);
 }
 
+function getNomeMes(mes) {
+    const nomes = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    return nomes[mes] || 'Mês inválido';
+}
+
 // =====================================================
-// RENDERIZAÇÃO DO CALENDÁRIO
+// RENDERIZAR CALENDÁRIO - CORRIGIDO COM BOTÕES FOCÁVEIS
 // =====================================================
 
 function renderizarCalendario() {
@@ -161,11 +169,15 @@ function renderizarCalendario() {
     const hoje = new Date();
     const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-    let html = `<table><thead><tr>`;
+    // 🔥 INÍCIO DA TABELA COM role="table" para acessibilidade
+    let html = `<table role="table" aria-label="Calendário de escalas"><thead><tr>`;
     DIAS_SEMANA.forEach(dia => {
-        html += `<th style="background:${corHeaderFundo};color:${corHeaderTexto};border-bottom:3px solid ${corHeaderBorda};">${dia}</th>`;
+        const isDomingo = dia === 'DOM';
+        // 🔥 DOMINGO em vermelho com letras brancas
+        const styleDomingo = isDomingo ? 'background:#DC2626 !important;color:#FFFFFF !important;border-bottom:3px solid #B91C1C !important;' : '';
+        html += `<th role="columnheader" scope="col" style="background:${corHeaderFundo};color:${corHeaderTexto};border-bottom:3px solid ${corHeaderBorda};${styleDomingo}">${dia}</th>`;
     });
-    html += '</tr></thead><tbody>';
+    html += '</tr></thead><tbody role="rowgroup">';
 
     let dataAtual = new Date(primeiroDia);
     let rowOpen = false;
@@ -173,7 +185,7 @@ function renderizarCalendario() {
     for (let i = 0; i < 42; i++) {
         if (i % 7 === 0) {
             if (rowOpen) html += '</tr>';
-            html += `<tr>`;
+            html += `<tr role="row">`;
             rowOpen = true;
         }
 
@@ -182,6 +194,7 @@ function renderizarCalendario() {
         const ano = dataAtual.getFullYear();
         const dataStr = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
+        // 🔥 MANTÉM TODA A LÓGICA EXISTENTE
         const status = obterStatusDia(equipeSelecionada, dataAtual);
         const isHoje = dataStr === hojeStr;
         const noPeriodo = dataEstaNoPeriodo(dataAtual, periodo);
@@ -201,10 +214,10 @@ function renderizarCalendario() {
         if (dataComemorativa) {
             if (dataComemorativa.tipo === 'feriado') {
                 classeEspecial = status === 1 ? 'dia-feriado-trabalhado' : 'dia-feriado';
-                iconeEspecial = `<span class="evento-icone">${dataComemorativa.icone}${status === 1 ? '⚠️' : ''}</span>`;
+                iconeEspecial = `<span class="evento-icone" aria-hidden="true">${dataComemorativa.icone}${status === 1 ? '⚠️' : ''}</span>`;
             } else {
                 classeEspecial = 'dia-comemorativo';
-                iconeEspecial = `<span class="evento-icone">${dataComemorativa.icone}</span>`;
+                iconeEspecial = `<span class="evento-icone" aria-hidden="true">${dataComemorativa.icone}</span>`;
             }
         }
 
@@ -213,18 +226,50 @@ function renderizarCalendario() {
             const extraMin = Math.round(totalExtraDia * 60);
             const h = Math.floor(extraMin / 60);
             const m = extraMin % 60;
-            labelExtra = `<span class="evento-extra">➕ ${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}</span>`;
+            labelExtra = `<span class="evento-extra" aria-hidden="true">➕ ${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}</span>`;
         }
 
-        html += `<td class="${classeHoje} ${classeExtra} ${classeEspecial} ${classePeriodo}" 
-                    data-data="${dataStr}"
-                    onclick="window.abrirDetalhesDia('${dataStr}')"
-                    style="cursor:pointer;">
-            <span class="status-dia ${statusClasse}">${statusTexto}</span>
-            <span class="dia-numero">${dia}</span>
-            ${iconeEspecial}
-            ${labelExtra}
-        </td>`;
+        // 🔥 CONSTRÓI O ARIA-LABEL PARA ACESSIBILIDADE
+        let ariaLabel = `${dia}/${String(mes).padStart(2, '0')}/${ano}`;
+        if (status === 1) ariaLabel += ' - Trabalho';
+        else if (status === 0) ariaLabel += ' - Folga';
+        if (dataComemorativa) ariaLabel += ` - ${dataComemorativa.nome}`;
+        if (temExtra) ariaLabel += ` - ${Math.round(totalExtraDia * 60)} minutos extras`;
+
+        // 🔥 BOTÃO FOCÁVEL POR TAB (em vez de TD com onclick)
+        html += `<td role="gridcell" class="${classeHoje} ${classeExtra} ${classeEspecial} ${classePeriodo}" data-data="${dataStr}">`;
+        html += `<button class="dia-btn" 
+                         role="gridcell" 
+                         tabindex="0" 
+                         data-data="${dataStr}"
+                         aria-label="${ariaLabel}"
+                         style="
+                             display: flex;
+                             flex-direction: column;
+                             align-items: center;
+                             justify-content: center;
+                             width: 100%;
+                             height: 100%;
+                             min-height: 56px;
+                             min-width: 44px;
+                             padding: 4px 2px;
+                             border: 2px solid transparent;
+                             border-radius: 6px;
+                             background: transparent;
+                             cursor: pointer;
+                             font-family: inherit;
+                             font-size: 1rem;
+                             transition: all 0.2s ease;
+                             color: var(--a11y-text-primary, #1a1a1a);
+                             outline: none;
+                             position: relative;
+                         ">`;
+        html += `<span class="status-dia ${statusClasse}" aria-hidden="true">${statusTexto}</span>`;
+        html += `<span class="dia-numero" aria-hidden="true">${dia}</span>`;
+        html += iconeEspecial;
+        html += labelExtra;
+        html += `</button>`;
+        html += `</td>`;
 
         dataAtual.setDate(dataAtual.getDate() + 1);
     }
@@ -232,6 +277,75 @@ function renderizarCalendario() {
     if (rowOpen) html += '</tr>';
     html += '</tbody></table>';
     container.innerHTML = html;
+
+    // ============================================================
+    // 🔥 ADICIONA EVENTOS DE NAVEGAÇÃO POR TECLADO
+    // ============================================================
+    const dias = container.querySelectorAll('.dia-btn');
+    
+    dias.forEach((btn) => {
+        // Evento de clique - mantém a lógica existente
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Remove seleção anterior
+            container.querySelectorAll('.dia-btn.selecionado')
+                .forEach(el => el.classList.remove('selecionado'));
+            
+            // Adiciona seleção no atual
+            this.classList.add('selecionado');
+            
+            const dataStr = this.dataset.data;
+            console.log(`📅 Dia ${dataStr} selecionado`);
+            
+            // 🔥 CHAMA A FUNÇÃO EXISTENTE
+            if (typeof window.abrirDetalhesDia === 'function') {
+                window.abrirDetalhesDia(dataStr);
+            }
+        });
+
+        // 🔥 NAVEGAÇÃO POR SETAS (ARROW KEYS)
+        btn.addEventListener('keydown', function(e) {
+            const todosDias = Array.from(container.querySelectorAll('.dia-btn'));
+            const idx = todosDias.indexOf(this);
+            const cols = 7;
+            let novoIdx = -1;
+
+            switch(e.key) {
+                case 'ArrowRight':
+                    e.preventDefault();
+                    novoIdx = idx + 1;
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    novoIdx = idx - 1;
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    novoIdx = idx + cols;
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    novoIdx = idx - cols;
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    novoIdx = 0;
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    novoIdx = todosDias.length - 1;
+                    break;
+                default:
+                    return;
+            }
+
+            if (novoIdx >= 0 && novoIdx < todosDias.length) {
+                todosDias[novoIdx].focus();
+                todosDias[novoIdx].scrollIntoView({ block: 'nearest' });
+            }
+        });
+    });
 }
 
 // =====================================================
@@ -316,7 +430,8 @@ function renderizarBotoesEquipe() {
 
 function selecionarEquipe(equipe) {
     equipeSelecionada = equipe;
-     // 🔥 ATUALIZAR ESTATÍSTICAS
+    
+    // 🔥 ATUALIZAR ESTATÍSTICAS
     import('./core/estatisticas.js').then(module => {
         if (module.initEstatisticas) {
             module.initEstatisticas(equipe);
@@ -356,7 +471,6 @@ function atualizarContadores() {
         contadores.forEach(contador => {
             contador.classList.remove('escala-1', 'escala-2', 'escala-3', 'escala-4', 'escala-5');
             contador.classList.add(`escala-${escalaId}`);
-            // ❌ NÃO usar style.border - mantém as cores de fundo e ícones
         });
     }
 }
@@ -706,6 +820,7 @@ function abrirGuia() {
 - Use ESC para fechar modais
 - Clique em ☰ para abrir o menu
 - Período máximo de 31 dias
+- Navegue no calendário com TAB e setas do teclado
 
 📞 Dúvidas? Envie um e-mail para adri0mt@uni9.edu.br`);
 }
@@ -1034,6 +1149,7 @@ window.abrirGuia = abrirGuia;
 window.recarregarPessoas = recarregarPessoas;
 window.abrirDetalhesDia = abrirDetalhesDia;
 window.fecharDetalhesDia = fecharDetalhesDia;
+window.renderizarCalendario = renderizarCalendario;
 
 console.log('✅ Funções exportadas para o window!');
 
@@ -1065,8 +1181,7 @@ function init() {
     initModais();
     initPopups(equipeSelecionada);
 
-
-     // 🔥 ADICIONAR ESTA LINHA - INICIALIZAR ESTATÍSTICAS
+    // 🔥 INICIALIZAR ESTATÍSTICAS
     import('./core/estatisticas.js').then(module => {
         if (module.initEstatisticas) {
             module.initEstatisticas(equipeSelecionada);

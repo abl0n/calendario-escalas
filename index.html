@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 
+<!DOCTYPE html>
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
@@ -32,14 +35,17 @@
     <!-- CSS do Projeto -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="assets/css/icons-animated.css">
+    <link rel="stylesheet" href="css/accessibility.css"> 
 
     <!-- JS Module -->
     <script type="module" src="js/app.js" defer></script>
+    
 </head>
 
+
+
+
 <body>
-
-
 
     <!-- ============================================================
     TOAST NOTIFICATION
@@ -54,7 +60,7 @@
         <!-- ============================================================
         HEADER - ESCALAS
         ============================================================ -->
-        <header class="header-escalas" id="headerEscalas" role="banner">
+        <header class="header-escalas" id="headerEscalas" role="banner" aria-label="Seleção de escalas">
             <div class="escalas-container">
                 <div class="botoes-equipe" id="botoesEquipe" role="tablist" aria-label="Seleção de escalas"></div>
             </div>
@@ -71,32 +77,32 @@
         <nav class="menu-lateral" id="menuLateral" role="navigation" aria-label="Menu principal">
             <div class="menu-header">
                 <h2>
-                    <svg class="icon" width="20" height="20">
+                    <svg class="icon" width="20" height="20" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-settings"></use>
                     </svg>
                     Menu
                 </h2>
                 <button class="menu-fechar" onclick="window.fecharMenu()" aria-label="Fechar menu">
-                    <svg class="icon" width="24" height="24">
+                    <svg class="icon" width="24" height="24" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-close"></use>
                     </svg>
                 </button>
             </div>
 
             <!-- GUIA RÁPIDO -->
-            <div class="menu-guia" onclick="window.abrirGuia()">
-                <svg class="icon icon-float" width="24" height="24">
+            <button class="menu-guia" onclick="window.abrirGuia()" aria-label="Abrir guia rápido">
+                <svg class="icon icon-float" width="24" height="24" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-help"></use>
                 </svg>
                 <div>
                     <div class="guia-titulo">Guia Rápido</div>
                     <div class="guia-subtitulo">Clique para ver dicas de uso</div>
                 </div>
-            </div>
+            </button>
 
             <!-- CADASTRAR FUNCIONÁRIO -->
-            <button class="menu-item menu-item-destaque" onclick="window.abrirModalPessoa()">
-                <span class="icone">
+            <button class="menu-item menu-item-destaque" onclick="window.abrirModalPessoa()" aria-label="Cadastrar funcionário">
+                <span class="icone" aria-hidden="true">
                     <svg class="icon" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-user-add"></use>
                     </svg>
@@ -112,7 +118,7 @@
             <!-- CONFIGURAÇÃO DO PERÍODO -->
             <div class="menu-periodo-config">
                 <span class="periodo-label">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-calendar"></use>
                     </svg>
                     Período
@@ -126,8 +132,8 @@
                         <label for="periodoDiaFim">Fim</label>
                         <input type="number" id="periodoDiaFim" class="input" value="15" min="1" max="31" aria-label="Dia de fim do período">
                     </div>
-                    <button class="btn btn-primary btn-sm" onclick="window.aplicarPeriodo()">
-                        <svg class="icon" width="16" height="16">
+                    <button class="btn btn-primary btn-sm" onclick="window.aplicarPeriodo()" aria-label="Aplicar período">
+                        <svg class="icon" width="16" height="16" aria-hidden="true">
                             <use href="assets/icons/sprite.svg#icon-check"></use>
                         </svg>
                         Aplicar
@@ -140,7 +146,7 @@
 
             <!-- TEMA -->
             <button class="menu-item toggle-tema" onclick="window.toggleTema()" aria-label="Alternar tema claro/escuro">
-                <span class="icone">
+                <span class="icone" aria-hidden="true">
                     <svg class="icon" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-moon"></use>
                     </svg>
@@ -149,14 +155,14 @@
                     Tema
                     <small>Claro / Escuro</small>
                 </span>
-                <span class="status-tema" id="statusTema">🌞</span>
+                <span class="status-tema" id="statusTema" aria-hidden="true">🌞</span>
             </button>
 
             <div class="menu-divider" role="separator"></div>
 
             <!-- EXPORTAR -->
             <button class="menu-item" onclick="window.exportarDados()" aria-label="Exportar dados">
-                <span class="icone">
+                <span class="icone" aria-hidden="true">
                     <svg class="icon icon-hover-float" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-download"></use>
                     </svg>
@@ -169,7 +175,7 @@
 
             <!-- IMPORTAR -->
             <button class="menu-item" onclick="window.importarDados()" aria-label="Importar dados">
-                <span class="icone">
+                <span class="icone" aria-hidden="true">
                     <svg class="icon icon-hover-float" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-upload"></use>
                     </svg>
@@ -182,7 +188,7 @@
 
             <!-- LIMPAR DADOS -->
             <button class="menu-item" onclick="window.limparDados()" aria-label="Limpar dados">
-                <span class="icone">
+                <span class="icone" aria-hidden="true">
                     <svg class="icon icon-pulse" width="24" height="24" style="color:var(--color-danger)">
                         <use href="assets/icons/sprite.svg#icon-delete"></use>
                     </svg>
@@ -195,7 +201,7 @@
 
             <!-- RESETAR -->
             <button class="menu-item" onclick="window.resetarTudo()" aria-label="Resetar tudo">
-                <span class="icone">
+                <span class="icone" aria-hidden="true">
                     <svg class="icon icon-hover-spin" width="24" height="24">
                         <use href="assets/icons/sprite.svg#icon-sync"></use>
                     </svg>
@@ -210,7 +216,7 @@
 
             <!-- SUGERIR MELHORIA -->
             <button class="menu-item" onclick="window.abrirMelhorias()" aria-label="Sugerir melhoria">
-                <span class="icone">
+                <span class="icone" aria-hidden="true">
                     <svg class="icon icon-float" width="24" height="24" style="color:var(--color-warning)">
                         <use href="assets/icons/sprite.svg#icon-lightbulb"></use>
                     </svg>
@@ -223,7 +229,7 @@
 
             <!-- REPORTAR BUG -->
             <button class="menu-item" onclick="window.abrirBug()" aria-label="Reportar bug">
-                <span class="icone">
+                <span class="icone" aria-hidden="true">
                     <svg class="icon icon-pulse" width="24" height="24" style="color:var(--color-danger)">
                         <use href="assets/icons/sprite.svg#icon-bug"></use>
                     </svg>
@@ -237,105 +243,124 @@
             <div class="menu-divider" role="separator"></div>
 
             <!-- VERSÃO -->
-            <div class="menu-version">
+            <div class="menu-version" aria-label="Versão do aplicativo">
                 Versão 1.0.0
-                <span class="badge-version">Beta</span>
+                <span class="badge-version" aria-hidden="true">Beta</span>
             </div>
         </nav>
 
         <!-- ============================================================
         NAVEGAÇÃO DO CALENDÁRIO
         ============================================================ -->
-        <div class="navegacao-mes">
-            <button class="btn btn-ghost btn-icon" onclick="window.mudarPeriodo(-1)" aria-label="Período anterior">
-                <svg class="icon" width="24" height="24">
+        <div class="navegacao-mes" role="navigation" aria-label="Navegação do calendário">
+            <button class="btn btn-ghost btn-nav" onclick="window.mudarPeriodo(-1)" aria-label="Período anterior">
+                <svg class="icon" width="24" height="24" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-chevron-left"></use>
                 </svg>
+                <span class="sr-only">Período anterior</span>
             </button>
-            <span class="mes-titulo" id="periodoNome">Junho/Julho 2026</span>
-            <button class="btn btn-ghost btn-icon" onclick="window.mudarPeriodo(1)" aria-label="Próximo período">
-                <svg class="icon" width="24" height="24">
+            <span class="mes-titulo" id="periodoNome" tabindex="0" role="heading" aria-level="2">
+                Junho/Julho 2026
+            </span>
+            <button class="btn btn-ghost btn-nav" onclick="window.mudarPeriodo(1)" aria-label="Próximo período">
+                <svg class="icon" width="24" height="24" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-chevron-right"></use>
                 </svg>
+                <span class="sr-only">Próximo período</span>
             </button>
         </div>
 
         <!-- ============================================================
         CALENDÁRIO
         ============================================================ -->
-        <section class="calendario" id="calendarioContainer" role="grid" aria-label="Calendário de escalas"></section>
+        <section class="calendario" id="calendarioContainer" 
+                 role="grid" 
+                 aria-label="Calendário de escalas">
+            <!-- O JavaScript vai popular este grid com <button> -->
+        </section>
 
         <!-- ============================================================
         CONTADORES
         ============================================================ -->
-        <div class="contadores-container" id="contadoresContainer">
-            <div class="contador-item total" onclick="window.abrirPopup('total')" title="Ver todos os funcionários">
-                <svg class="icon" width="20" height="20">
+        <div class="contadores-container" id="contadoresContainer" role="group" aria-label="Contadores de funcionários por turno">
+            <button class="contador-item total" 
+                    onclick="window.abrirPopup('total')" 
+                    aria-label="Ver todos os funcionários. Total: 0">
+                <svg class="icon" width="20" height="20" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-users"></use>
                 </svg>
-                <span class="contador-numero" id="numPessoasEscala">0</span>
+                <span class="contador-numero" id="numPessoasEscala" aria-hidden="true">0</span>
                 <span class="contador-label">Total</span>
-            </div>
-            <div class="contador-item manha" onclick="window.abrirPopup('M')" title="Ver funcionários da manhã">
-                <svg class="icon" width="20" height="20" style="color:var(--color-warning)">
+            </button>
+
+            <button class="contador-item manha" 
+                    onclick="window.abrirPopup('M')" 
+                    aria-label="Ver funcionários da manhã. Manhã: 0">
+                <svg class="icon" width="20" height="20" style="color:var(--color-warning)" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-sun"></use>
                 </svg>
-                <span class="contador-numero" id="numManha">0</span>
+                <span class="contador-numero" id="numManha" aria-hidden="true">0</span>
                 <span class="contador-label">Manhã</span>
-            </div>
-            <div class="contador-item tarde" onclick="window.abrirPopup('T')" title="Ver funcionários da tarde">
-                <svg class="icon" width="20" height="20" style="color:#EA580C;">
+            </button>
+
+            <button class="contador-item tarde" 
+                    onclick="window.abrirPopup('T')" 
+                    aria-label="Ver funcionários da tarde. Tarde: 0">
+                <svg class="icon" width="20" height="20" style="color:#EA580C;" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-sun"></use>
                 </svg>
-                <span class="contador-numero" id="numTarde">0</span>
+                <span class="contador-numero" id="numTarde" aria-hidden="true">0</span>
                 <span class="contador-label">Tarde</span>
-            </div>
-            <div class="contador-item noite" onclick="window.abrirPopup('N')" title="Ver funcionários da noite">
-                <svg class="icon" width="20" height="20" style="color:#4F46E5;">
+            </button>
+
+            <button class="contador-item noite" 
+                    onclick="window.abrirPopup('N')" 
+                    aria-label="Ver funcionários da noite. Noite: 0">
+                <svg class="icon" width="20" height="20" style="color:#4F46E5;" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-moon"></use>
                 </svg>
-                <span class="contador-numero" id="numNoite">0</span>
+                <span class="contador-numero" id="numNoite" aria-hidden="true">0</span>
                 <span class="contador-label">Noite</span>
-            </div>
+            </button>
         </div>
 
         <!-- ============================================================
         POPUP LISTA DE FUNCIONÁRIOS
         ============================================================ -->
-        <div class="modal-overlay" id="popupOverlay" onclick="window.fecharPopup()" role="dialog" aria-label="Lista de funcionários">
+        <div class="modal-overlay" id="popupOverlay" role="dialog" aria-label="Lista de funcionários" aria-modal="true">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="popup-header">
                     <h3 id="popupTitulo">
-                        <svg class="icon" width="20" height="20">
+                        <svg class="icon" width="20" height="20" aria-hidden="true">
                             <use href="assets/icons/sprite.svg#icon-users"></use>
                         </svg>
                         Funcionários
                     </h3>
                     <span class="popup-total" id="popupTotal">Total: 0</span>
-                    <button class="menu-fechar" onclick="window.fecharPopup()" aria-label="Fechar">
-                        <svg class="icon" width="24" height="24">
+                    <button class="menu-fechar" onclick="window.fecharPopup()" aria-label="Fechar lista de funcionários">
+                        <svg class="icon" width="24" height="24" aria-hidden="true">
                             <use href="assets/icons/sprite.svg#icon-close"></use>
                         </svg>
                     </button>
                 </div>
-                <div class="popup-conteudo" id="popupConteudo"></div>
+                <div class="popup-conteudo" id="popupConteudo" role="list"></div>
             </div>
         </div>
 
         <!-- ============================================================
         POPUP ESTATÍSTICAS
         ============================================================ -->
-        <div class="modal-overlay" id="popupEstatisticas" onclick="window.fecharEstatisticas()" role="dialog" aria-label="Estatísticas detalhadas">
+        <div class="modal-overlay" id="popupEstatisticas" role="dialog" aria-label="Estatísticas detalhadas" aria-modal="true">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="popup-header">
                     <h3>
-                        <svg class="icon" width="20" height="20" style="color:#8B5CF6;">
+                        <svg class="icon" width="20" height="20" style="color:#8B5CF6;" aria-hidden="true">
                             <use href="assets/icons/sprite.svg#icon-chart"></use>
                         </svg>
                         Estatísticas Detalhadas
                     </h3>
-                    <button class="menu-fechar" onclick="window.fecharEstatisticas()" aria-label="Fechar">
-                        <svg class="icon" width="24" height="24">
+                    <button class="menu-fechar" onclick="window.fecharEstatisticas()" aria-label="Fechar estatísticas">
+                        <svg class="icon" width="24" height="24" aria-hidden="true">
                             <use href="assets/icons/sprite.svg#icon-close"></use>
                         </svg>
                     </button>
@@ -347,17 +372,17 @@
         <!-- ============================================================
         POPUP DETALHES DO DIA
         ============================================================ -->
-        <div class="modal-overlay" id="popupDetalhesDia" role="dialog" aria-label="Detalhes do dia">
+        <div class="modal-overlay" id="popupDetalhesDia" role="dialog" aria-label="Detalhes do dia" aria-modal="true">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="popup-header">
                     <h3 id="detalhesTitulo">
-                        <svg class="icon" width="20" height="20">
+                        <svg class="icon" width="20" height="20" aria-hidden="true">
                             <use href="assets/icons/sprite.svg#icon-calendar"></use>
                         </svg>
                         Detalhes do Dia
                     </h3>
-                    <button class="menu-fechar" onclick="window.fecharDetalhesDia()" aria-label="Fechar">
-                        <svg class="icon" width="24" height="24">
+                    <button class="menu-fechar" onclick="window.fecharDetalhesDia()" aria-label="Fechar detalhes do dia">
+                        <svg class="icon" width="24" height="24" aria-hidden="true">
                             <use href="assets/icons/sprite.svg#icon-close"></use>
                         </svg>
                     </button>
@@ -366,36 +391,35 @@
             </div>
         </div>
 
-
         <!-- ============================================================
-        RODAPÉ - MENU DE AÇÕES (OTIMIZADO)
+        RODAPÉ - MENU DE AÇÕES
         ============================================================ -->
         <footer class="footer-actions" role="navigation" aria-label="Menu de ações">
             <div class="footer-actions-inner">
                 
-                <button class="footer-btn" onclick="window.toggleMenu()" aria-label="Menu principal">
-                    <svg class="icon" width="26" height="26">
+                <button class="footer-btn" onclick="window.toggleMenu()" aria-label="Abrir menu principal">
+                    <svg class="icon" width="26" height="26" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-menu"></use>
                     </svg>
                     <span class="footer-btn-label">Menu</span>
                 </button>
 
                 <button class="footer-btn footer-btn-primary" onclick="window.abrirModalExtra()" aria-label="Adicionar hora extra">
-                    <svg class="icon" width="30" height="30">
+                    <svg class="icon" width="30" height="30" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-clock"></use>
                     </svg>
                     <span class="footer-btn-label">Extra</span>
                 </button>
 
                 <button class="footer-btn" onclick="window.abrirEstatisticas()" aria-label="Ver estatísticas">
-                    <svg class="icon" width="26" height="26" style="color:#8B5CF6;">
+                    <svg class="icon" width="26" height="26" style="color:#8B5CF6;" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-chart"></use>
                     </svg>
                     <span class="footer-btn-label">Stats</span>
                 </button>
 
                 <button class="footer-btn" onclick="window.abrirPopupADM()" aria-label="Funcionários administrativos">
-                    <svg class="icon" width="26" height="26" style="color:#10B981;">
+                    <svg class="icon" width="26" height="26" style="color:#10B981;" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-contacts"></use>
                     </svg>
                     <span class="footer-btn-label">ADM</span>
@@ -409,10 +433,10 @@
     <!-- ============================================================
     MODAL HORA EXTRA
     ============================================================ -->
-    <div class="modal-overlay" id="modalExtra" role="dialog" aria-label="Adicionar hora extra">
+    <div class="modal-overlay" id="modalExtra" role="dialog" aria-label="Adicionar hora extra" aria-modal="true">
         <div class="modal-content">
             <h2>
-                <svg class="icon" width="24" height="24">
+                <svg class="icon" width="24" height="24" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-clock"></use>
                 </svg>
                 Hora Extra
@@ -421,7 +445,7 @@
 
             <div class="campo">
                 <label for="inputDataExtra">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-calendar"></use>
                     </svg>
                     Data
@@ -431,7 +455,7 @@
 
             <div class="campo">
                 <label for="inputInicioExtra">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-clock"></use>
                     </svg>
                     Início
@@ -441,7 +465,7 @@
 
             <div class="campo">
                 <label for="inputFimExtra">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-clock"></use>
                     </svg>
                     Término
@@ -450,14 +474,14 @@
             </div>
 
             <div class="modal-actions">
-                <button class="btn btn-primary" onclick="window.salvarExtra()">
-                    <svg class="icon" width="20" height="20">
+                <button class="btn btn-primary" onclick="window.salvarExtra()" aria-label="Salvar hora extra">
+                    <svg class="icon" width="20" height="20" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-check"></use>
                     </svg>
                     Salvar
                 </button>
-                <button class="btn btn-ghost" onclick="window.fecharModalExtra()">
-                    <svg class="icon" width="20" height="20">
+                <button class="btn btn-ghost" onclick="window.fecharModalExtra()" aria-label="Cancelar">
+                    <svg class="icon" width="20" height="20" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-close"></use>
                     </svg>
                     Cancelar
@@ -466,12 +490,12 @@
 
             <div class="lista-extras" id="listaExtras">
                 <h3>
-                    <svg class="icon" width="18" height="18">
+                    <svg class="icon" width="18" height="18" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-list"></use>
                     </svg>
                     Horas Extras Registradas
                 </h3>
-                <div id="listaExtrasContainer"></div>
+                <div id="listaExtrasContainer" role="list"></div>
                 <div class="total-extra-modal" id="totalExtraModal">Total: 0h</div>
             </div>
         </div>
@@ -480,10 +504,10 @@
     <!-- ============================================================
     MODAL PESSOA
     ============================================================ -->
-    <div class="modal-overlay" id="modalPessoa" role="dialog" aria-label="Cadastrar funcionário">
+    <div class="modal-overlay" id="modalPessoa" role="dialog" aria-label="Cadastrar funcionário" aria-modal="true">
         <div class="modal-content">
             <h2 id="modalPessoaTitulo">
-                <svg class="icon" width="24" height="24">
+                <svg class="icon" width="24" height="24" aria-hidden="true">
                     <use href="assets/icons/sprite.svg#icon-user-add"></use>
                 </svg>
                 Cadastrar Funcionário
@@ -492,7 +516,7 @@
 
             <div class="campo">
                 <label for="inputNomePessoa">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-user"></use>
                     </svg>
                     Nome Completo *
@@ -502,7 +526,7 @@
 
             <div class="campo">
                 <label for="inputCargoPessoa">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-work"></use>
                     </svg>
                     Cargo
@@ -512,7 +536,7 @@
 
             <div class="campo">
                 <label for="inputEmpresaPessoa">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-business"></use>
                     </svg>
                     Empresa
@@ -522,7 +546,7 @@
 
             <div class="campo">
                 <label for="inputContatoPessoa">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-phone"></use>
                     </svg>
                     Contato
@@ -532,7 +556,7 @@
 
             <div class="campo">
                 <label for="inputEscalaPessoa">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-calendar"></use>
                     </svg>
                     Escala
@@ -548,7 +572,7 @@
 
             <div class="campo">
                 <label for="inputTurnoPessoa">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-sun"></use>
                     </svg>
                     Turno
@@ -562,7 +586,7 @@
 
             <div class="campo">
                 <label for="inputTipoPessoa">
-                    <svg class="icon" width="16" height="16">
+                    <svg class="icon" width="16" height="16" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-verified"></use>
                     </svg>
                     Tipo
@@ -574,14 +598,14 @@
             </div>
 
             <div class="modal-actions">
-                <button class="btn btn-primary" onclick="window.salvarPessoa()">
-                    <svg class="icon" width="20" height="20">
+                <button class="btn btn-primary" onclick="window.salvarPessoa()" aria-label="Salvar funcionário">
+                    <svg class="icon" width="20" height="20" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-check"></use>
                     </svg>
                     Salvar
                 </button>
-                <button class="btn btn-ghost" onclick="window.fecharModalPessoa()">
-                    <svg class="icon" width="20" height="20">
+                <button class="btn btn-ghost" onclick="window.fecharModalPessoa()" aria-label="Cancelar">
+                    <svg class="icon" width="20" height="20" aria-hidden="true">
                         <use href="assets/icons/sprite.svg#icon-close"></use>
                     </svg>
                     Cancelar
