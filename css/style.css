@@ -414,7 +414,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 56px;
+    height: 64px;
     padding: 6px 2px;
     border-radius: var(--radius-md);
     cursor: pointer;
@@ -442,17 +442,17 @@ body {
 }
 
 .contador-item.manha {
-    background: #FEF9C3;
+    background: #F1F5F9;
     color: #78350F;
 }
 
 .contador-item.tarde {
-    background: #FFEDD5;
+    background: #F1F5F9;
     color: #7C2D12;
 }
 
 .contador-item.noite {
-    background: #DBEAFE;
+    background: #F1F5F9;
     color: #1E3A8A;
 }
 
@@ -937,19 +937,19 @@ body.modo-escuro .contador-item.total {
 }
 
 body.modo-escuro .contador-item.manha {
-    background: #2D1F00;
+    background: #1A1A1A;
     border-color: #F59E0B;
     color: #FDE68A;
 }
 
 body.modo-escuro .contador-item.tarde {
-    background: #2D1200;
+    background: #1A1A1A;
     border-color: #EA580C;
     color: #FDBA74;
 }
 
 body.modo-escuro .contador-item.noite {
-    background: #0D1A2D;
+    background: #1A1A1A;
     border-color: #3B82F6;
     color: #93C5FD;
 }
