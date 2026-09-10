@@ -132,7 +132,7 @@ function getNomeMes(mes) {
 }
 
 // =====================================================
-// RENDERIZAR CALENDÁRIO - CORRIGIDO COM BOTÕES FOCÁVEIS
+// RENDERIZAR CALENDÁRIO - OTIMIZADO E CORRIGIDO
 // =====================================================
 
 function renderizarCalendario() {
@@ -150,6 +150,9 @@ function renderizarCalendario() {
     container.className = '';
     container.classList.add('calendario', mesesClasses[mesIndex]);
 
+    // =====================================================
+    // CALCULAR PRIMEIRO DIA DO CALENDÁRIO
+    // =====================================================
     const mesInicio = periodo.inicio.getMonth();
     const mesFim = periodo.fim.getMonth();
     const anoInicio = periodo.inicio.getFullYear();
@@ -158,27 +161,34 @@ function renderizarCalendario() {
     let primeiroDia;
     if (mesInicio !== mesFim || anoInicio !== anoFim) {
         primeiroDia = new Date(periodo.inicio);
-        const diaSemanaRef = primeiroDia.getDay();
-        primeiroDia.setDate(primeiroDia.getDate() - diaSemanaRef);
+        primeiroDia.setDate(primeiroDia.getDate() - primeiroDia.getDay());
     } else {
-        primeiroDia = new Date(periodo.inicio.getFullYear(), periodo.inicio.getMonth(), 1);
-        const diaSemana = primeiroDia.getDay();
-        primeiroDia.setDate(primeiroDia.getDate() - diaSemana);
+        primeiroDia = new Date(anoInicio, mesInicio, 1);
+        primeiroDia.setDate(primeiroDia.getDate() - primeiroDia.getDay());
     }
 
     const hoje = new Date();
     const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-    // 🔥 INÍCIO DA TABELA COM role="table" para acessibilidade
-    let html = `<table role="table" aria-label="Calendário de escalas"><thead><tr>`;
+    // =====================================================
+    // CABEÇALHO DA TABELA
+    // =====================================================
+    let html = `<table role="grid" aria-label="Calendário de escalas"><thead><tr>`;
+    
     DIAS_SEMANA.forEach(dia => {
         const isDomingo = dia === 'DOM';
-        // 🔥 DOMINGO em vermelho com letras brancas
-        const styleDomingo = isDomingo ? 'background:#DC2626 !important;color:#FFFFFF !important;border-bottom:3px solid #B91C1C !important;' : '';
-        html += `<th role="columnheader" scope="col" style="background:${corHeaderFundo};color:${corHeaderTexto};border-bottom:3px solid ${corHeaderBorda};${styleDomingo}">${dia}</th>`;
+        const styleDomingo = isDomingo 
+            ? 'background:#DC2626;color:#FFFFFF;border-bottom:3px solid #B91C1C;' 
+            : `background:${corHeaderFundo};color:${corHeaderTexto};border-bottom:3px solid ${corHeaderBorda};`;
+        
+        html += `<th role="columnheader" scope="col" style="${styleDomingo}">${dia}</th>`;
     });
-    html += '</tr></thead><tbody role="rowgroup">';
+    
+    html += '</tr></thead><tbody>';
 
+    // =====================================================
+    // LOOP DE 42 DIAS
+    // =====================================================
     let dataAtual = new Date(primeiroDia);
     let rowOpen = false;
 
@@ -194,7 +204,7 @@ function renderizarCalendario() {
         const ano = dataAtual.getFullYear();
         const dataStr = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
-        // 🔥 MANTÉM TODA A LÓGICA EXISTENTE
+        // ===== LÓGICA EXISTENTE =====
         const status = obterStatusDia(equipeSelecionada, dataAtual);
         const isHoje = dataStr === hojeStr;
         const noPeriodo = dataEstaNoPeriodo(dataAtual, periodo);
@@ -203,73 +213,71 @@ function renderizarCalendario() {
         const temExtra = extras.length > 0;
         const totalExtraDia = extras.reduce((acc, item) => acc + item.horas, 0);
 
+        // ===== CLASSES =====
         const classePeriodo = noPeriodo ? '' : 'dia-outro-periodo';
         const classeHoje = isHoje ? 'dia-hoje' : '';
         const classeExtra = temExtra ? 'dia-com-extra' : '';
         const statusTexto = status === 1 ? 'T' : 'F';
         const statusClasse = status === 1 ? 'status-trabalho' : 'status-folga';
 
+        // ===== ÍCONE DO EVENTO =====
         let classeEspecial = '';
-        let iconeEspecial = '';
+        let iconeEvento = '';
+        let nomeEvento = '';
+        
         if (dataComemorativa) {
+            nomeEvento = dataComemorativa.nome;
             if (dataComemorativa.tipo === 'feriado') {
                 classeEspecial = status === 1 ? 'dia-feriado-trabalhado' : 'dia-feriado';
-                iconeEspecial = `<span class="evento-icone" aria-hidden="true">${dataComemorativa.icone}${status === 1 ? '⚠️' : ''}</span>`;
+            // 🔥 REMOVIDO O ⚠️ - Apenas o emoji do feriado
+             iconeEvento = dataComemorativa.icone;
             } else {
                 classeEspecial = 'dia-comemorativo';
-                iconeEspecial = `<span class="evento-icone" aria-hidden="true">${dataComemorativa.icone}</span>`;
+                iconeEvento = dataComemorativa.icone;
             }
         }
 
+        // ===== LABEL DE EXTRA =====
         let labelExtra = '';
         if (temExtra) {
             const extraMin = Math.round(totalExtraDia * 60);
             const h = Math.floor(extraMin / 60);
             const m = extraMin % 60;
-            labelExtra = `<span class="evento-extra" aria-hidden="true">➕ ${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}</span>`;
+            labelExtra = `➕${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}`;
         }
 
-        // 🔥 CONSTRÓI O ARIA-LABEL PARA ACESSIBILIDADE
-        let ariaLabel = `${dia}/${String(mes).padStart(2, '0')}/${ano}`;
-        if (status === 1) ariaLabel += ' - Trabalho';
-        else if (status === 0) ariaLabel += ' - Folga';
-        if (dataComemorativa) ariaLabel += ` - ${dataComemorativa.nome}`;
-        if (temExtra) ariaLabel += ` - ${Math.round(totalExtraDia * 60)} minutos extras`;
+        // ===== ARIA-LABEL =====
+        let ariaLabel = `${dia} de ${['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'][mes - 1]}`;
+        ariaLabel += status === 1 ? ', trabalho' : ', folga';
+        if (nomeEvento) ariaLabel += `, ${nomeEvento}`;
+        if (temExtra) ariaLabel += `, ${Math.round(totalExtraDia * 60)} minutos extras`;
 
-        // 🔥 BOTÃO FOCÁVEL POR TAB (em vez de TD com onclick)
-        html += `<td role="gridcell" class="${classeHoje} ${classeExtra} ${classeEspecial} ${classePeriodo}" data-data="${dataStr}">`;
-        html += `<button class="dia-btn" 
-                         role="gridcell" 
-                         tabindex="0" 
-                         data-data="${dataStr}"
-                         aria-label="${ariaLabel}"
-                         style="
-                             display: flex;
-                             flex-direction: column;
-                             align-items: center;
-                             justify-content: center;
-                             width: 100%;
-                             height: 100%;
-                             min-height: 56px;
-                             min-width: 44px;
-                             padding: 4px 2px;
-                             border: 2px solid transparent;
-                             border-radius: 6px;
-                             background: transparent;
-                             cursor: pointer;
-                             font-family: inherit;
-                             font-size: 1rem;
-                             transition: all 0.2s ease;
-                             color: var(--a11y-text-primary, #1a1a1a);
-                             outline: none;
-                             position: relative;
-                         ">`;
-        html += `<span class="status-dia ${statusClasse}" aria-hidden="true">${statusTexto}</span>`;
-        html += `<span class="dia-numero" aria-hidden="true">${dia}</span>`;
-        html += iconeEspecial;
-        html += labelExtra;
-        html += `</button>`;
-        html += `</td>`;
+        // =====================================================
+        // HTML DO DIA - ESTRUTURA 2x2 (2 SUPERIORES + 2 INFERIORES)
+        // =====================================================
+        html += `<td class="dia-td ${classePeriodo}" data-data="${dataStr}">
+    <button 
+        class="dia-btn ${classeHoje} ${classeExtra} ${classeEspecial}"
+        type="button"
+        role="gridcell"
+        tabindex="0"
+        data-data="${dataStr}"
+        aria-label="${ariaLabel}"
+        onclick="window.abrirDetalhesDia('${dataStr}')"
+    >
+        <!-- SUPERIOR ESQUERDO: Número do dia -->
+        <span class="dia-sup-esq" aria-hidden="true">${dia}</span>
+        
+        <!-- SUPERIOR DIREITO: Status T/F -->
+        <span class="dia-sup-dir ${statusClasse}" aria-hidden="true">${statusTexto}</span>
+        
+        <!-- INFERIOR ESQUERDO: Emoji/Ícone do evento -->
+        <span class="dia-inf-esq ${status === 1 && dataComemorativa?.tipo === 'feriado' ? 'feriado-trabalhado' : ''}" aria-hidden="true">${iconeEvento}</span>
+        
+        <!-- INFERIOR DIREITO: Indicador de hora extra -->
+        <span class="dia-inf-dir ${temExtra ? 'tem-mensagem' : ''}" aria-hidden="true">${labelExtra}</span>
+    </button>
+</td>`;
 
         dataAtual.setDate(dataAtual.getDate() + 1);
     }
@@ -278,71 +286,33 @@ function renderizarCalendario() {
     html += '</tbody></table>';
     container.innerHTML = html;
 
-    // ============================================================
-    // 🔥 ADICIONA EVENTOS DE NAVEGAÇÃO POR TECLADO
-    // ============================================================
-    const dias = container.querySelectorAll('.dia-btn');
+    // =====================================================
+    // NAVEGAÇÃO POR TECLADO (SETAS)
+    // =====================================================
+    const botoes = container.querySelectorAll('.dia-btn');
     
-    dias.forEach((btn) => {
-        // Evento de clique - mantém a lógica existente
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            
-            // Remove seleção anterior
-            container.querySelectorAll('.dia-btn.selecionado')
-                .forEach(el => el.classList.remove('selecionado'));
-            
-            // Adiciona seleção no atual
-            this.classList.add('selecionado');
-            
-            const dataStr = this.dataset.data;
-            console.log(`📅 Dia ${dataStr} selecionado`);
-            
-            // 🔥 CHAMA A FUNÇÃO EXISTENTE
-            if (typeof window.abrirDetalhesDia === 'function') {
-                window.abrirDetalhesDia(dataStr);
-            }
-        });
-
-        // 🔥 NAVEGAÇÃO POR SETAS (ARROW KEYS)
+    botoes.forEach((btn, index) => {
         btn.addEventListener('keydown', function(e) {
-            const todosDias = Array.from(container.querySelectorAll('.dia-btn'));
-            const idx = todosDias.indexOf(this);
+            const todos = Array.from(container.querySelectorAll('.dia-btn'));
+            const idx = todos.indexOf(this);
             const cols = 7;
             let novoIdx = -1;
 
             switch(e.key) {
-                case 'ArrowRight':
-                    e.preventDefault();
-                    novoIdx = idx + 1;
-                    break;
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    novoIdx = idx - 1;
-                    break;
-                case 'ArrowDown':
-                    e.preventDefault();
-                    novoIdx = idx + cols;
-                    break;
-                case 'ArrowUp':
-                    e.preventDefault();
-                    novoIdx = idx - cols;
-                    break;
-                case 'Home':
-                    e.preventDefault();
-                    novoIdx = 0;
-                    break;
-                case 'End':
-                    e.preventDefault();
-                    novoIdx = todosDias.length - 1;
-                    break;
-                default:
-                    return;
+                case 'ArrowRight': novoIdx = idx + 1; break;
+                case 'ArrowLeft':  novoIdx = idx - 1; break;
+                case 'ArrowDown':  novoIdx = idx + cols; break;
+                case 'ArrowUp':    novoIdx = idx - cols; break;
+                case 'Home':       novoIdx = 0; break;
+                case 'End':        novoIdx = todos.length - 1; break;
+                default: return;
             }
 
-            if (novoIdx >= 0 && novoIdx < todosDias.length) {
-                todosDias[novoIdx].focus();
-                todosDias[novoIdx].scrollIntoView({ block: 'nearest' });
+            e.preventDefault();
+
+            if (novoIdx >= 0 && novoIdx < todos.length) {
+                todos[novoIdx].focus();
+                todos[novoIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             }
         });
     });
