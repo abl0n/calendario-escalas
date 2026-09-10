@@ -54,16 +54,10 @@
     <meta name="twitter:description" content="Sistema de gerenciamento de escalas de trabalho">
 
     <!-- ============================================================
-         PRELOAD DE RECURSOS CRÍTICOS
-         ============================================================ -->
-    <link rel="preload" href="assets/icons/sprite.svg" as="image" type="image/svg+xml">
-
-    <!-- ============================================================
          CSS
          ============================================================ -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="assets/css/icons-animated.css">
-    <link rel="stylesheet" href="css/accessibility.css">
 
     <!-- ============================================================
          JAVASCRIPT
@@ -73,8 +67,10 @@
 
 <body>
 
-
-  
+    <!-- ============================================================
+         TOAST NOTIFICATION
+         ============================================================ -->
+    <div class="toast" id="toastNotification" role="alert" aria-live="polite"></div>
 
     <!-- ============================================================
          APP CONTAINER
@@ -346,10 +342,14 @@
                 </button>
             </div>
 
-            <!-- CALENDÁRIO -->
-            <section class="calendario" id="calendarioContainer" aria-label="Calendário de escalas">
+            <!-- CALENDÁRIO (VAZIO - JS POPULA) -->
+            <section class="calendario" 
+                     id="calendarioContainer" 
+                     aria-label="Calendário de escalas">
+                <!-- ⚠️ NÃO COLOQUE NADA AQUI! O JavaScript vai popular -->
+            </section>
 
-            <!-- CONTADORES -->
+            <!-- CONTADORES (FORA DO CALENDÁRIO) -->
             <div class="contadores-container" 
                  id="contadoresContainer" 
                  role="group" 
