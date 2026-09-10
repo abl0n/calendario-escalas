@@ -1,5 +1,5 @@
 // =====================================================
-// APP - Inicialização principal (CORRIGIDO)
+// APP - Inicialização principal (OTIMIZADO)
 // =====================================================
 
 import { 
@@ -18,37 +18,36 @@ import {
     mostrarToast, 
     horasParaMinutos, 
     formatarMinutos, 
-    parseSemana, 
-    getCicloCompleto, 
-    formatarData, 
-    obterNomeDiaSemana,
-    mostrarLoading,
-    esconderLoading
+    getCicloCompleto,
+    formatarData
 } from './utils/helpers.js';
 
 import { 
-    getPeriodoData, 
-    getPeriodoAtual, 
     getPeriodoPorIndex, 
     getNomePeriodo, 
     dataEstaNoPeriodo, 
     formatarDataPeriodo, 
     getDiasNoPeriodo,
     setConfigPeriodo,
-    getConfigPeriodo,
-    validarPeriodo
+    getConfigPeriodo
 } from './utils/periodos.js';
 
 import { toggleMenu, fecharMenu } from './ui/menu.js';
 import { initTema, toggleTema, aplicarTema } from './ui/tema.js';
-import { abrirModalPessoa, fecharModalPessoa, abrirModalExtra, fecharModalExtra, initModais } from './ui/modais.js';
+import { 
+    abrirModalPessoa, 
+    fecharModalPessoa, 
+    abrirModalExtra, 
+    fecharModalExtra, 
+    initModais 
+} from './ui/modais.js';
 
 import { 
     initPopups, 
     atualizarEquipePopup, 
-    abrirPopup,
-    fecharPopup,
-    abrirPopupADM
+    abrirPopup, 
+    fecharPopup, 
+    abrirPopupADM 
 } from './ui/popups.js';
 
 import {
@@ -59,10 +58,8 @@ import {
     carregarPessoasStorage, salvarPessoasStorage
 } from './utils/storage.js';
 
-import { getPessoas, recarregarPessoas } from './core/pessoas.js';
-
-// 🔥 CORES CENTRALIZADAS
-import { CORES_ESCALAS, CORES_TURNOS } from './constants/cores.js';
+import { recarregarPessoas } from './core/pessoas.js';
+import { CORES_ESCALAS } from './constants/cores.js';
 
 // =====================================================
 // VARIÁVEIS GLOBAIS
@@ -123,16 +120,8 @@ function getTotalExtras() {
     return horasExtras.reduce((acc, item) => acc + (item.horas || 0), 0);
 }
 
-function getNomeMes(mes) {
-    const nomes = [
-        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-    ];
-    return nomes[mes] || 'Mês inválido';
-}
-
 // =====================================================
-// RENDERIZAR CALENDÁRIO - OTIMIZADO E CORRIGIDO
+// RENDERIZAR CALENDÁRIO
 // =====================================================
 
 function renderizarCalendario() {
@@ -150,9 +139,7 @@ function renderizarCalendario() {
     container.className = '';
     container.classList.add('calendario', mesesClasses[mesIndex]);
 
-    // =====================================================
-    // CALCULAR PRIMEIRO DIA DO CALENDÁRIO
-    // =====================================================
+    // Calcular primeiro dia do calendário
     const mesInicio = periodo.inicio.getMonth();
     const mesFim = periodo.fim.getMonth();
     const anoInicio = periodo.inicio.getFullYear();
@@ -170,9 +157,7 @@ function renderizarCalendario() {
     const hoje = new Date();
     const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-    // =====================================================
-    // CABEÇALHO DA TABELA
-    // =====================================================
+    // Cabeçalho
     let html = `<table role="grid" aria-label="Calendário de escalas"><thead><tr>`;
     
     DIAS_SEMANA.forEach(dia => {
@@ -186,9 +171,7 @@ function renderizarCalendario() {
     
     html += '</tr></thead><tbody>';
 
-    // =====================================================
-    // LOOP DE 42 DIAS
-    // =====================================================
+    // Loop de 42 dias
     let dataAtual = new Date(primeiroDia);
     let rowOpen = false;
 
@@ -204,7 +187,6 @@ function renderizarCalendario() {
         const ano = dataAtual.getFullYear();
         const dataStr = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
-        // ===== LÓGICA EXISTENTE =====
         const status = obterStatusDia(equipeSelecionada, dataAtual);
         const isHoje = dataStr === hojeStr;
         const noPeriodo = dataEstaNoPeriodo(dataAtual, periodo);
@@ -213,14 +195,12 @@ function renderizarCalendario() {
         const temExtra = extras.length > 0;
         const totalExtraDia = extras.reduce((acc, item) => acc + item.horas, 0);
 
-        // ===== CLASSES =====
         const classePeriodo = noPeriodo ? '' : 'dia-outro-periodo';
         const classeHoje = isHoje ? 'dia-hoje' : '';
         const classeExtra = temExtra ? 'dia-com-extra' : '';
         const statusTexto = status === 1 ? 'T' : 'F';
         const statusClasse = status === 1 ? 'status-trabalho' : 'status-folga';
 
-        // ===== ÍCONE DO EVENTO =====
         let classeEspecial = '';
         let iconeEvento = '';
         let nomeEvento = '';
@@ -229,15 +209,13 @@ function renderizarCalendario() {
             nomeEvento = dataComemorativa.nome;
             if (dataComemorativa.tipo === 'feriado') {
                 classeEspecial = status === 1 ? 'dia-feriado-trabalhado' : 'dia-feriado';
-            // 🔥 REMOVIDO O ⚠️ - Apenas o emoji do feriado
-             iconeEvento = dataComemorativa.icone;
+                iconeEvento = dataComemorativa.icone;
             } else {
                 classeEspecial = 'dia-comemorativo';
                 iconeEvento = dataComemorativa.icone;
             }
         }
 
-        // ===== LABEL DE EXTRA =====
         let labelExtra = '';
         if (temExtra) {
             const extraMin = Math.round(totalExtraDia * 60);
@@ -246,35 +224,27 @@ function renderizarCalendario() {
             labelExtra = `➕${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}`;
         }
 
-        // ===== ARIA-LABEL =====
-        let ariaLabel = `${dia} de ${['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'][mes - 1]}`;
+        // ARIA-LABEL
+        const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+        let ariaLabel = `${dia} de ${meses[mes - 1]}`;
         ariaLabel += status === 1 ? ', trabalho' : ', folga';
         if (nomeEvento) ariaLabel += `, ${nomeEvento}`;
         if (temExtra) ariaLabel += `, ${Math.round(totalExtraDia * 60)} minutos extras`;
 
-        // =====================================================
-        // HTML DO DIA - ESTRUTURA 2x2 (2 SUPERIORES + 2 INFERIORES)
-        // =====================================================
+        const isFeriadoTrabalhado = status === 1 && dataComemorativa?.tipo === 'feriado';
+
         html += `<td class="dia-td ${classePeriodo}" data-data="${dataStr}">
     <button 
         class="dia-btn ${classeHoje} ${classeExtra} ${classeEspecial}"
         type="button"
-        role="gridcell"
         tabindex="0"
         data-data="${dataStr}"
         aria-label="${ariaLabel}"
         onclick="window.abrirDetalhesDia('${dataStr}')"
     >
-        <!-- SUPERIOR ESQUERDO: Número do dia -->
         <span class="dia-sup-esq" aria-hidden="true">${dia}</span>
-        
-        <!-- SUPERIOR DIREITO: Status T/F -->
         <span class="dia-sup-dir ${statusClasse}" aria-hidden="true">${statusTexto}</span>
-        
-        <!-- INFERIOR ESQUERDO: Emoji/Ícone do evento -->
-        <span class="dia-inf-esq ${status === 1 && dataComemorativa?.tipo === 'feriado' ? 'feriado-trabalhado' : ''}" aria-hidden="true">${iconeEvento}</span>
-        
-        <!-- INFERIOR DIREITO: Indicador de hora extra -->
+        <span class="dia-inf-esq ${isFeriadoTrabalhado ? 'feriado-trabalhado' : ''}" aria-hidden="true">${iconeEvento}</span>
         <span class="dia-inf-dir ${temExtra ? 'tem-mensagem' : ''}" aria-hidden="true">${labelExtra}</span>
     </button>
 </td>`;
@@ -286,12 +256,8 @@ function renderizarCalendario() {
     html += '</tbody></table>';
     container.innerHTML = html;
 
-    // =====================================================
-    // NAVEGAÇÃO POR TECLADO (SETAS)
-    // =====================================================
-    const botoes = container.querySelectorAll('.dia-btn');
-    
-    botoes.forEach((btn, index) => {
+    // Navegação por teclado
+    container.querySelectorAll('.dia-btn').forEach(btn => {
         btn.addEventListener('keydown', function(e) {
             const todos = Array.from(container.querySelectorAll('.dia-btn'));
             const idx = todos.indexOf(this);
@@ -319,7 +285,7 @@ function renderizarCalendario() {
 }
 
 // =====================================================
-// BOTÕES EQUIPE - OTIMIZADO COM CORES CENTRALIZADAS
+// BOTÕES EQUIPE
 // =====================================================
 
 function renderizarBotoesEquipe() {
@@ -330,7 +296,7 @@ function renderizarBotoesEquipe() {
     const iconesEscalas = ['icon-calendar', 'icon-calendar-month', 'icon-calendar', 'icon-calendar'];
 
     equipes.forEach(equipe => {
-        const isSelected = equipeSelecionada && equipe.id === equipeSelecionada.id;
+        const isSelected = equipeSelecionada?.id === equipe.id;
         const cores = CORES_ESCALAS[equipe.id] || CORES_ESCALAS[1];
         const icone = iconesEscalas[equipe.id - 1] || 'icon-calendar';
         const isADM = equipe.tipo === 'ADM';
@@ -363,14 +329,13 @@ function renderizarBotoesEquipe() {
             flex: 1;
             max-width: ${isADM ? '120px' : '100px'};
             text-align: center;
-            font-family: var(--font-family, system-ui, sans-serif);
+            font-family: inherit;
             box-shadow: ${isSelected ? `0 4px 15px ${cores.bg}40` : 'none'};
             transform: ${isSelected ? 'scale(1.05)' : 'scale(1)'};
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            will-change: transform, box-shadow, background;
         `;
 
         btn.addEventListener('mouseenter', () => {
@@ -378,8 +343,6 @@ function renderizarBotoesEquipe() {
                 btn.style.background = cores.bg + '20';
                 btn.style.transform = 'scale(1.05)';
                 btn.style.boxShadow = `0 4px 12px ${cores.bg}30`;
-                const svg = btn.querySelector('svg');
-                if (svg) svg.style.fill = cores.bg;
             }
         });
 
@@ -388,8 +351,6 @@ function renderizarBotoesEquipe() {
                 btn.style.background = 'transparent';
                 btn.style.transform = 'scale(1)';
                 btn.style.boxShadow = 'none';
-                const svg = btn.querySelector('svg');
-                if (svg) svg.style.fill = cores.bg;
             }
         });
 
@@ -401,12 +362,8 @@ function renderizarBotoesEquipe() {
 function selecionarEquipe(equipe) {
     equipeSelecionada = equipe;
     
-    // 🔥 ATUALIZAR ESTATÍSTICAS
     import('./core/estatisticas.js').then(module => {
-        if (module.initEstatisticas) {
-            module.initEstatisticas(equipe);
-            console.log('📊 Estatísticas atualizadas para:', equipe);
-        }
+        if (module.initEstatisticas) module.initEstatisticas(equipe);
     });
 
     if (typeof atualizarEquipePopup === 'function') atualizarEquipePopup(equipe);
@@ -418,7 +375,7 @@ function selecionarEquipe(equipe) {
 }
 
 // =====================================================
-// CONTADORES - COM BORDAS DA ESCALA SELECIONADA
+// CONTADORES
 // =====================================================
 
 function atualizarContadores() {
@@ -426,23 +383,17 @@ function atualizarContadores() {
     const turnos = { M: 0, T: 0, N: 0 };
     pessoasEscala.forEach(p => turnos[p.turno] = (turnos[p.turno] || 0) + 1);
 
-    // 🔥 Atualizar números
     if (DOM.numPessoasEscala) DOM.numPessoasEscala.textContent = pessoasEscala.length;
     if (DOM.numManha) DOM.numManha.textContent = turnos.M;
     if (DOM.numTarde) DOM.numTarde.textContent = turnos.T;
     if (DOM.numNoite) DOM.numNoite.textContent = turnos.N;
 
-    // 🔥 ATUALIZAR BORDAS DOS CONTADORES - APENAS CLASSES
+    // Atualizar bordas dos contadores
     const escalaId = equipeSelecionada?.id || 1;
-    const cores = CORES_ESCALAS[escalaId];
-    
-    if (cores) {
-        const contadores = document.querySelectorAll('.contador-item');
-        contadores.forEach(contador => {
-            contador.classList.remove('escala-1', 'escala-2', 'escala-3', 'escala-4', 'escala-5');
-            contador.classList.add(`escala-${escalaId}`);
-        });
-    }
+    document.querySelectorAll('.contador-item').forEach(contador => {
+        contador.classList.remove('escala-1', 'escala-2', 'escala-3', 'escala-4', 'escala-5');
+        contador.classList.add(`escala-${escalaId}`);
+    });
 }
 
 // =====================================================
@@ -454,7 +405,11 @@ function renderizarLegendaFeriados() {
     if (!container) return;
     const periodo = getPeriodoPorIndex(periodoIndex);
     const feriadosPeriodo = getFeriadosDoPeriodo(periodo);
-    if (feriadosPeriodo.length === 0) { container.innerHTML = ''; return; }
+    
+    if (feriadosPeriodo.length === 0) { 
+        container.innerHTML = ''; 
+        return; 
+    }
 
     container.innerHTML = feriadosPeriodo.map(item =>
         `<span class="feriado-item">
@@ -609,7 +564,6 @@ function salvarPessoa() {
         mostrarToast('✅ Funcionário atualizado com sucesso!', 'sucesso');
     } else {
         pessoas.push({ id: Date.now(), nome, cargo, empresa, contato, escalaId, turno, tipo });
-        console.log('📝 Novo funcionário cadastrado:', { nome, tipo });
         mostrarToast('✅ Funcionário cadastrado com sucesso!', 'sucesso');
     }
 
@@ -620,64 +574,45 @@ function salvarPessoa() {
 }
 
 function removerPessoa(id) {
-    console.log('🗑️ Tentando remover funcionário ID:', id);
-    console.log('📋 Pessoas atuais:', pessoas);
-    
     const idNumero = Number(id);
     const pessoa = pessoas.find(p => Number(p.id) === idNumero);
     
     if (!pessoa) {
-        console.error('❌ Funcionário não encontrado! ID:', id);
         mostrarToast('❌ Funcionário não encontrado!', 'erro');
         return;
     }
 
-    console.log('✅ Funcionário encontrado:', pessoa);
-
     if (confirm(`Tem certeza que deseja remover "${pessoa.nome}" da escala ${pessoa.escalaId}?`)) {
-        const novasPessoas = pessoas.filter(p => Number(p.id) !== idNumero);
-        console.log(`📊 Antes: ${pessoas.length} funcionários`);
-        console.log(`📊 Depois: ${novasPessoas.length} funcionários`);
-        pessoas = novasPessoas;
+        pessoas = pessoas.filter(p => Number(p.id) !== idNumero);
         salvarPessoasStorage(pessoas);
         if (typeof recarregarPessoas === 'function') recarregarPessoas();
         atualizarContadores();
         fecharPopup();
         renderizarCalendario();
         mostrarToast(`🗑️ "${pessoa.nome}" removido com sucesso!`, 'sucesso');
-        console.log('✅ Funcionário removido com sucesso!');
     }
 }
 
 function editarFuncionario(id) {
-    console.log('✏️ Editando funcionário ID:', id);
     fecharPopup();
     const pessoa = pessoas.find(p => p.id === parseInt(id) || p.id === String(id));
     if (!pessoa) {
-        console.error('❌ Funcionário não encontrado! ID:', id);
         mostrarToast('❌ Funcionário não encontrado!', 'erro');
         return;
     }
-    console.log('📝 Funcionário encontrado:', pessoa);
     abrirModalPessoa(id);
 }
 
 // =====================================================
-// ESTATÍSTICAS - FUNÇÃO PARA ABRIR
+// ESTATÍSTICAS
 // =====================================================
 
 function abrirEstatisticas() {
     const overlay = document.getElementById('popupEstatisticas');
     const conteudo = document.getElementById('popupEstatisticasConteudo');
     
-    console.log('🔍 abrirEstatisticas chamada!');
-    
-    if (!overlay || !conteudo) {
-        console.error('❌ Elementos não encontrados!');
-        return;
-    }
+    if (!overlay || !conteudo) return;
 
-    // 🔥 LOADING
     conteudo.innerHTML = `
         <div style="text-align:center; padding:40px; color:var(--color-text-muted);">
             <svg class="icon mi-spin" width="32" height="32" style="color:var(--color-primary);">
@@ -688,33 +623,23 @@ function abrirEstatisticas() {
     `;
     overlay.classList.add('ativo');
 
-    // 🔥 IMPORT DINÂMICO
     import('./core/estatisticas.js')
         .then(module => {
-            console.log('✅ Módulo carregado!');
-            console.log('📦 Funções disponíveis:', Object.keys(module));
-            
             if (typeof module.renderizarEstatisticas === 'function') {
                 module.renderizarEstatisticas(conteudo, periodoIndex);
-                console.log('✅ Estatísticas renderizadas!');
             } else {
-                console.error('❌ renderizarEstatisticas não é uma função');
                 conteudo.innerHTML = `
                     <div style="text-align:center; padding:40px; color:var(--color-danger);">
                         <p>❌ Erro: Função não encontrada</p>
-                        <small style="color:var(--color-text-muted);">O módulo não exporta renderizarEstatisticas</small>
                     </div>
                 `;
             }
         })
         .catch(err => {
-            console.error('❌ Erro ao carregar módulo:', err);
             conteudo.innerHTML = `
                 <div style="text-align:center; padding:40px; color:var(--color-danger);">
                     <p>❌ Erro ao carregar estatísticas</p>
                     <small style="color:var(--color-text-muted);">${err.message}</small>
-                    <br>
-                    <small style="color:var(--color-text-muted); font-size:0.7rem;">Verifique se o arquivo core/estatisticas.js existe</small>
                 </div>
             `;
         });
@@ -722,9 +647,7 @@ function abrirEstatisticas() {
 
 function fecharEstatisticas() {
     const overlay = document.getElementById('popupEstatisticas');
-    if (overlay) {
-        overlay.classList.remove('ativo');
-    }
+    if (overlay) overlay.classList.remove('ativo');
 }
 
 // =====================================================
@@ -790,13 +713,13 @@ function abrirGuia() {
 - Use ESC para fechar modais
 - Clique em ☰ para abrir o menu
 - Período máximo de 31 dias
-- Navegue no calendário com TAB e setas do teclado
+- Navegue no calendário com TAB e setas
 
 📞 Dúvidas? Envie um e-mail para adri0mt@uni9.edu.br`);
 }
 
 // =====================================================
-// EXPORTAR/IMPORTAR DADOS
+// EXPORTAR/IMPORTAR
 // =====================================================
 
 function exportarDados() {
@@ -808,7 +731,10 @@ function exportarDados() {
             escalas: equipes,
             horasExtras,
             pessoas,
-            periodoConfig: { diaInicio: getConfigPeriodo().diaInicio, diaFim: getConfigPeriodo().diaFim }
+            periodoConfig: { 
+                diaInicio: getConfigPeriodo().diaInicio, 
+                diaFim: getConfigPeriodo().diaFim 
+            }
         };
 
         const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
@@ -820,7 +746,7 @@ function exportarDados() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        mostrarToast(`✅ Dados exportados com sucesso! (${pessoas.length} funcionários)`, 'sucesso');
+        mostrarToast(`✅ Dados exportados! (${pessoas.length} funcionários)`, 'sucesso');
     } catch (error) {
         console.error('Erro ao exportar:', error);
         mostrarToast('❌ Erro ao exportar dados!', 'erro');
@@ -852,7 +778,7 @@ function importarDados() {
                 const qtdHorasExtras = dados.horasExtras?.length || 0;
                 const qtdEscalas = dados.escalas.length;
 
-                if (!confirm(`⚠️ Isso irá substituir todos os dados atuais!\n\n📋 ${qtdEscalas} escalas\n👥 ${qtdPessoas} funcionários\n⏱️ ${qtdHorasExtras} horas extras\n\nDeseja continuar?`)) {
+                if (!confirm(`⚠️ Isso irá substituir todos os dados!\n\n📋 ${qtdEscalas} escalas\n👥 ${qtdPessoas} funcionários\n⏱️ ${qtdHorasExtras} horas extras\n\nContinuar?`)) {
                     document.body.removeChild(input);
                     return;
                 }
@@ -889,9 +815,9 @@ function importarDados() {
                 atualizarPeriodoInfo();
                 renderizarListaExtras();
                 atualizarContadores();
-                if (typeof carregarConfigPeriodoUI === 'function') carregarConfigPeriodoUI();
+                carregarConfigPeriodoUI();
 
-                mostrarToast(`✅ Dados importados com sucesso!\n👥 ${pessoas.length} funcionários`, 'sucesso');
+                mostrarToast(`✅ Dados importados! 👥 ${pessoas.length} funcionários`, 'sucesso');
 
             } catch (error) {
                 console.error('Erro ao importar:', error);
@@ -914,14 +840,15 @@ function limparDados() {
         salvarExtrasStorage(horasExtras);
         renderizarListaExtras();
         renderizarCalendario();
-        mostrarToast('🗑️ Todas as horas extras foram removidas', 'info');
+        mostrarToast('🗑️ Horas extras removidas', 'info');
         fecharMenu();
     }
 }
 
 function resetarTudo() {
-    if (confirm('⚠️ Isso irá restaurar todas as configurações para o padrão.') &&
+    if (confirm('⚠️ Restaurar todas as configurações padrão?') &&
         confirm('Última confirmação: TODOS os dados serão perdidos!')) {
+        
         equipes = JSON.parse(JSON.stringify(escalasPadrao));
         salvarEscalasStorage(equipes);
         horasExtras = [];
@@ -933,25 +860,26 @@ function resetarTudo() {
         equipeSelecionada = equipes[0] || null;
         temaEscuro = false;
         aplicarTema();
+        
         renderizarBotoesEquipe();
         renderizarCalendario();
         renderizarLegendaFeriados();
         atualizarPeriodoInfo();
         renderizarListaExtras();
         atualizarContadores();
-        mostrarToast('🔄 Tudo foi resetado para o padrão!', 'sucesso');
+        mostrarToast('🔄 Tudo foi resetado!', 'sucesso');
         fecharMenu();
     }
 }
 
 function abrirMelhorias() {
     fecharMenu();
-    window.open(`mailto:adri0mt@uni9.edu.br?subject=${encodeURIComponent('💡 Sugestão de Melhoria - Calendário de Escalas')}`, '_blank');
+    window.open(`mailto:adri0mt@uni9.edu.br?subject=${encodeURIComponent('💡 Sugestão de Melhoria')}`, '_blank');
 }
 
 function abrirBug() {
     fecharMenu();
-    window.open(`mailto:adri0mt@uni9.edu.br?subject=${encodeURIComponent('🐛 Reporte de Bug - Calendário de Escalas')}`, '_blank');
+    window.open(`mailto:adri0mt@uni9.edu.br?subject=${encodeURIComponent('🐛 Reporte de Bug')}`, '_blank');
 }
 
 // =====================================================
@@ -1069,7 +997,7 @@ function abrirDetalhesDia(dataStr) {
                     <svg class="icon" width="32" height="32" style="opacity:0.3;">
                         <use href="assets/icons/sprite.svg#icon-info"></use>
                     </svg>
-                    <p style="margin-top:8px;">Nenhuma informação adicional para este dia.</p>
+                    <p style="margin-top:8px;">Nenhuma informação adicional.</p>
                 </div>
             ` : ''}
         </div>
@@ -1084,42 +1012,24 @@ function fecharDetalhesDia() {
 }
 
 // =====================================================
-// EXPORTA FUNÇÕES PARA O GLOBAL (window)
+// EXPORTA FUNÇÕES PARA O GLOBAL
 // =====================================================
 
-window.toggleMenu = toggleMenu;
-window.fecharMenu = fecharMenu;
-window.toggleTema = toggleTema;
-window.abrirModalPessoa = abrirModalPessoa;
-window.fecharModalPessoa = fecharModalPessoa;
-window.abrirModalExtra = abrirModalExtra;
-window.fecharModalExtra = fecharModalExtra;
-window.abrirPopup = abrirPopup;
-window.fecharPopup = fecharPopup;
-window.abrirPopupADM = abrirPopupADM;
-window.abrirEstatisticas = abrirEstatisticas;
-window.fecharEstatisticas = fecharEstatisticas;
-window.mudarPeriodo = mudarPeriodo;
-window.selecionarEquipe = selecionarEquipe;
-window.salvarExtra = salvarExtra;
-window.removerExtra = removerExtra;
-window.renderizarListaExtras = renderizarListaExtras;
-window.salvarPessoa = salvarPessoa;
-window.removerPessoa = removerPessoa;
-window.editarFuncionario = editarFuncionario;
-window.aplicarPeriodo = aplicarPeriodo;
-window.carregarConfigPeriodoUI = carregarConfigPeriodoUI;
-window.exportarDados = exportarDados;
-window.importarDados = importarDados;
-window.limparDados = limparDados;
-window.resetarTudo = resetarTudo;
-window.abrirMelhorias = abrirMelhorias;
-window.abrirBug = abrirBug;
-window.abrirGuia = abrirGuia;
-window.recarregarPessoas = recarregarPessoas;
-window.abrirDetalhesDia = abrirDetalhesDia;
-window.fecharDetalhesDia = fecharDetalhesDia;
-window.renderizarCalendario = renderizarCalendario;
+Object.assign(window, {
+    toggleMenu, fecharMenu, toggleTema,
+    abrirModalPessoa, fecharModalPessoa, abrirModalExtra, fecharModalExtra,
+    abrirPopup, fecharPopup, abrirPopupADM,
+    abrirEstatisticas, fecharEstatisticas,
+    mudarPeriodo, selecionarEquipe,
+    salvarExtra, removerExtra, renderizarListaExtras,
+    salvarPessoa, removerPessoa, editarFuncionario,
+    aplicarPeriodo, carregarConfigPeriodoUI,
+    exportarDados, importarDados, limparDados, resetarTudo,
+    abrirMelhorias, abrirBug, abrirGuia,
+    recarregarPessoas,
+    abrirDetalhesDia, fecharDetalhesDia,
+    renderizarCalendario
+});
 
 console.log('✅ Funções exportadas para o window!');
 
@@ -1144,19 +1054,15 @@ document.addEventListener('keydown', function(e) {
 
 function init() {
     console.log('🚀 Inicializando Explorer...');
-    console.log('👥 Pessoas carregadas:', pessoas);
-    console.log('📋 Equipe selecionada:', equipeSelecionada);
+    console.log('👥 Pessoas carregadas:', pessoas.length);
+    console.log('📋 Equipe selecionada:', equipeSelecionada?.id);
 
     initTema();
     initModais();
     initPopups(equipeSelecionada);
 
-    // 🔥 INICIALIZAR ESTATÍSTICAS
     import('./core/estatisticas.js').then(module => {
-        if (module.initEstatisticas) {
-            module.initEstatisticas(equipeSelecionada);
-            console.log('📊 Estatísticas inicializadas com:', equipeSelecionada);
-        }
+        if (module.initEstatisticas) module.initEstatisticas(equipeSelecionada);
     });
 
     renderizarBotoesEquipe();
@@ -1166,7 +1072,6 @@ function init() {
 
     if ('requestIdleCallback' in window) {
         requestIdleCallback(() => {
-            console.log('🔄 Carregando elementos não críticos...');
             carregarConfigPeriodoUI();
             renderizarLegendaFeriados();
             renderizarListaExtras();
@@ -1189,18 +1094,12 @@ function init() {
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         requestIdleCallback(() => {
             navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('✅ Service Worker registrado com sucesso!'))
-                .catch(error => console.log('⚠️ Falha ao registrar Service Worker:', error));
+                .then(() => console.log('✅ Service Worker registrado!'))
+                .catch(error => console.log('⚠️ Falha no Service Worker:', error));
         });
     }
 
     console.log('✅ Calendário inicializado!');
-    console.log('📅 Período atual:', getNomePeriodo(getPeriodoPorIndex(periodoIndex)));
-    console.log('👥 Funcionários:', pessoas.length);
 }
-
-// =====================================================
-// INICIALIZAÇÃO
-// =====================================================
 
 init();

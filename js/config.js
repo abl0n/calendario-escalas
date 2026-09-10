@@ -90,4 +90,5 @@ export const feriados = {
 // ===== CONSTANTES GLOBAIS =====
 export const DATA_REFERENCIA = new Date(2026, 6, 5);
 export const HORAS_POR_DIA = 9;
-export const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+export const DIAS_SEMANA = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+
