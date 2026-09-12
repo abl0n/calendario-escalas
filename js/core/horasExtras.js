@@ -1,5 +1,5 @@
 // =====================================================
-// HORAS EXTRAS - Gerenciamento de horas extras
+// HORAS EXTRAS - Gerenciamento
 // =====================================================
 
 import { carregarExtrasStorage, salvarExtrasStorage } from '../utils/storage.js';
@@ -21,18 +21,40 @@ export function getExtrasPorData(dataStr) {
 }
 
 export function getTotalExtras() {
-    return horasExtras.reduce((acc, item) => acc + item.horas, 0);
+    return horasExtras.reduce((acc, item) => acc + (item.horas || 0), 0);
 }
 
-export function getTotalExtrasPorPeriodo(periodo) {
-    let total = 0;
+/**
+ * 🔥 Retorna o total de horas extras DENTRO do período atual.
+ * @param {number} periodoIndex - índice do período (0 = atual)
+ * @returns {{ total: number, minutos: number, quantidade: number }}
+ */
+export function getTotalExtrasPorPeriodo(periodoIndex = 0) {
+    const periodo = getPeriodoPorIndex(periodoIndex);
+    let totalHoras = 0;
+    let quantidade = 0;
+
     horasExtras.forEach(item => {
-        const data = new Date(item.data + 'T00:00:00');
-        if (data >= periodo.inicio && data <= periodo.fim) {
-            total += item.horas;
+        const d = new Date(item.data + 'T00:00:00');
+        if (d >= periodo.inicio && d <= periodo.fim) {
+            totalHoras += item.horas || 0;
+            quantidade++;
         }
     });
-    return total;
+
+    const minutos = horasParaMinutos(totalHoras);
+    return { total: totalHoras, minutos, quantidade };
+}
+
+/**
+ * 🔥 Retorna lista de extras DENTRO do período.
+ */
+export function getExtrasPorPeriodo(periodoIndex = 0) {
+    const periodo = getPeriodoPorIndex(periodoIndex);
+    return horasExtras.filter(item => {
+        const d = new Date(item.data + 'T00:00:00');
+        return d >= periodo.inicio && d <= periodo.fim;
+    });
 }
 
 export function adicionarExtra(data, inicio, fim) {
@@ -54,13 +76,7 @@ export function adicionarExtra(data, inicio, fim) {
         return false;
     }
 
-    horasExtras.push({
-        data: data,
-        inicio: inicio,
-        fim: fim,
-        horas: horas
-    });
-
+    horasExtras.push({ data, inicio, fim, horas });
     salvarExtrasStorage(horasExtras);
     mostrarToast('✅ Hora extra adicionada com sucesso!', 'sucesso');
     return true;
@@ -76,14 +92,20 @@ export function removerExtra(index) {
     return false;
 }
 
-export function renderizarListaExtras(container, totalModal) {
-    if (horasExtras.length === 0) {
-        container.innerHTML = '<p style="color: #94a3b8; font-size: 0.85rem; text-align: center; padding: 12px;">Nenhuma hora extra registrada</p>';
+export function renderizarListaExtras(container, totalModal, periodoIndex = 0) {
+    const periodo = getPeriodoPorIndex(periodoIndex);
+    const doPeriodo = horasExtras.filter(item => {
+        const d = new Date(item.data + 'T00:00:00');
+        return d >= periodo.inicio && d <= periodo.fim;
+    });
+
+    if (doPeriodo.length === 0) {
+        container.innerHTML = '<p style="color:#94a3b8;font-size:0.85rem;text-align:center;padding:12px;">Nenhuma hora extra registrada neste período</p>';
         totalModal.textContent = 'Total: 0h';
         return;
     }
 
-    const sorted = [...horasExtras].sort((a, b) => b.data.localeCompare(a.data));
+    const sorted = [...doPeriodo].sort((a, b) => b.data.localeCompare(a.data));
     let html = '';
     sorted.forEach((item) => {
         const dataFormatada = item.data.split('-').reverse().join('/');
@@ -97,6 +119,6 @@ export function renderizarListaExtras(container, totalModal) {
     });
 
     container.innerHTML = html;
-    const totalMin = horasParaMinutos(getTotalExtras());
+    const totalMin = horasParaMinutos(doPeriodo.reduce((acc, i) => acc + i.horas, 0));
     totalModal.textContent = `Total: ${formatarMinutos(totalMin)}`;
 }

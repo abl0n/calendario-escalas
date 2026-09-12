@@ -1,25 +1,95 @@
 {
+    "id": "/calendario-escalas/",
     "name": "Calendário de Escalas",
     "short_name": "Escalas",
-    "description": "Visualizador de escalas de trabalho com ciclo de 4 semanas",
-    "start_url": "/calendario-escalas/",
-    "scope": "/calendario-escalas/",
+    "description": "Visualizador de escalas de trabalho com ciclo de 4 semanas, feriados fixos e móveis, horas extras e estatísticas.",
+
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
     "orientation": "portrait-primary",
-    "background_color": "#f1f5f9",
-    "theme_color": "#3B82F6",
+
+    "lang": "pt-BR",
+    "dir": "ltr",
+
+    "background_color": "#F8FAFC",
+    "theme_color": "#2563EB",
+
+    "categories": ["productivity", "utilities", "business"],
+
     "icons": [
         {
             "src": "icons/icon-192.png",
             "sizes": "192x192",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "icons/icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon-192-maskable.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/icon-512-maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
-    ]
+    ],
+
+    "shortcuts": [
+        {
+            "name": "Adicionar Hora Extra",
+            "short_name": "Extra",
+            "description": "Registrar uma nova hora extra",
+            "url": "./?acao=extra",
+            "icons": [
+                {
+                    "src": "icons/shortcut-extra.png",
+                    "sizes": "96x96",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Ver Estatísticas",
+            "short_name": "Stats",
+            "description": "Abrir estatísticas do período",
+            "url": "./?acao=stats",
+            "icons": [
+                {
+                    "src": "icons/shortcut-stats.png",
+                    "sizes": "96x96",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ],
+
+    "screenshots": [
+        {
+            "src": "screenshots/mobile.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Calendário de escalas no celular"
+        },
+        {
+            "src": "screenshots/desktop.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Calendário de escalas no desktop"
+        }
+    ],
+
+    "prefer_related_applications": false
 }

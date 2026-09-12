@@ -5,7 +5,7 @@
 import { getPeriodoPorIndex, getDiasNoPeriodo, formatarDataPeriodo } from '../utils/periodos.js';
 import { carregarExtrasStorage } from '../utils/storage.js';
 import { getPessoas } from '../core/pessoas.js';
-import { HORAS_POR_DIA, DATA_REFERENCIA, feriados } from '../config.js';
+import { HORAS_POR_DIA, DATA_REFERENCIA, getFeriados } from '../config.js';
 import { horasParaMinutos, formatarMinutos, getCicloCompleto } from '../utils/helpers.js';
 import { CORES_ESCALAS, CORES_TURNOS } from '../constants/cores.js';
 
@@ -38,9 +38,11 @@ function calcularEstatisticas(periodoIndex) {
         const status = obterStatusDia(equipeSelecionada, dataAtual);
         const dia = dataAtual.getDate();
         const mes = dataAtual.getMonth() + 1;
+        const ano = dataAtual.getFullYear();
 
+        // 🔥 CORRIGIDO: getFeriados(ano)
         const chave = `${String(dia).padStart(2, '0')}-${String(mes).padStart(2, '0')}`;
-        const infoFeriado = feriados[chave];
+        const infoFeriado = getFeriados(ano)[chave];
         const isFeriado = infoFeriado && infoFeriado.tipo === 'feriado';
 
         if (isFeriado) {
@@ -59,6 +61,8 @@ function calcularEstatisticas(periodoIndex) {
     }
 
     const minutosTrabalhados = horasParaMinutos(horasTrabalhadas);
+
+    // 🔥 CORRIGIDO: horas extras SOMENTE dentro do período
     const extrasStorage = carregarExtrasStorage();
     const totalExtrasPeriodo = extrasStorage.reduce((acc, item) => {
         const itemData = new Date(item.data + 'T00:00:00');
@@ -73,7 +77,7 @@ function calcularEstatisticas(periodoIndex) {
 
     const todasPessoas = getPessoas();
     const pessoasEscala = todasPessoas.filter(p => Number(p.escalaId) === Number(equipeSelecionada?.id));
-    
+
     const turnos = {
         M: pessoasEscala.filter(p => p.turno === 'M').length,
         T: pessoasEscala.filter(p => p.turno === 'T').length,

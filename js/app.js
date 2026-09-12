@@ -9,7 +9,8 @@ import {
     coresHeaderFundo,
     coresHeaderTexto,
     coresHeaderBorda,
-    feriados, 
+    getFeriados,
+    getFeriado,
     DATA_REFERENCIA, 
     DIAS_SEMANA
 } from './config.js';
@@ -61,6 +62,7 @@ import {
 import { recarregarPessoas } from './core/pessoas.js';
 import { CORES_ESCALAS } from './constants/cores.js';
 
+
 // =====================================================
 // VARIÁVEIS GLOBAIS
 // =====================================================
@@ -107,11 +109,12 @@ function obterStatusDia(equipe, data) {
     return ciclo[posicao] || 0;
 }
 
-function getDataComemorativa(dia, mes) {
-    const chave = `${String(dia).padStart(2, '0')}-${String(mes).padStart(2, '0')}`;
-    return feriados[chave] || null;
-}
 
+
+function getDataComemorativa(dia, mes, ano) {
+    const chave = `${String(dia).padStart(2, '0')}-${String(mes).padStart(2, '0')}`;
+    return getFeriados(ano)[chave] || null;
+}
 function getExtrasPorData(dataStr) {
     return horasExtras.filter(item => item.data === dataStr);
 }
@@ -190,7 +193,7 @@ function renderizarCalendario() {
         const status = obterStatusDia(equipeSelecionada, dataAtual);
         const isHoje = dataStr === hojeStr;
         const noPeriodo = dataEstaNoPeriodo(dataAtual, periodo);
-        const dataComemorativa = getDataComemorativa(dia, mes);
+       const dataComemorativa = getDataComemorativa(dia, mes, dataAtual.getFullYear());
         const extras = getExtrasPorData(dataStr);
         const temExtra = extras.length > 0;
         const totalExtraDia = extras.reduce((acc, item) => acc + item.horas, 0);
@@ -425,7 +428,8 @@ function getFeriadosDoPeriodo(periodo) {
     while (dataAtual <= periodo.fim) {
         const dia = dataAtual.getDate();
         const mes = dataAtual.getMonth() + 1;
-        const dataComemorativa = getDataComemorativa(dia, mes);
+        const ano = dataAtual.getFullYear();
+        const dataComemorativa = getDataComemorativa(dia, mes, ano);
         if (dataComemorativa) {
             resultados.push({
                 data: new Date(dataAtual),
@@ -900,65 +904,80 @@ function abrirDetalhesDia(dataStr) {
     const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
     const nomeDia = diasSemana[data.getDay()];
 
+    // Status trabalho/folga
     const status = obterStatusDia(equipeSelecionada, data);
     const statusTexto = status === 1 ? 'Trabalho' : 'Folga';
     const statusIcone = status === 1 ? 'icon-work' : 'icon-beach';
     const statusCor = status === 1 ? '#3B82F6' : '#10B981';
 
-    const dataComemorativa = getDataComemorativa(dia, mes);
-    let feriadoHtml = dataComemorativa ? `
-        <div class="detalhe-item" style="border-left-color: ${dataComemorativa.tipo === 'feriado' ? '#EF4444' : '#8B5CF6'};">
-            <span class="detalhe-icone">${dataComemorativa.icone}</span>
-            <div>
-                <div class="detalhe-label">${dataComemorativa.tipo === 'feriado' ? 'Feriado' : 'Comemorativo'}</div>
-                <div class="detalhe-valor">${dataComemorativa.nome}</div>
-            </div>
-        </div>
-    ` : '';
+    // 🔥 FERIADOS MÓVEIS + FIXOS (via getFeriado)
+    const dataComemorativa = getFeriado(dia, mes, ano);
 
-    const extras = getExtrasPorData(dataStr);
+    let feriadoHtml = '';
+    if (dataComemorativa) {
+        const corFeriado = dataComemorativa.tipo === 'feriado'
+            ? '#EF4444'
+            : dataComemorativa.tipo === 'facultativo'
+                ? '#F59E0B'
+                : '#8B5CF6';
+
+        const labelTipo = dataComemorativa.tipo === 'feriado'
+            ? 'Feriado'
+            : dataComemorativa.tipo === 'facultativo'
+                ? 'Ponto Facultativo'
+                : 'Comemorativo';
+
+        feriadoHtml = `
+            <div class="detalhe-item" style="border-left-color: ${corFeriado};">
+                <span class="detalhe-icone">${dataComemorativa.icone}</span>
+                <div>
+                    <div class="detalhe-label" style="color:${corFeriado};font-weight:700;">${labelTipo}</div>
+                    <div class="detalhe-valor">${dataComemorativa.nome}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // =====================================================
+    // 🔥 HORAS EXTRAS - FILTRADAS PELO PERÍODO ATUAL
+    // =====================================================
+    const periodoAtual = getPeriodoPorIndex(periodoIndex);
+    const extras = getExtrasPorData(dataStr).filter(extra => {
+        const d = new Date(extra.data + 'T00:00:00');
+        return d >= periodoAtual.inicio && d <= periodoAtual.fim;
+    });
+
     let extrasHtml = '';
     if (extras.length) {
-        const totalHoras = extras.reduce((acc, item) => acc + item.horas, 0);
-        const extraMin = Math.round(totalHoras * 60);
-        const h = Math.floor(extraMin / 60);
-        const m = extraMin % 60;
+        const totalMinutos = extras.reduce(
+            (acc, item) => acc + Math.round(item.horas * 60), 0
+        );
+        const h = Math.floor(totalMinutos / 60);
+        const m = totalMinutos % 60;
+
         extrasHtml = `
             <div class="detalhe-item" style="border-left-color: #F59E0B;">
                 <span class="detalhe-icone">⏱️</span>
                 <div>
                     <div class="detalhe-label">Horas Extras</div>
-                    <div class="detalhe-valor" style="color:#F59E0B;font-weight:700;">${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}</div>
+                    <div class="detalhe-valor" style="color:#F59E0B;font-weight:700;">
+                        ${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}
+                    </div>
                 </div>
             </div>
             ${extras.map(extra => {
-                const extraMin2 = Math.round(extra.horas * 60);
-                const h2 = Math.floor(extraMin2 / 60);
-                const m2 = extraMin2 % 60;
+                const min2 = Math.round(extra.horas * 60);
+                const h2 = Math.floor(min2 / 60);
+                const m2 = min2 % 60;
                 return `<div class="detalhe-item" style="border-left-color:#F59E0B;padding-left:40px;font-size:0.85rem;">
-                    <span style="color:var(--color-text-muted);">${extra.inicio || '08:00'} - ${extra.fim || '18:00'} (${h2 > 0 ? h2 + 'h' : ''}${m2 > 0 ? m2 + 'min' : ''})</span>
+                    <span style="color:var(--color-text-muted);">
+                        ${extra.inicio || '08:00'} - ${extra.fim || '18:00'}
+                        (${h2 > 0 ? h2 + 'h' : ''}${m2 > 0 ? m2 + 'min' : ''})
+                    </span>
                 </div>`;
             }).join('')}
         `;
     }
-
-    const pessoasDoDia = pessoas.filter(p => equipeSelecionada?.escalas?.some(e => e.data === dataStr && e.pessoaId === p.id));
-    const pessoasHtml = pessoasDoDia.length ? `
-        <div class="detalhe-item" style="border-left-color:#8B5CF6;">
-            <span class="detalhe-icone">👥</span>
-            <div>
-                <div class="detalhe-label">Pessoas Escaladas</div>
-                ${pessoasDoDia.map(p => `
-                    <div style="display:flex;align-items:center;gap:8px;padding:2px 0;">
-                        <span>• ${p.nome}</span>
-                        <span style="font-size:0.65rem;background:var(--color-bg);padding:0 8px;border-radius:4px;color:var(--color-text-muted);">
-                            ${p.turno === 'M' ? '☀️ Manhã' : p.turno === 'T' ? '🌆 Tarde' : '🌙 Noite'}
-                        </span>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    ` : '';
 
     const equipeNome = equipeSelecionada?.nome || `Escala ${equipeSelecionada?.id}`;
 
@@ -991,8 +1010,7 @@ function abrirDetalhesDia(dataStr) {
             </div>
             ${feriadoHtml}
             ${extrasHtml}
-            ${pessoasHtml}
-            ${!feriadoHtml && !extrasHtml && !pessoasDoDia.length ? `
+            ${!feriadoHtml && !extrasHtml ? `
                 <div style="text-align:center;padding:20px 0;color:var(--color-text-muted);">
                     <svg class="icon" width="32" height="32" style="opacity:0.3;">
                         <use href="assets/icons/sprite.svg#icon-info"></use>
