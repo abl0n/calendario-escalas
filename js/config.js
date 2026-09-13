@@ -5,29 +5,48 @@
 import { CORES_ESCALAS, CORES_CALENDARIO, PALETA } from './constants/cores.js';
 import { getFeriadosMoveis } from './utils/feriadosMoveis.js';
 
-// ===== ESCALAS PADRÃO =====
+// =====================================================
+// ESCALAS PADRÃO
+// =====================================================
+// Marcadores:
+//   T   → trabalho normal
+//   F   → folga
+//   'T' → trabalho + alerta de saída antecipada (1 hora)
+// =====================================================
+
 export const escalasPadrao = [
     {
         id: 1, nome: "Escala 1", cor: CORES_ESCALAS[1].bg,
-        semana1: "T T F T T T F", semana2: "F T T F T T T",
-        semana3: "T F T T T F F", semana4: "F T T T F T T"
+        semana1: "T T F T T 'T' F",
+        semana2: "F T 'T' F T T T",
+        semana3: "T F T T T F F",
+        semana4: "F T T 'T' F T T"
     },
     {
         id: 2, nome: "Escala 2", cor: CORES_ESCALAS[2].bg,
-        semana1: "T F T T T F F", semana2: "F T T T F T T",
-        semana3: "T T F T T T F", semana4: "F T T F T T T"
+        semana1: "T F T T T F F",
+        semana2: "F T T 'T' F T T",
+        semana3: "T T F T T 'T' F",
+        semana4: "F T 'T' F T T T"
     },
     {
         id: 3, nome: "Escala 3", cor: CORES_ESCALAS[3].bg,
-        semana1: "F T T F T T T", semana2: "T F T T T F F",
-        semana3: "F T T T F T T", semana4: "T T F T T T F"
+        semana1: "F T 'T' F T T T",
+        semana2: "T F T T T F F",
+        semana3: "F T T 'T' F T T",
+        semana4: "T T F T T 'T' F"
     },
     {
         id: 4, nome: "Escala 4", cor: CORES_ESCALAS[4].bg,
-        semana1: "F T T T F T T", semana2: "T T F T T T F",
-        semana3: "F T T F T T T", semana4: "T F T T T F F"
+        semana1: "F T T 'T' F T T",
+        semana2: "T T F T T 'T' F",
+        semana3: "F T 'T' F T T T",
+        semana4: "T F T T T F F"
     }
 ];
+
+// Versão do schema das escalas. Bumpe quando mudar escalasPadrao.
+export const ESCALAS_VERSAO = 2;
 
 // =====================================================
 // CORES DO HEADER
@@ -94,7 +113,10 @@ export function getFeriado(dia, mes, ano) {
     return getFeriados(ano)[chave] || null;
 }
 
-// ===== CONSTANTES GLOBAIS =====
+// =====================================================
+// CONSTANTES GLOBAIS
+// =====================================================
+
 export const DATA_REFERENCIA = new Date(2026, 6, 5);
 export const HORAS_POR_DIA = 9;
 export const DIAS_SEMANA = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];

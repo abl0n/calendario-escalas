@@ -1789,3 +1789,219 @@ body.modo-escuro .toast {
     }
 }
 
+/* ============================================================
+   🔥 DIA COM ALERTA - Fundo vermelho claro (T com aspas)
+   ============================================================ */
+
+#calendarioContainer .dia-btn.dia-alerta-saida {
+    background: #FEE2E2;              /* vermelho claro */
+    border: 2px solid #EF4444;        /* borda vermelha */
+    box-shadow: inset 0 0 0 1px #FCA5A5;
+}
+
+#calendarioContainer .dia-btn.dia-alerta-saida:hover {
+    background: #FECACA;              /* vermelho um pouco mais forte */
+    border-color: #DC2626;
+    box-shadow: inset 0 0 0 1px #EF4444, 0 2px 8px rgba(239, 68, 68, 0.35);
+}
+
+/* Número do dia em vermelho escuro para contraste */
+#calendarioContainer .dia-btn.dia-alerta-saida .dia-sup-esq {
+    color: #991B1B;
+    font-weight: 800;
+}
+
+/* Badge T fica vermelha no dia de alerta */
+#calendarioContainer .dia-btn.dia-alerta-saida .status-trabalho {
+    background: #EF4444;
+    border-color: #DC2626;
+    color: #FFFFFF;
+}
+
+/* ===== TEMA ESCURO ===== */
+body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida {
+    background: #7F1D1D;              /* vermelho escuro */
+    border-color: #EF4444;
+    box-shadow: inset 0 0 0 1px #991B1B;
+}
+
+body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover {
+    background: #991B1B;
+    border-color: #FCA5A5;
+}
+
+body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida .dia-sup-esq {
+    color: #FECACA;
+}
+
+body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida .status-trabalho {
+    background: #EF4444;
+    border-color: #FCA5A5;
+    color: #FFFFFF;
+}
+
+/* ============================================================
+   💙 CRÉDITOS DO DESENVOLVEDOR - COM ÍCONES DINÂMICOS
+   ============================================================ */
+
+.menu-creditos {
+    padding: 16px 16px 20px;
+    margin-top: auto;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Linha "Desenvolvido com paixão por" */
+.creditos-linha {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: var(--a11y-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* 🔥 CORAÇÃO PULSANTE */
+.creditos-linha .icon-coracao {
+    color: var(--color-danger);
+    flex-shrink: 0;
+    animation: coracao-pulsa 1.5s ease-in-out infinite;
+    will-change: transform;
+    transform-origin: center;
+}
+
+@keyframes coracao-pulsa {
+    0%, 100% { transform: scale(1); }
+    15%       { transform: scale(1.3); }
+    30%       { transform: scale(1); }
+    45%       { transform: scale(1.15); }
+    60%       { transform: scale(1); }
+}
+
+/* Nome do desenvolvedor */
+.creditos-nome {
+    font-size: 0.95rem;
+    color: var(--a11y-text);
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.creditos-nome strong {
+    font-weight: 700;
+    background: linear-gradient(90deg, 
+        var(--color-primary) 0%, 
+        var(--color-purple) 50%, 
+        var(--color-primary) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--color-primary);
+    animation: gradiente-desliza 4s ease-in-out infinite;
+}
+
+/* 🔥 GRADIENTE ANIMADO NO NOME */
+@keyframes gradiente-desliza {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+}
+
+/* 🔥 CURSOR PISCANDO */
+.creditos-nome .cursor-blink {
+    display: inline-block;
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    animation: pisca-cursor 1s step-end infinite;
+    margin-left: 1px;
+}
+
+@keyframes pisca-cursor {
+    0%, 50%   { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Link GitHub */
+.creditos-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+}
+
+.creditos-link:hover {
+    background: var(--color-primary);
+    color: var(--a11y-white);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+.creditos-link:focus-visible {
+    outline: var(--a11y-outline);
+    outline-offset: 2px;
+}
+
+.creditos-link .icon {
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.creditos-link:hover .icon {
+    transform: rotate(-15deg) scale(1.1);
+    color: var(--a11y-white);
+}
+
+/* ===== TEMA ESCURO ===== */
+body.modo-escuro .menu-creditos {
+    border-top-color: var(--border);
+}
+
+body.modo-escuro .creditos-linha {
+    color: var(--a11y-text-secondary);
+}
+
+body.modo-escuro .creditos-nome {
+    color: var(--a11y-text);
+}
+
+body.modo-escuro .creditos-link {
+    background: var(--surface-alt);
+    border-color: var(--border);
+    color: var(--color-primary-light);
+}
+
+body.modo-escuro .creditos-link:hover {
+    background: var(--color-primary);
+    color: var(--a11y-white);
+    border-color: var(--color-primary);
+}
+
+/* ===== ACESSIBILIDADE: pausar animações ===== */
+@media (prefers-reduced-motion: reduce) {
+    .creditos-linha .icon-coracao,
+    .creditos-nome strong,
+    .creditos-nome .cursor-blink,
+    .creditos-link .icon {
+        animation: none !important;
+        transition: none !important;
+    }
+}

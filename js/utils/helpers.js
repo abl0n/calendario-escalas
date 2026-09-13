@@ -118,10 +118,29 @@ export function formatarHora(horas) {
     return `${h}h${m}min`;
 }
 
-// ===== PARSE E CICLO DE ESCALA =====
+// =====================================================
+// PARSE DE SEMANA - Detecta T (1), F (0) e 'T' (2)
+// =====================================================
+
+/**
+ * Converte uma string de semana em array de números.
+ * - `T`   → 1  (trabalho normal)
+ * - `F`   → 0  (folga)
+ * - `'T'` → 2  (trabalho + alerta de saída antecipada)
+ */
 export function parseSemana(semana) {
     if (!semana) return [];
-    return semana.trim().split(/\s+/).map(s => s.toUpperCase() === 'T' ? 1 : 0);
+
+    const partes = semana.trim().split(/\s+/);
+
+    return partes.map(s => {
+        const temAspas = /['"]/.test(s);
+        const limpo = s.replace(/['"]/g, '').toUpperCase();
+
+        if (limpo === 'T') return temAspas ? 2 : 1;
+        if (limpo === 'F') return 0;
+        return 0;
+    });
 }
 
 export function getCicloCompleto(equipe) {

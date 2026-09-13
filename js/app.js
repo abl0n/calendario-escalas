@@ -1,9 +1,10 @@
 // =====================================================
-// APP - Inicialização principal (OTIMIZADO)
+// APP - Inicialização principal (OTIMIZADO v2)
 // =====================================================
 
 import { 
     escalasPadrao, 
+    ESCALAS_VERSAO,
     coresMeses, 
     coresDestaque, 
     coresHeaderFundo,
@@ -59,15 +60,33 @@ import {
     carregarPessoasStorage, salvarPessoasStorage
 } from './utils/storage.js';
 
-import { recarregarPessoas } from './core/pessoas.js';
+import { recarregarPessoas, getPessoas } from './core/pessoas.js';
 import { CORES_ESCALAS } from './constants/cores.js';
 
+// =====================================================
+// MIGRAÇÃO AUTOMÁTICA DE ESCALAS
+// =====================================================
+// Se a versão do storage for menor que a do config.js,
+// substitui as escalas automaticamente (útil quando
+// escalasPadrao muda — ex: adicionar marcadores 'T').
+// =====================================================
+
+const versaoStorage = parseInt(localStorage.getItem('escalas_versao') || '0');
+let equipes;
+
+if (versaoStorage < ESCALAS_VERSAO) {
+    console.log(`🔄 Migrando escalas v${versaoStorage} → v${ESCALAS_VERSAO}`);
+    equipes = JSON.parse(JSON.stringify(escalasPadrao));
+    localStorage.setItem('escalas', JSON.stringify(equipes));
+    localStorage.setItem('escalas_versao', String(ESCALAS_VERSAO));
+} else {
+    equipes = carregarEscalasStorage() || JSON.parse(JSON.stringify(escalasPadrao));
+}
 
 // =====================================================
 // VARIÁVEIS GLOBAIS
 // =====================================================
 
-let equipes = carregarEscalasStorage() || JSON.parse(JSON.stringify(escalasPadrao));
 let horasExtras = carregarExtrasStorage() || [];
 let pessoas = carregarPessoasStorage() || [];
 let equipeSelecionada = equipes[0] || null;
@@ -75,7 +94,7 @@ let periodoIndex = carregarPeriodoStorage() || 0;
 let temaEscuro = carregarTemaStorage() || false;
 
 // =====================================================
-// DOM REFS
+// DOM REFS (cache único)
 // =====================================================
 
 const DOM = {
@@ -93,6 +112,7 @@ const DOM = {
     popupConteudo: document.getElementById('popupConteudo'),
     popupTotal: document.getElementById('popupTotal'),
     popupTitulo: document.getElementById('popupTitulo'),
+    periodoNome: document.getElementById('periodoNome'),
     loadingOverlay: document.getElementById('loadingOverlay'),
 };
 
@@ -100,6 +120,12 @@ const DOM = {
 // FUNÇÕES AUXILIARES
 // =====================================================
 
+/**
+ * Retorna o status de um dia:
+ *   0 = folga
+ *   1 = trabalho
+ *   2 = trabalho + alerta de saída antecipada
+ */
 function obterStatusDia(equipe, data) {
     if (!equipe) return 0;
     const ciclo = getCicloCompleto(equipe);
@@ -109,18 +135,68 @@ function obterStatusDia(equipe, data) {
     return ciclo[posicao] || 0;
 }
 
-
+/**
+ * 🔥 Retorna objeto de status pronto para renderização.
+ * Centraliza a lógica: evita duplicar "status === 2" em 3 lugares.
+ */
+function getStatusInfo(status) {
+    switch (status) {
+        case 2:
+            return {
+                isTrabalho: true,
+                isAlerta: true,
+                texto: 'Trabalho',
+                textoBadge: 'T',
+                icone: 'icon-work',
+                cor: '#3B82F6',
+                ariaLabel: 'trabalho com alerta de saída antecipada em 1 hora'
+            };
+        case 1:
+            return {
+                isTrabalho: true,
+                isAlerta: false,
+                texto: 'Trabalho',
+                textoBadge: 'T',
+                icone: 'icon-work',
+                cor: '#3B82F6',
+                ariaLabel: 'trabalho'
+            };
+        default:
+            return {
+                isTrabalho: false,
+                isAlerta: false,
+                texto: 'Folga',
+                textoBadge: 'F',
+                icone: 'icon-beach',
+                cor: '#10B981',
+                ariaLabel: 'folga'
+            };
+    }
+}
 
 function getDataComemorativa(dia, mes, ano) {
     const chave = `${String(dia).padStart(2, '0')}-${String(mes).padStart(2, '0')}`;
     return getFeriados(ano)[chave] || null;
 }
+
 function getExtrasPorData(dataStr) {
     return horasExtras.filter(item => item.data === dataStr);
 }
 
 function getTotalExtras() {
     return horasExtras.reduce((acc, item) => acc + (item.horas || 0), 0);
+}
+
+/**
+ * 🔥 Filtra horas extras pelo período atual.
+ * Reutilizada em várias funções.
+ */
+function getExtrasDoPeriodoAtual() {
+    const periodo = getPeriodoPorIndex(periodoIndex);
+    return horasExtras.filter(item => {
+        const d = new Date(item.data + 'T00:00:00');
+        return d >= periodo.inicio && d <= periodo.fim;
+    });
 }
 
 // =====================================================
@@ -191,9 +267,11 @@ function renderizarCalendario() {
         const dataStr = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
         const status = obterStatusDia(equipeSelecionada, dataAtual);
+        const info = getStatusInfo(status);   // 🔥 centralizado
+
         const isHoje = dataStr === hojeStr;
         const noPeriodo = dataEstaNoPeriodo(dataAtual, periodo);
-       const dataComemorativa = getDataComemorativa(dia, mes, dataAtual.getFullYear());
+        const dataComemorativa = getDataComemorativa(dia, mes, ano);
         const extras = getExtrasPorData(dataStr);
         const temExtra = extras.length > 0;
         const totalExtraDia = extras.reduce((acc, item) => acc + item.horas, 0);
@@ -201,8 +279,7 @@ function renderizarCalendario() {
         const classePeriodo = noPeriodo ? '' : 'dia-outro-periodo';
         const classeHoje = isHoje ? 'dia-hoje' : '';
         const classeExtra = temExtra ? 'dia-com-extra' : '';
-        const statusTexto = status === 1 ? 'T' : 'F';
-        const statusClasse = status === 1 ? 'status-trabalho' : 'status-folga';
+        const classeAlerta = info.isAlerta ? 'dia-alerta-saida' : '';   // 🔥
 
         let classeEspecial = '';
         let iconeEvento = '';
@@ -211,7 +288,7 @@ function renderizarCalendario() {
         if (dataComemorativa) {
             nomeEvento = dataComemorativa.nome;
             if (dataComemorativa.tipo === 'feriado') {
-                classeEspecial = status === 1 ? 'dia-feriado-trabalhado' : 'dia-feriado';
+                classeEspecial = info.isTrabalho ? 'dia-feriado-trabalhado' : 'dia-feriado';
                 iconeEvento = dataComemorativa.icone;
             } else {
                 classeEspecial = 'dia-comemorativo';
@@ -229,16 +306,15 @@ function renderizarCalendario() {
 
         // ARIA-LABEL
         const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-        let ariaLabel = `${dia} de ${meses[mes - 1]}`;
-        ariaLabel += status === 1 ? ', trabalho' : ', folga';
+        let ariaLabel = `${dia} de ${meses[mes - 1]}, ${info.ariaLabel}`;
         if (nomeEvento) ariaLabel += `, ${nomeEvento}`;
         if (temExtra) ariaLabel += `, ${Math.round(totalExtraDia * 60)} minutos extras`;
 
-        const isFeriadoTrabalhado = status === 1 && dataComemorativa?.tipo === 'feriado';
+        const isFeriadoTrabalhado = info.isTrabalho && dataComemorativa?.tipo === 'feriado';
 
         html += `<td class="dia-td ${classePeriodo}" data-data="${dataStr}">
     <button 
-        class="dia-btn ${classeHoje} ${classeExtra} ${classeEspecial}"
+        class="dia-btn ${classeHoje} ${classeExtra} ${classeEspecial} ${classeAlerta}"
         type="button"
         tabindex="0"
         data-data="${dataStr}"
@@ -246,7 +322,7 @@ function renderizarCalendario() {
         onclick="window.abrirDetalhesDia('${dataStr}')"
     >
         <span class="dia-sup-esq" aria-hidden="true">${dia}</span>
-        <span class="dia-sup-dir ${statusClasse}" aria-hidden="true">${statusTexto}</span>
+        <span class="dia-sup-dir ${info.isTrabalho ? 'status-trabalho' : 'status-folga'}" aria-hidden="true">${info.textoBadge}</span>
         <span class="dia-inf-esq ${isFeriadoTrabalhado ? 'feriado-trabalhado' : ''}" aria-hidden="true">${iconeEvento}</span>
         <span class="dia-inf-dir ${temExtra ? 'tem-mensagem' : ''}" aria-hidden="true">${labelExtra}</span>
     </button>
@@ -382,16 +458,20 @@ function selecionarEquipe(equipe) {
 // =====================================================
 
 function atualizarContadores() {
-    const pessoasEscala = pessoas.filter(p => p.escalaId === equipeSelecionada?.id);
+    // 🔥 Usa getPessoas() para pegar sempre a versão atualizada
+    const todasPessoas = getPessoas();
+    const pessoasEscala = todasPessoas.filter(p => Number(p.escalaId) === Number(equipeSelecionada?.id));
+    
     const turnos = { M: 0, T: 0, N: 0 };
-    pessoasEscala.forEach(p => turnos[p.turno] = (turnos[p.turno] || 0) + 1);
+    pessoasEscala.forEach(p => {
+        if (turnos[p.turno] !== undefined) turnos[p.turno]++;
+    });
 
     if (DOM.numPessoasEscala) DOM.numPessoasEscala.textContent = pessoasEscala.length;
     if (DOM.numManha) DOM.numManha.textContent = turnos.M;
     if (DOM.numTarde) DOM.numTarde.textContent = turnos.T;
     if (DOM.numNoite) DOM.numNoite.textContent = turnos.N;
 
-    // Atualizar bordas dos contadores
     const escalaId = equipeSelecionada?.id || 1;
     document.querySelectorAll('.contador-item').forEach(contador => {
         contador.classList.remove('escala-1', 'escala-2', 'escala-3', 'escala-4', 'escala-5');
@@ -431,10 +511,12 @@ function getFeriadosDoPeriodo(periodo) {
         const ano = dataAtual.getFullYear();
         const dataComemorativa = getDataComemorativa(dia, mes, ano);
         if (dataComemorativa) {
+            const status = obterStatusDia(equipeSelecionada, dataAtual);
             resultados.push({
                 data: new Date(dataAtual),
                 ...dataComemorativa,
-                trabalhado: obterStatusDia(equipeSelecionada, dataAtual) === 1
+                // 🔥 FIX: status 2 também é trabalho
+                trabalhado: status === 1 || status === 2
             });
         }
         dataAtual.setDate(dataAtual.getDate() + 1);
@@ -444,8 +526,7 @@ function getFeriadosDoPeriodo(periodo) {
 
 function atualizarPeriodoInfo() {
     const periodo = getPeriodoPorIndex(periodoIndex);
-    const periodoNome = document.getElementById('periodoNome');
-    if (periodoNome) periodoNome.textContent = getNomePeriodo(periodo);
+    if (DOM.periodoNome) DOM.periodoNome.textContent = getNomePeriodo(periodo);
 }
 
 function mudarPeriodo(delta) {
@@ -454,10 +535,11 @@ function mudarPeriodo(delta) {
     renderizarCalendario();
     renderizarLegendaFeriados();
     atualizarPeriodoInfo();
+    renderizarListaExtras();   // 🔥 atualiza lista de extras do novo período
 }
 
 // =====================================================
-// HORAS EXTRAS
+// HORAS EXTRAS (🔥 filtradas pelo período)
 // =====================================================
 
 function renderizarListaExtras() {
@@ -465,13 +547,15 @@ function renderizarListaExtras() {
     const totalModal = DOM.totalExtraModal;
     if (!container) return;
 
-    if (horasExtras.length === 0) {
-        container.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.8rem;text-align:center;padding:16px;">Nenhuma hora extra registrada</p>';
+    const extrasDoPeriodo = getExtrasDoPeriodoAtual();   // 🔥 FILTRO
+
+    if (extrasDoPeriodo.length === 0) {
+        container.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.8rem;text-align:center;padding:16px;">Nenhuma hora extra neste período</p>';
         if (totalModal) totalModal.textContent = 'Total: 0h';
         return;
     }
 
-    const sorted = [...horasExtras].sort((a, b) => b.data.localeCompare(a.data));
+    const sorted = [...extrasDoPeriodo].sort((a, b) => b.data.localeCompare(a.data));
     container.innerHTML = sorted.map(item => {
         const dataFormatada = item.data.split('-').reverse().join('/');
         const index = horasExtras.indexOf(item);
@@ -488,7 +572,7 @@ function renderizarListaExtras() {
         `;
     }).join('');
 
-    const totalMin = horasParaMinutos(getTotalExtras());
+    const totalMin = horasParaMinutos(extrasDoPeriodo.reduce((acc, i) => acc + i.horas, 0));
     if (totalModal) totalModal.textContent = `Total: ${formatarMinutos(totalMin)}`;
 }
 
@@ -554,8 +638,12 @@ function salvarPessoa() {
         return;
     }
 
-    const duplicado = pessoas.find(p => p.nome.toLowerCase() === nome.toLowerCase() && p.escalaId === escalaId);
-    if (duplicado && !editando) {
+    const duplicado = pessoas.find(p => 
+        p.nome.toLowerCase() === nome.toLowerCase() && 
+        Number(p.escalaId) === escalaId &&
+        p.id !== parseInt(editando || '0')
+    );
+    if (duplicado) {
         mostrarToast('⚠️ Funcionário já cadastrado nesta escala!', 'erro');
         return;
     }
@@ -572,9 +660,9 @@ function salvarPessoa() {
     }
 
     salvarPessoasStorage(pessoas);
+    if (typeof recarregarPessoas === 'function') recarregarPessoas();
     atualizarContadores();
     fecharModalPessoa();
-    if (typeof recarregarPessoas === 'function') recarregarPessoas();
 }
 
 function removerPessoa(id) {
@@ -640,6 +728,7 @@ function abrirEstatisticas() {
             }
         })
         .catch(err => {
+            console.error('Erro ao carregar estatísticas:', err);
             conteudo.innerHTML = `
                 <div style="text-align:center; padding:40px; color:var(--color-danger);">
                     <p>❌ Erro ao carregar estatísticas</p>
@@ -679,8 +768,8 @@ function aplicarPeriodo() {
         return;
     }
 
-    let diaInicio = parseInt(inputInicio.value);
-    let diaFim = parseInt(inputFim.value);
+    const diaInicio = parseInt(inputInicio.value);
+    const diaFim = parseInt(inputFim.value);
 
     if (isNaN(diaInicio) || isNaN(diaFim) || diaInicio < 1 || diaInicio > 31 || diaFim < 1 || diaFim > 31) {
         mostrarToast('❌ Digite dias entre 1 e 31!', 'erro');
@@ -695,6 +784,7 @@ function aplicarPeriodo() {
     renderizarLegendaFeriados();
     atualizarPeriodoInfo();
     atualizarContadores();
+    renderizarListaExtras();
     mostrarToast(`✅ Período: Início ${diaInicio}, Fim ${diaFim}`, 'sucesso');
 }
 
@@ -709,9 +799,12 @@ function abrirGuia() {
 1. 📋 Selecione uma escala (1, 2, 3 ou 4)
 2. 👤 Cadastre funcionários em "Cadastrar Funcionário"
 3. 👥 Clique nos contadores para ver a lista
-4. ⏱️ Adicione horas extras com "H.Extra"
-5. 📊 Veja estatísticas com "Estatística"
+4. ⏱️ Adicione horas extras com "Extra"
+5. 📊 Veja estatísticas com "Stats"
 6. 📅 Altere o período no menu lateral
+
+🔴 DIAS COM ALERTA:
+Dias em vermelho indicam saída antecipada em 1 hora.
 
 💡 DICAS:
 - Use ESC para fechar modais
@@ -719,7 +812,7 @@ function abrirGuia() {
 - Período máximo de 31 dias
 - Navegue no calendário com TAB e setas
 
-📞 Dúvidas? Envie um e-mail para adri0mt@uni9.edu.br`);
+📞 Dúvidas? adri0mt@uni9.edu.br`);
 }
 
 // =====================================================
@@ -730,6 +823,7 @@ function exportarDados() {
     try {
         const dados = {
             versao: "1.0.0",
+            escalasVersao: ESCALAS_VERSAO,
             dataExportacao: new Date().toISOString(),
             temaEscuro,
             escalas: equipes,
@@ -855,6 +949,7 @@ function resetarTudo() {
         
         equipes = JSON.parse(JSON.stringify(escalasPadrao));
         salvarEscalasStorage(equipes);
+        localStorage.setItem('escalas_versao', String(ESCALAS_VERSAO));
         horasExtras = [];
         salvarExtrasStorage(horasExtras);
         pessoas = [];
@@ -865,6 +960,7 @@ function resetarTudo() {
         temaEscuro = false;
         aplicarTema();
         
+        if (typeof recarregarPessoas === 'function') recarregarPessoas();
         renderizarBotoesEquipe();
         renderizarCalendario();
         renderizarLegendaFeriados();
@@ -887,7 +983,7 @@ function abrirBug() {
 }
 
 // =====================================================
-// DETALHES DO DIA
+// 🔥 DETALHES DO DIA (CORRIGIDO — mostra alerta)
 // =====================================================
 
 function abrirDetalhesDia(dataStr) {
@@ -904,13 +1000,31 @@ function abrirDetalhesDia(dataStr) {
     const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
     const nomeDia = diasSemana[data.getDay()];
 
-    // Status trabalho/folga
+    // 🔥 Status usando getStatusInfo (trata status 2 corretamente)
     const status = obterStatusDia(equipeSelecionada, data);
-    const statusTexto = status === 1 ? 'Trabalho' : 'Folga';
-    const statusIcone = status === 1 ? 'icon-work' : 'icon-beach';
-    const statusCor = status === 1 ? '#3B82F6' : '#10B981';
+    const info = getStatusInfo(status);
 
-    // 🔥 FERIADOS MÓVEIS + FIXOS (via getFeriado)
+    // 🔥 Card de alerta vermelho (só quando status === 2)
+    const alertaHtml = info.isAlerta ? `
+        <div class="detalhe-item" style="
+            border-left-color: #EF4444;
+            background: #FEE2E2;
+            border-radius: 8px;
+            padding: 12px 14px;
+        ">
+            <span class="detalhe-icone" style="font-size: 1.4rem;">⚠️</span>
+            <div>
+                <div class="detalhe-label" style="color:#991B1B; font-weight:700; font-size:0.75rem; text-transform:uppercase;">
+                    Alerta do Dia
+                </div>
+                <div class="detalhe-valor" style="color:#7F1D1D; font-weight:700; font-size:1rem;">
+                    Antecipar saída em 1 hora (Ambipar)
+                </div>
+            </div>
+        </div>
+    ` : '';
+
+    // Feriado (móvel ou fixo)
     const dataComemorativa = getFeriado(dia, mes, ano);
 
     let feriadoHtml = '';
@@ -938,9 +1052,7 @@ function abrirDetalhesDia(dataStr) {
         `;
     }
 
-    // =====================================================
-    // 🔥 HORAS EXTRAS - FILTRADAS PELO PERÍODO ATUAL
-    // =====================================================
+    // Extras do período
     const periodoAtual = getPeriodoPorIndex(periodoIndex);
     const extras = getExtrasPorData(dataStr).filter(extra => {
         const d = new Date(extra.data + 'T00:00:00');
@@ -949,9 +1061,7 @@ function abrirDetalhesDia(dataStr) {
 
     let extrasHtml = '';
     if (extras.length) {
-        const totalMinutos = extras.reduce(
-            (acc, item) => acc + Math.round(item.horas * 60), 0
-        );
+        const totalMinutos = extras.reduce((acc, item) => acc + Math.round(item.horas * 60), 0);
         const h = Math.floor(totalMinutos / 60);
         const m = totalMinutos % 60;
 
@@ -990,15 +1100,15 @@ function abrirDetalhesDia(dataStr) {
 
     conteudo.innerHTML = `
         <div style="display:flex;flex-direction:column;gap:12px;">
-            <div class="detalhe-item" style="border-left-color:${statusCor};">
+            <div class="detalhe-item" style="border-left-color:${info.cor};">
                 <span class="detalhe-icone">
-                    <svg class="icon" width="24" height="24" style="color:${statusCor};">
-                        <use href="assets/icons/sprite.svg#${statusIcone}"></use>
+                    <svg class="icon" width="24" height="24" style="color:${info.cor};">
+                        <use href="assets/icons/sprite.svg#${info.icone}"></use>
                     </svg>
                 </span>
                 <div>
                     <div class="detalhe-label">Status</div>
-                    <div class="detalhe-valor" style="color:${statusCor};font-weight:700;">${statusTexto}</div>
+                    <div class="detalhe-valor" style="color:${info.cor};font-weight:700;">${info.texto}</div>
                 </div>
             </div>
             <div class="detalhe-item" style="border-left-color:#3B82F6;">
@@ -1008,9 +1118,10 @@ function abrirDetalhesDia(dataStr) {
                     <div class="detalhe-valor">${equipeNome}</div>
                 </div>
             </div>
+            ${alertaHtml}
             ${feriadoHtml}
             ${extrasHtml}
-            ${!feriadoHtml && !extrasHtml ? `
+            ${!alertaHtml && !feriadoHtml && !extrasHtml ? `
                 <div style="text-align:center;padding:20px 0;color:var(--color-text-muted);">
                     <svg class="icon" width="32" height="32" style="opacity:0.3;">
                         <use href="assets/icons/sprite.svg#icon-info"></use>
@@ -1049,7 +1160,22 @@ Object.assign(window, {
     renderizarCalendario
 });
 
+// 🔥 Debug global
+window.__debug = {
+    get equipeSelecionada() { return equipeSelecionada; },
+    get pessoas() { return pessoas; },
+    get horasExtras() { return horasExtras; },
+    get periodoIndex() { return periodoIndex; },
+    getCicloCompleto: (equipe) => getCicloCompleto(equipe || equipeSelecionada),
+    obterStatusDia: (data) => obterStatusDia(equipeSelecionada, data),
+    getStatusInfo,
+    getFeriados,
+    renderizarCalendario,
+    getExtrasDoPeriodoAtual
+};
+
 console.log('✅ Funções exportadas para o window!');
+console.log('🐛 Debug: window.__debug');
 
 // =====================================================
 // ATALHOS DE TECLADO
@@ -1072,7 +1198,7 @@ document.addEventListener('keydown', function(e) {
 
 function init() {
     console.log('🚀 Inicializando Explorer...');
-    console.log('👥 Pessoas carregadas:', pessoas.length);
+    console.log('📋 Escalas versão:', ESCALAS_VERSAO);
     console.log('📋 Equipe selecionada:', equipeSelecionada?.id);
 
     initTema();
@@ -1088,18 +1214,17 @@ function init() {
     atualizarContadores();
     atualizarPeriodoInfo();
 
+    // 🔥 Usa setTimeout (mais compatível que requestIdleCallback)
+    const lazyInit = () => {
+        carregarConfigPeriodoUI();
+        renderizarLegendaFeriados();
+        renderizarListaExtras();
+    };
+
     if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-            carregarConfigPeriodoUI();
-            renderizarLegendaFeriados();
-            renderizarListaExtras();
-        }, { timeout: 2000 });
+        requestIdleCallback(lazyInit, { timeout: 2000 });
     } else {
-        setTimeout(() => {
-            carregarConfigPeriodoUI();
-            renderizarLegendaFeriados();
-            renderizarListaExtras();
-        }, 100);
+        setTimeout(lazyInit, 100);
     }
 
     document.getElementById('modalExtra')?.addEventListener('click', function(e) {
@@ -1109,12 +1234,19 @@ function init() {
         if (e.target === this) fecharModalPessoa();
     });
 
+    // 🔥 Service Worker compatível com Safari
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
-        requestIdleCallback(() => {
+        const registrarSW = () => {
             navigator.serviceWorker.register('sw.js')
                 .then(() => console.log('✅ Service Worker registrado!'))
                 .catch(error => console.log('⚠️ Falha no Service Worker:', error));
-        });
+        };
+
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(registrarSW, { timeout: 3000 });
+        } else {
+            setTimeout(registrarSW, 1000);
+        }
     }
 
     console.log('✅ Calendário inicializado!');
