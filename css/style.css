@@ -72,6 +72,15 @@
     --cal-border-spacing: 4px;
     --cal-quad-row-gap: 2px;
     --cal-quad-column-gap: 2px;
+
+      
+    /* 🔥 Destaque do dia atual */
+    --cal-hoje-border-width: 4px;
+    --cal-hoje-ring-width: 2px;
+    --cal-hoje-aura-width: 2px;
+    --cal-hoje-aura-color: rgba(37, 99, 235, 0.15);
+    --cal-hoje-ring-color: var(--color-primary);
+
 }
 
 /* 🔥 RESET */
@@ -447,15 +456,15 @@ body {
 #calendarioContainer .status-trabalho {
     background: var(--cal-status-trabalho-bg);
     color: var(--a11y-white);
-    border: 1px solid var(--cal-status-trabalho-border);
-    box-shadow: 0 1px 4px rgba(30, 58, 95, 0.3);
+    /*border: 1px solid var(--cal-status-trabalho-border);*/
+    /*box-shadow: 0 1px 4px rgba(30, 58, 95, 0.3);*/
 }
 
 #calendarioContainer .status-folga {
     background: var(--cal-status-folga-bg);
     color: var(--a11y-white);
-    border: 1px solid var(--cal-status-folga-border);
-    box-shadow: 0 1px 4px rgba(219, 39, 119, 0.3);
+    /*border: 1px solid var(--cal-status-folga-border);*/
+    /*box-shadow: 0 1px 4px rgba(219, 39, 119, 0.3);*/
 }
 
 #calendarioContainer .dia-btn:hover .status-trabalho {
@@ -487,15 +496,42 @@ body {
 
 /* ===== ESTADOS ESPECIAIS ===== */
 
-/* Hoje */
+/* ============================================================
+   🔥 HOJE - Borda azul destacada com aura
+   ============================================================ */
+
 #calendarioContainer .dia-btn.hoje {
-    border: 2px solid var(--color-primary);
+    border: 3px solid var(--color-primary);
     background: var(--cal-hoje-bg);
+    box-shadow: 
+        0 0 0 2px var(--surface),                      /* separador branco */
+        0 0 0 4px var(--color-primary),                /* anel azul sólido */
+        0 0 0 6px rgba(37, 99, 235, 0.15);            /* aura azul translúcida */
+    z-index: 3;
 }
 
 #calendarioContainer .dia-btn.hoje .dia-sup-esq {
     color: var(--color-primary);
     font-weight: 800;
+}
+
+/* Hover no dia atual */
+#calendarioContainer .dia-btn.hoje:hover {
+    box-shadow: 
+        0 0 0 2px var(--surface),
+        0 0 0 4px var(--color-primary-hover),
+        0 0 0 7px rgba(37, 99, 235, 0.25);
+    transform: scale(1.04);
+}
+
+/* Foco no dia atual (teclado) */
+#calendarioContainer .dia-btn.hoje:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    box-shadow: 
+        0 0 0 2px var(--surface),
+        0 0 0 4px var(--color-primary),
+        0 0 0 8px rgba(37, 99, 235, 0.3);
 }
 
 /* Com extra */

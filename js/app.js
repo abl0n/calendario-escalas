@@ -277,7 +277,7 @@ function renderizarCalendario() {
         const totalExtraDia = extras.reduce((acc, item) => acc + item.horas, 0);
 
         const classePeriodo = noPeriodo ? '' : 'dia-outro-periodo';
-        const classeHoje = isHoje ? 'dia-hoje' : '';
+        const classeHoje = isHoje ? 'hoje' : ''; //const classeHoje = isHoje ? 'dia-hoje' : '';
         const classeExtra = temExtra ? 'dia-com-extra' : '';
         const classeAlerta = info.isAlerta ? 'dia-alerta-saida' : '';   // 🔥
 
