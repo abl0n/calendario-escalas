@@ -1383,11 +1383,6 @@ body.modo-escuro #calendarioContainer .dia-btn.feriado .dia-sup-esq {
     color: #EF4444;
 }
 
-body.modo-escuro #calendarioContainer .dia-btn.dia-feriado-trabalhado {
-    background: rgba(239, 68, 68, 0.12);
-    border-color: #F59E0B;
-}
-
 body.modo-escuro #calendarioContainer .dia-btn.com-extra {
     border-color: #F59E0B;
     background: rgba(245, 158, 11, 0.08);
@@ -1412,7 +1407,7 @@ body.modo-escuro #calendarioContainer .status-folga {
 
 /* FUNDO AMARELO NO EMOJI - TEMA ESCURO */
 body.modo-escuro #calendarioContainer .dia-inf-esq.feriado-trabalhado {
-    background: #78350F;
+    background: #FDE68A;
     color: #FCD34D;
 }
 
@@ -1790,56 +1785,45 @@ body.modo-escuro .toast {
 }
 
 /* ============================================================
-   🔥 DIA COM ALERTA - Fundo vermelho claro (T com aspas)
+   🔥 DIA COM ALERTA - Número em chip vermelho (uniforme com badge)
    ============================================================ */
 
-#calendarioContainer .dia-btn.dia-alerta-saida {
-    background: #FEE2E2;              /* vermelho claro */
-    border: 2px solid #EF4444;        /* borda vermelha */
-    box-shadow: inset 0 0 0 1px #FCA5A5;
-}
-
-#calendarioContainer .dia-btn.dia-alerta-saida:hover {
-    background: #FECACA;              /* vermelho um pouco mais forte */
-    border-color: #DC2626;
-    box-shadow: inset 0 0 0 1px #EF4444, 0 2px 8px rgba(239, 68, 68, 0.35);
-}
-
-/* Número do dia em vermelho escuro para contraste */
 #calendarioContainer .dia-btn.dia-alerta-saida .dia-sup-esq {
-    color: #991B1B;
-    font-weight: 800;
+    background: #DC2626;
+    color: #FFFFFF;
+    /*font-weight: 800;/*
+    font-size: 0.7rem;                  /* mesma escala do badge */
+    padding: 2px 5px;
+    border-radius: 3px;                 /* mesmo radius do badge */
+    line-height: 1;
+    min-width: 16px;                    /* mesmo min-width do badge */
+    /*max-width: fit-content;*/
+    /*height: auto;                       /* NÃO esticar */
+    /*width: auto;                        /* NÃO esticar */
+    display: inline-flex;               /* permite encolher */
+    align-items: center;
+    justify-content: center;
+    justify-self: center;               /* centraliza no grid-area */
+    align-self: center;                 /* centraliza vertical */
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.35);
+    transition: all 0.2s ease;
 }
 
-/* Badge T fica vermelha no dia de alerta */
-#calendarioContainer .dia-btn.dia-alerta-saida .status-trabalho {
-    background: #EF4444;
-    border-color: #DC2626;
-    color: #FFFFFF;
+#calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-esq {
+    background: #B91C1C;
+    box-shadow: 0 2px 5px rgba(220, 38, 38, 0.5);
 }
 
 /* ===== TEMA ESCURO ===== */
-body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida {
-    background: #7F1D1D;              /* vermelho escuro */
-    border-color: #EF4444;
-    box-shadow: inset 0 0 0 1px #991B1B;
-}
-
-body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover {
-    background: #991B1B;
-    border-color: #FCA5A5;
-}
-
 body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida .dia-sup-esq {
-    color: #FECACA;
-}
-
-body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida .status-trabalho {
-    background: #EF4444;
-    border-color: #FCA5A5;
+    background: #DC2626;
     color: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.5);
 }
 
+body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-esq {
+    background: #B91C1C;
+}
 /* ============================================================
    💙 CRÉDITOS DO DESENVOLVEDOR - COM ÍCONES DINÂMICOS
    ============================================================ */
