@@ -344,6 +344,7 @@ body {
         "inf-esq  inf-dir";
     align-items: center;
     justify-items: center;
+    gap: 1px 2px;
     width: 100%;
     height: 100%;
     min-height: 56px;
@@ -402,6 +403,7 @@ body {
     line-height: 1;
     text-align: center;
     min-width: 18px;
+    box-shadow: #0D0D0D;
 }
 
 /* 3. Emoji/Ícone */
@@ -437,14 +439,7 @@ body {
     line-height: 1;
 }
 
-#calendarioContainer .dia-inf-dir.tem-mensagem::after {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background-color: var(--cal-indicator);
-    border-radius: 50%;
-    display: block;
-}
+
 
 /* ===== STATUS TRABALHO/FOLGA ===== */
 #calendarioContainer .status-trabalho {
@@ -535,6 +530,7 @@ body {
 
 #calendarioContainer .dia-btn:hover .dia-inf-esq.feriado-trabalhado {
     background: #FDE68A;
+    border: #F59E0B;
 }
 
 /* ============================================================
