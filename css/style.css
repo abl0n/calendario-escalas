@@ -1,6 +1,6 @@
 /* ============================================================
    CALENDÁRIO DE ESCALAS - STYLE.CSS
-   Versão otimizada e limpa - Sem redundâncias
+   Versão 4.0 - Otimizada (layout preservado)
    ============================================================ */
 
 /* ============================================================
@@ -8,7 +8,7 @@
    ============================================================ */
 
 :root {
-    /* 🔥 CORES PRINCIPAIS */
+    /* ----- CORES PRINCIPAIS ----- */
     --color-primary: #2563EB;
     --color-primary-hover: #1D4ED8;
     --color-primary-light: #60A5FA;
@@ -21,7 +21,7 @@
     --color-warning-hover: #D97706;
     --color-purple: #8B5CF6;
 
-    /* 🔥 ACESSIBILIDADE */
+    /* ----- ACESSIBILIDADE ----- */
     --a11y-text: #1a1a1a;
     --a11y-text-secondary: #2d2d2d;
     --a11y-text-muted: #4a4a4a;
@@ -30,7 +30,7 @@
     --a11y-outline: 3px solid #0066cc;
     --a11y-white: #ffffff;
 
-    /* 🔥 SUPERFÍCIES */
+    /* ----- SUPERFÍCIES ----- */
     --surface: #FFFFFF;
     --surface-alt: #F1F5F9;
     --text: #1E293B;
@@ -38,12 +38,12 @@
     --border: #E2E8F0;
     --bg: #F8FAFC;
 
-    /* 🔥 SOMBRAS */
+    /* ----- SOMBRAS ----- */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
     --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.12);
 
-    /* 🔥 BORDAS & ESPAÇOS */
+    /* ----- BORDAS & ESPAÇOS ----- */
     --radius-sm: 6px;
     --radius-md: 8px;
     --radius-lg: 12px;
@@ -56,7 +56,7 @@
     --space-5: 20px;
     --space-6: 24px;
 
-    /* 🔥 CALENDÁRIO */
+    /* ----- CALENDÁRIO ----- */
     --cal-status-trabalho-bg: #1E3A5F;
     --cal-status-trabalho-hover: #15294A;
     --cal-status-trabalho-border: #15294A;
@@ -70,20 +70,18 @@
     --cal-cell-height: 68px;
     --cal-cell-padding: 3px;
     --cal-border-spacing: 4px;
-    --cal-quad-row-gap: 2px;
-    --cal-quad-column-gap: 2px;
+    --cal-quad-row-gap: 1.5px;
+    --cal-quad-column-gap: 1.5px;
 
-      
-    /* 🔥 Destaque do dia atual */
+    /* ----- Destaque do dia atual ----- */
     --cal-hoje-border-width: 4px;
     --cal-hoje-ring-width: 2px;
     --cal-hoje-aura-width: 2px;
     --cal-hoje-aura-color: rgba(37, 99, 235, 0.15);
     --cal-hoje-ring-color: var(--color-primary);
-
 }
 
-/* 🔥 RESET */
+/* ----- RESET ----- */
 *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -297,7 +295,7 @@ body {
     margin: 0;
 }
 
-/* ===== CABEÇALHO ===== */
+/* ----- CABEÇALHO ----- */
 #calendarioContainer th {
     width: 14.28%;
     padding: 12px 4px;
@@ -326,7 +324,7 @@ body {
     background: var(--color-danger-hover);
 }
 
-/* ===== CÉLULA ===== */
+/* ----- CÉLULA ----- */
 #calendarioContainer .dia-td {
     height: var(--cal-cell-height);
     padding: 0;
@@ -345,7 +343,7 @@ body {
     background: var(--surface-alt);
 }
 
-/* ===== BOTÃO DO DIA (GRID 2x2) ===== */
+/* ----- BOTÃO DO DIA (GRID 2x2) ----- */
 #calendarioContainer .dia-btn {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -375,9 +373,7 @@ body {
     overflow: hidden;
 }
 
-/* ===== POSICIONAMENTO DOS 4 ELEMENTOS ===== */
-
-/* 1. Número do dia */
+/* ----- QUADRANTE 1: NÚMERO DO DIA ----- */
 #calendarioContainer .dia-sup-esq {
     grid-area: sup-esq;
     display: flex;
@@ -395,7 +391,7 @@ body {
     line-height: 1;
 }
 
-/* 2. Status T/F */
+/* ----- QUADRANTE 2: BADGE T/F ----- */
 #calendarioContainer .dia-sup-dir {
     grid-area: sup-dir;
     display: flex;
@@ -414,10 +410,10 @@ body {
     line-height: 1;
     text-align: center;
     min-width: 18px;
-    box-shadow: #0D0D0D;
+    /* box-shadow inválido removido (era "#0D0D0D") */
 }
 
-/* 3. Emoji/Ícone */
+/* ----- QUADRANTE 3: EMOJI/ÍCONE ----- */
 #calendarioContainer .dia-inf-esq {
     grid-area: inf-esq;
     display: flex;
@@ -433,7 +429,7 @@ body {
     line-height: 1;
 }
 
-/* 4. Indicador */
+/* ----- QUADRANTE 4: INDICADOR ----- */
 #calendarioContainer .dia-inf-dir {
     grid-area: inf-dir;
     display: flex;
@@ -452,19 +448,15 @@ body {
 
 
 
-/* ===== STATUS TRABALHO/FOLGA ===== */
+/* ----- STATUS TRABALHO/FOLGA ----- */
 #calendarioContainer .status-trabalho {
     background: var(--cal-status-trabalho-bg);
     color: var(--a11y-white);
-    /*border: 1px solid var(--cal-status-trabalho-border);*/
-    /*box-shadow: 0 1px 4px rgba(30, 58, 95, 0.3);*/
 }
 
 #calendarioContainer .status-folga {
     background: var(--cal-status-folga-bg);
     color: var(--a11y-white);
-    /*border: 1px solid var(--cal-status-folga-border);*/
-    /*box-shadow: 0 1px 4px rgba(219, 39, 119, 0.3);*/
 }
 
 #calendarioContainer .dia-btn:hover .status-trabalho {
@@ -477,7 +469,7 @@ body {
     transform: scale(1.05);
 }
 
-/* ===== HOVER E FOCO ===== */
+/* ----- HOVER E FOCO ----- */
 #calendarioContainer .dia-btn:hover {
     background: var(--surface-alt);
     border-color: var(--color-primary);
@@ -494,53 +486,78 @@ body {
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
 }
 
-/* ===== ESTADOS ESPECIAIS ===== */
+/* ============================================================
+   🔥 DIA COM ALERTA - Número em chip vermelho
+   ============================================================ */
+
+#calendarioContainer .dia-btn.dia-alerta-saida .dia-sup-esq {
+    background: #FEE2E2;                          /* 🌸 rosa claro */
+    color: #B91C1C;                               /* 🔴 texto vermelho escuro */
+    font-size: 0.7rem;
+    font-weight: 800;                             /* ← adicionado para destacar o número */
+    padding: 2px 5px;
+    border-radius: 3px;
+    line-height: 1;
+    min-width: 16px;
+    border: 1.5px solid #DC2626;                  /* 🔴 borda vermelha */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+    align-self: center;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.2);
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-esq {
+    background: #FECACA;                          /* 🌸 rosa um pouco mais forte no hover */
+    border-color: #B91C1C;                        /* 🔴 borda mais escura */
+    box-shadow: 0 2px 5px rgba(220, 38, 38, 0.35);
+}
 
 /* ============================================================
    🔥 HOJE - Borda azul destacada com aura
    ============================================================ */
 
 #calendarioContainer .dia-btn.hoje {
-    border: 3px solid var(--color-primary);
-    background: var(--cal-hoje-bg);
-    box-shadow: 
-        0 0 0 2px var(--surface),                      /* separador branco */
-        0 0 0 4px var(--color-primary),                /* anel azul sólido */
-        0 0 0 6px rgba(37, 99, 235, 0.15);            /* aura azul translúcida */
+    border: 2px solid var(--color-primary);
+    background: var(--cal-hoje-bg, rgba(37, 99, 235, 0.08));
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 0 0 2px var(--surface),
+        0 0 0 4px var(--color-primary),
+        0 0 12px 2px rgba(37, 99, 235, 0.25);
     z-index: 3;
 }
 
 #calendarioContainer .dia-btn.hoje .dia-sup-esq {
-    color: var(--color-primary);
     font-weight: 800;
 }
 
-/* Hover no dia atual */
 #calendarioContainer .dia-btn.hoje:hover {
-    box-shadow: 
+    border-color: var(--color-primary-hover, var(--color-primary));
+    box-shadow:
         0 0 0 2px var(--surface),
-        0 0 0 4px var(--color-primary-hover),
-        0 0 0 7px rgba(37, 99, 235, 0.25);
+        0 0 0 4px var(--color-primary-hover, var(--color-primary)),
+        0 0 16px 4px rgba(37, 99, 235, 0.35);
     transform: scale(1.04);
 }
 
-/* Foco no dia atual (teclado) */
 #calendarioContainer .dia-btn.hoje:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 4px;
-    box-shadow: 
+    outline: none;
+    box-shadow:
         0 0 0 2px var(--surface),
         0 0 0 4px var(--color-primary),
-        0 0 0 8px rgba(37, 99, 235, 0.3);
+        0 0 0 8px rgba(37, 99, 235, 0.4);
 }
 
-/* Com extra */
+/* ----- COM EXTRA ----- */
 #calendarioContainer .dia-btn.com-extra {
     border: 2px solid var(--color-warning);
     background: var(--cal-extra-bg);
 }
 
-/* Feriado */
+/* ----- FERIADO ----- */
 #calendarioContainer .dia-btn.feriado {
     background: var(--cal-feriado-bg);
 }
@@ -549,32 +566,27 @@ body {
     color: var(--color-danger);
 }
 
-/* Folga */
-#calendarioContainer .dia-btn.folga {
-    opacity: 0.6;
-}
-
-/* ============================================================
-   FUNDO AMARELO NO QUADRANTE DO EMOJI
-   (Feriado Trabalhado)
-   ============================================================ */
-
+/* ----- FERIADO TRABALHADO (fundo amarelo no emoji + borda) ----- */
 #calendarioContainer .dia-inf-esq.feriado-trabalhado {
-    background: #FEF3C7;
+    background: #FEF3C7;                          /* 🟡 fundo amarelo claro */
+    border: 1.5px solid #F59E0B;                  /* 🟠 borda amarela/âmbar */
     border-radius: 3px;
-    color: #92400E;
+    color: #92400E;                                /* texto marrom */
     font-weight: 700;
+    padding: 1px 4px;                             /* 🔥 respiro interno */
+    display: inline-flex;                          /* garante alinhamento */
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
+/* Hover — borda mais escura */
 #calendarioContainer .dia-btn:hover .dia-inf-esq.feriado-trabalhado {
-    background: #FDE68A;
-    border: #F59E0B;
+    background: #FDE68A;                          /* amarelo um pouco mais forte */
+    border-color: #D97706;                         /* borda laranja escura */
 }
 
-/* ============================================================
-   FORA DO PERÍODO
-   ============================================================ */
-
+/* ----- FORA DO PERÍODO ----- */
 #calendarioContainer .dia-outro-periodo {
     opacity: 0.4;
     pointer-events: none;
@@ -696,44 +708,21 @@ body {
     white-space: nowrap;
 }
 
-/* Cores dos contadores */
-.contador-item.total {
-    background: var(--surface);
-    color: var(--a11y-text);
-    border-color: var(--border);
-}
+/* ----- Cores por turno ----- */
+.contador-item.total { background: var(--surface); color: var(--a11y-text); border-color: var(--border); }
+.contador-item.manha { background: var(--surface); color: #78350F; border-color: var(--color-warning); }
+.contador-item.tarde { background: var(--surface); color: #7C2D12; border-color: #EA580C; }
+.contador-item.noite { background: var(--surface); color: #1E3A8A; border-color: #4F46E5; }
 
-.contador-item.manha {
-    background: var(--surface);
-    color: #78350F;
-    border-color: var(--color-warning);
-}
-
-.contador-item.tarde {
-    background: var(--surface);
-    color: #7C2D12;
-    border-color: #EA580C;
-}
-
-.contador-item.noite {
-    background: var(--surface);
-    color: #1E3A8A;
-    border-color: #4F46E5;
-}
-
-/* Bordas por escala */
+/* ----- Bordas por escala ----- */
 .contador-item.escala-1 { border-color: #2563EB !important; }
 .contador-item.escala-1:hover { border-color: #1D4ED8 !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important; }
-
 .contador-item.escala-2 { border-color: #DC2626 !important; }
 .contador-item.escala-2:hover { border-color: #B91C1C !important; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important; }
-
 .contador-item.escala-3 { border-color: #8B5CF6 !important; }
 .contador-item.escala-3:hover { border-color: #6D28D9 !important; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important; }
-
 .contador-item.escala-4 { border-color: #F59E0B !important; }
 .contador-item.escala-4:hover { border-color: #D97706 !important; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3) !important; }
-
 .contador-item.escala-5 { border-color: #10B981 !important; }
 .contador-item.escala-5:hover { border-color: #059669 !important; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important; }
 
@@ -1359,11 +1348,7 @@ body.modo-escuro .modal-content {
     border-color: var(--border);
 }
 
-/* CALENDÁRIO - TEMA ESCURO */
-body.modo-escuro .calendario {
-    background: #0a0a0a;
-    border-color: #2a2a2a;
-}
+body.modo-escuro .calendario { background: #0a0a0a; border-color: #2a2a2a; }
 
 body.modo-escuro #calendarioContainer th {
     background: #1a1a1a;
@@ -1387,35 +1372,23 @@ body.modo-escuro #calendarioContainer .dia-td:hover {
     border-color: #3B82F6;
 }
 
-body.modo-escuro #calendarioContainer .dia-btn {
-    border: 2px solid #2a2a2a;
-}
-
-body.modo-escuro #calendarioContainer .dia-btn:hover {
-    border-color: #3B82F6;
-}
-
-body.modo-escuro #calendarioContainer table {
-    border-spacing: 6px;
-}
+body.modo-escuro #calendarioContainer .dia-btn { border: 2px solid #2a2a2a; }
+body.modo-escuro #calendarioContainer .dia-btn:hover { border-color: #3B82F6; }
+body.modo-escuro #calendarioContainer table { border-spacing: 6px; }
 
 body.modo-escuro #calendarioContainer .dia-btn.hoje {
     border-color: #3B82F6;
     background: rgba(59, 130, 246, 0.15);
 }
 
-body.modo-escuro #calendarioContainer .dia-btn.hoje .dia-sup-esq {
-    color: #3B82F6;
-}
+body.modo-escuro #calendarioContainer .dia-btn.hoje .dia-sup-esq { color: #3B82F6; }
 
 body.modo-escuro #calendarioContainer .dia-btn.feriado {
     background: rgba(239, 68, 68, 0.12);
     border-color: #3a2a2a;
 }
 
-body.modo-escuro #calendarioContainer .dia-btn.feriado .dia-sup-esq {
-    color: #EF4444;
-}
+body.modo-escuro #calendarioContainer .dia-btn.feriado .dia-sup-esq { color: #EF4444; }
 
 body.modo-escuro #calendarioContainer .dia-btn.com-extra {
     border-color: #F59E0B;
@@ -1427,21 +1400,14 @@ body.modo-escuro #calendarioContainer .dia-outro-periodo .dia-td {
     opacity: 0.4;
 }
 
-body.modo-escuro #calendarioContainer .dia-outro-periodo .dia-sup-esq {
-    color: #555555;
-}
+body.modo-escuro #calendarioContainer .dia-outro-periodo .dia-sup-esq { color: #555555; }
 
-body.modo-escuro #calendarioContainer .status-trabalho {
-    background: #2A4A7F !important;
-}
+body.modo-escuro #calendarioContainer .status-trabalho { background: #2A4A7F !important; }
+body.modo-escuro #calendarioContainer .status-folga { background: #EC4899 !important; }
 
-body.modo-escuro #calendarioContainer .status-folga {
-    background: #EC4899 !important;
-}
-
-/* FUNDO AMARELO NO EMOJI - TEMA ESCURO */
+/* ----- Feriado trabalhado no tema escuro (corrigido contraste) ----- */
 body.modo-escuro #calendarioContainer .dia-inf-esq.feriado-trabalhado {
-    background: #FDE68A;
+    background: #78350F;      /* 🔥 era #FDE68A (contraste ruim) */
     color: #FCD34D;
 }
 
@@ -1449,129 +1415,63 @@ body.modo-escuro #calendarioContainer .dia-btn:hover .dia-inf-esq.feriado-trabal
     background: #92400E;
 }
 
-/* CONTADORES - TEMA ESCURO */
-body.modo-escuro .contador-item {
-    background: var(--surface);
-    border-color: var(--border);
-    color: var(--a11y-text);
+/* ----- Alerta no tema escuro ----- */
+body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida .dia-sup-esq {
+    background: #7F1D1D;                          /* vermelho escuro */
+    color: #FECACA;                               /* rosa claro (texto) */
+    border: 1.5px solid #EF4444;                  /* borda vermelha viva */
+    box-shadow: 0 1px 3px rgba(239, 68, 68, 0.4);
 }
 
-body.modo-escuro .contador-item.total {
-    background: #1A1A1A;
-    border-color: #2A2A2A;
+body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-esq {
+    background: #991B1B;                          /* vermelho escuro mais claro */
+    border-color: #FCA5A5;                        /* borda rosa clara */
 }
 
-body.modo-escuro .contador-item.manha {
-    background: #1A1A1A;
-    border-color: #F59E0B;
-    color: #FDE68A;
-}
-
-body.modo-escuro .contador-item.tarde {
-    background: #1A1A1A;
-    border-color: #EA580C;
-    color: #FDBA74;
-}
-
-body.modo-escuro .contador-item.noite {
-    background: #1A1A1A;
-    border-color: #3B82F6;
-    color: #93C5FD;
-}
-
+/* ----- Contadores - tema escuro ----- */
+body.modo-escuro .contador-item { background: var(--surface); border-color: var(--border); color: var(--a11y-text); }
+body.modo-escuro .contador-item.total { background: #1A1A1A; border-color: #2A2A2A; }
+body.modo-escuro .contador-item.manha { background: #1A1A1A; border-color: #F59E0B; color: #FDE68A; }
+body.modo-escuro .contador-item.tarde { background: #1A1A1A; border-color: #EA580C; color: #FDBA74; }
+body.modo-escuro .contador-item.noite { background: #1A1A1A; border-color: #3B82F6; color: #93C5FD; }
 body.modo-escuro .contador-item .contador-numero { color: var(--a11y-text); }
 body.modo-escuro .contador-item .contador-label { color: var(--a11y-text-secondary); }
 
-/* RODAPÉ - TEMA ESCURO */
-body.modo-escuro .footer-actions {
-    background: #0D0D0D !important;
-    border-top-color: #2A2A2A !important;
-}
+/* ----- Rodapé - tema escuro ----- */
+body.modo-escuro .footer-actions { background: #0D0D0D !important; border-top-color: #2A2A2A !important; }
+body.modo-escuro .footer-btn { background: #1A1A1A !important; border-color: #2A2A2A !important; color: var(--a11y-text) !important; }
+body.modo-escuro .footer-btn:hover { background: var(--color-primary) !important; border-color: var(--color-primary) !important; color: var(--a11y-white) !important; }
+body.modo-escuro .footer-btn-primary { background: var(--color-primary) !important; border-color: var(--color-primary) !important; }
 
-body.modo-escuro .footer-btn {
-    background: #1A1A1A !important;
-    border-color: #2A2A2A !important;
-    color: var(--a11y-text) !important;
-}
-
-body.modo-escuro .footer-btn:hover {
-    background: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-    color: var(--a11y-white) !important;
-}
-
-body.modo-escuro .footer-btn-primary {
-    background: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-}
-
-/* MENU - TEMA ESCURO */
-body.modo-escuro .menu-lateral {
-    background: var(--surface);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
-}
-
-body.modo-escuro .menu-header {
-    background: var(--surface);
-    border-bottom-color: var(--border);
-}
-
+/* ----- Menu - tema escuro ----- */
+body.modo-escuro .menu-lateral { background: var(--surface); box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5); }
+body.modo-escuro .menu-header { background: var(--surface); border-bottom-color: var(--border); }
 body.modo-escuro .menu-item { color: var(--a11y-text); }
 body.modo-escuro .menu-item:hover { background: var(--surface-alt); }
 body.modo-escuro .menu-item .icone { color: var(--text-muted); }
 body.modo-escuro .menu-item:hover .icone { color: var(--color-primary-light); }
 body.modo-escuro .menu-item .descricao small { color: var(--a11y-text-secondary); }
-
 body.modo-escuro .menu-periodo-config { background: var(--surface-alt); }
 body.modo-escuro .periodo-label { color: var(--a11y-text); }
-body.modo-escuro .periodo-inputs .input-group .input {
-    background: var(--surface);
-    border-color: var(--border);
-    color: var(--a11y-text);
-}
-body.modo-escuro .periodo-exemplo {
-    background: var(--surface);
-    border-color: var(--border);
-    color: var(--a11y-text-secondary);
-}
+body.modo-escuro .periodo-inputs .input-group .input { background: var(--surface); border-color: var(--border); color: var(--a11y-text); }
+body.modo-escuro .periodo-exemplo { background: var(--surface); border-color: var(--border); color: var(--a11y-text-secondary); }
 body.modo-escuro .menu-divider { background: var(--border); }
-body.modo-escuro .menu-version {
-    border-top-color: var(--border);
-    color: var(--a11y-text-secondary);
-}
+body.modo-escuro .menu-version { border-top-color: var(--border); color: var(--a11y-text-secondary); }
 body.modo-escuro .menu-fechar:hover { background: var(--surface-alt); }
 body.modo-escuro .menu-item.toggle-tema .status-tema { background: var(--surface-alt); }
 
-/* INPUTS - TEMA ESCURO */
-body.modo-escuro .input {
-    background: var(--surface);
-    border-color: var(--border);
-    color: var(--a11y-text);
-}
-
+/* ----- Inputs - tema escuro ----- */
+body.modo-escuro .input { background: var(--surface); border-color: var(--border); color: var(--a11y-text); }
 body.modo-escuro .input::placeholder { color: var(--a11y-text-muted); }
 
-/* MODAL - TEMA ESCURO */
-body.modo-escuro .modal-content {
-    background: var(--surface);
-}
-
+/* ----- Modal - tema escuro ----- */
+body.modo-escuro .modal-content { background: var(--surface); }
 body.modo-escuro .modal-content h2,
-body.modo-escuro .modal-content h3 {
-    color: var(--a11y-text);
-}
-
+body.modo-escuro .modal-content h3 { color: var(--a11y-text); }
 body.modo-escuro .modal-content .sub { color: var(--a11y-text-secondary); }
 body.modo-escuro .popup-header { border-bottom-color: var(--border); }
-body.modo-escuro .popup-total {
-    background: var(--surface-alt);
-    color: var(--a11y-text-secondary);
-}
-
-body.modo-escuro .toast {
-    background: var(--surface);
-    color: var(--a11y-text);
-}
+body.modo-escuro .popup-total { background: var(--surface-alt); color: var(--a11y-text-secondary); }
+body.modo-escuro .toast { background: var(--surface); color: var(--a11y-text); }
 
 /* ============================================================
    14. ANIMAÇÕES
@@ -1599,9 +1499,7 @@ body.modo-escuro .toast {
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
@@ -1646,39 +1544,22 @@ body.modo-escuro .toast {
         --cal-border-spacing: 2px;
     }
 
-    #calendarioContainer th {
-        font-size: 0.55rem;
-        padding: 6px 2px;
-    }
-
-    #calendarioContainer .dia-btn {
-        min-height: 48px;
-        padding: 2px;
-    }
-
+    #calendarioContainer th { font-size: 0.55rem; padding: 6px 2px; }
+    #calendarioContainer .dia-btn { min-height: 48px; padding: 2px; }
     #calendarioContainer .dia-sup-esq { font-size: 0.85rem; }
     #calendarioContainer .dia-sup-dir { font-size: 0.5rem; padding: 1px 3px; min-width: 16px; }
     #calendarioContainer .dia-inf-esq { font-size: 0.75rem; }
     #calendarioContainer .dia-inf-dir { font-size: 0.45rem; }
 
     .contadores-container { gap: 6px; padding: 0 4px; }
-    .contador-item {
-        min-height: 48px;
-        padding: 4px 2px;
-        border-width: 2px;
-    }
+    .contador-item { min-height: 48px; padding: 4px 2px; border-width: 2px; }
     .contador-item .icon { width: 16px; height: 16px; }
     .contador-item .contador-numero { font-size: 1rem; }
     .contador-item .contador-label { font-size: 0.4rem; letter-spacing: 0.1px; }
 
     .footer-actions { padding: 4px 6px; }
     .footer-actions-inner { gap: 3px; max-width: 400px; }
-    .footer-btn {
-        padding: 4px 6px;
-        min-height: 36px;
-        min-width: 44px;
-        max-width: 70px;
-    }
+    .footer-btn { padding: 4px 6px; min-height: 36px; min-width: 44px; max-width: 70px; }
     .footer-btn .icon { width: 20px; height: 20px; }
     .footer-btn-label { font-size: 0.55rem; }
 }
@@ -1695,51 +1576,25 @@ body.modo-escuro .toast {
     }
 
     #calendarioContainer { min-height: 280px; }
-
-    #calendarioContainer th {
-        font-size: 0.45rem;
-        padding: 4px 1px;
-    }
-
-    #calendarioContainer .dia-btn {
-        min-height: 38px;
-        padding: 1px;
-        border-width: 1px;
-    }
-
+    #calendarioContainer th { font-size: 0.45rem; padding: 4px 1px; }
+    #calendarioContainer .dia-btn { min-height: 38px; padding: 1px; border-width: 1px; }
     #calendarioContainer .dia-sup-esq { font-size: 0.7rem; }
     #calendarioContainer .dia-sup-dir { font-size: 0.4rem; padding: 0 2px; min-width: 14px; }
     #calendarioContainer .dia-inf-esq { font-size: 0.65rem; }
     #calendarioContainer .dia-inf-dir { font-size: 0.4rem; }
-
     #calendarioContainer .dia-btn:hover { transform: none; }
 
     .modal-content { padding: var(--space-4); margin: var(--space-2); max-width: 95%; }
 
     .contadores-container { gap: 4px; padding: 0 2px; margin-top: 10px; margin-bottom: 10px; }
-    .contador-item {
-        min-height: 40px;
-        padding: 3px 1px;
-        border-radius: 4px;
-        border-width: 1.5px;
-    }
+    .contador-item { min-height: 40px; padding: 3px 1px; border-radius: 4px; border-width: 1.5px; }
     .contador-item .icon { width: 14px; height: 14px; }
     .contador-item .contador-numero { font-size: 0.85rem; line-height: 1; }
     .contador-item .contador-label { font-size: 0.35rem; letter-spacing: 0px; white-space: nowrap; }
 
-    .footer-actions {
-        padding: 4px 4px;
-        padding-bottom: max(4px, env(safe-area-inset-bottom));
-    }
+    .footer-actions { padding: 4px 4px; padding-bottom: max(4px, env(safe-area-inset-bottom)); }
     .footer-actions-inner { gap: 2px; max-width: 100%; padding: 0 2px; }
-    .footer-btn {
-        padding: 3px 4px;
-        min-height: 32px;
-        min-width: 36px;
-        max-width: 60px;
-        border-radius: var(--radius-sm);
-        gap: 1px;
-    }
+    .footer-btn { padding: 3px 4px; min-height: 32px; min-width: 36px; max-width: 60px; border-radius: var(--radius-sm); gap: 1px; }
     .footer-btn .icon { width: 18px; height: 18px; }
     .footer-btn-label { font-size: 0.45rem; letter-spacing: 0.1px; }
 
@@ -1765,11 +1620,7 @@ body.modo-escuro .toast {
         --cal-border-spacing: 1px;
     }
 
-    #calendarioContainer .dia-btn {
-        min-height: 34px;
-        padding: 0;
-    }
-
+    #calendarioContainer .dia-btn { min-height: 34px; padding: 0; }
     #calendarioContainer .dia-sup-esq { font-size: 0.65rem; }
     #calendarioContainer .dia-sup-dir { font-size: 0.35rem; padding: 0 2px; min-width: 12px; }
     #calendarioContainer .dia-inf-esq { font-size: 0.6rem; }
@@ -1777,11 +1628,7 @@ body.modo-escuro .toast {
     #calendarioContainer .dia-inf-dir.tem-mensagem::after { width: 4px; height: 4px; }
 
     .contadores-container { gap: 3px; padding: 0 1px; }
-    .contador-item {
-        min-height: 34px;
-        padding: 2px 1px;
-        border-width: 1px;
-    }
+    .contador-item { min-height: 34px; padding: 2px 1px; border-width: 1px; }
     .contador-item .icon { width: 12px; height: 12px; }
     .contador-item .contador-numero { font-size: 0.75rem; }
     .contador-item .contador-label { font-size: 0.3rem; letter-spacing: 0px; }
@@ -1793,12 +1640,7 @@ body.modo-escuro .toast {
 
 @media (max-width: 360px) {
     #calendarioContainer td { height: 38px; padding: 1px; }
-    #calendarioContainer .dia-btn {
-        min-height: 32px;
-        min-width: 26px;
-        font-size: 0.6rem;
-        padding: 1px;
-    }
+    #calendarioContainer .dia-btn { min-height: 32px; min-width: 26px; font-size: 0.6rem; padding: 1px; }
     #calendarioContainer .dia-sup-esq { font-size: 0.6rem; }
     #calendarioContainer .status-dia { display: none; }
 
@@ -1819,47 +1661,7 @@ body.modo-escuro .toast {
 }
 
 /* ============================================================
-   🔥 DIA COM ALERTA - Número em chip vermelho (uniforme com badge)
-   ============================================================ */
-
-#calendarioContainer .dia-btn.dia-alerta-saida .dia-sup-esq {
-    background: #DC2626;
-    color: #FFFFFF;
-    /*font-weight: 800;/*
-    font-size: 0.7rem;                  /* mesma escala do badge */
-    padding: 2px 5px;
-    border-radius: 3px;                 /* mesmo radius do badge */
-    line-height: 1;
-    min-width: 16px;                    /* mesmo min-width do badge */
-    /*max-width: fit-content;*/
-    /*height: auto;                       /* NÃO esticar */
-    /*width: auto;                        /* NÃO esticar */
-    display: inline-flex;               /* permite encolher */
-    align-items: center;
-    justify-content: center;
-    justify-self: center;               /* centraliza no grid-area */
-    align-self: center;                 /* centraliza vertical */
-    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.35);
-    transition: all 0.2s ease;
-}
-
-#calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-esq {
-    background: #B91C1C;
-    box-shadow: 0 2px 5px rgba(220, 38, 38, 0.5);
-}
-
-/* ===== TEMA ESCURO ===== */
-body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida .dia-sup-esq {
-    background: #DC2626;
-    color: #FFFFFF;
-    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.5);
-}
-
-body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-esq {
-    background: #B91C1C;
-}
-/* ============================================================
-   💙 CRÉDITOS DO DESENVOLVEDOR - COM ÍCONES DINÂMICOS
+   21. CRÉDITOS DO DESENVOLVEDOR
    ============================================================ */
 
 .menu-creditos {
@@ -1873,7 +1675,6 @@ body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-e
     gap: 8px;
 }
 
-/* Linha "Desenvolvido com paixão por" */
 .creditos-linha {
     display: flex;
     align-items: center;
@@ -1885,7 +1686,6 @@ body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-e
     font-weight: 600;
 }
 
-/* 🔥 CORAÇÃO PULSANTE */
 .creditos-linha .icon-coracao {
     color: var(--color-danger);
     flex-shrink: 0;
@@ -1902,7 +1702,6 @@ body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-e
     60%       { transform: scale(1); }
 }
 
-/* Nome do desenvolvedor */
 .creditos-nome {
     font-size: 0.95rem;
     color: var(--a11y-text);
@@ -1927,13 +1726,11 @@ body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-e
     animation: gradiente-desliza 4s ease-in-out infinite;
 }
 
-/* 🔥 GRADIENTE ANIMADO NO NOME */
 @keyframes gradiente-desliza {
     0%, 100% { background-position: 0% 50%; }
     50%      { background-position: 100% 50%; }
 }
 
-/* 🔥 CURSOR PISCANDO */
 .creditos-nome .cursor-blink {
     display: inline-block;
     color: var(--color-primary);
@@ -1948,7 +1745,6 @@ body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-e
     51%, 100% { opacity: 0; }
 }
 
-/* Link GitHub */
 .creditos-link {
     display: inline-flex;
     align-items: center;
@@ -1988,32 +1784,13 @@ body.modo-escuro #calendarioContainer .dia-btn.dia-alerta-saida:hover .dia-sup-e
     color: var(--a11y-white);
 }
 
-/* ===== TEMA ESCURO ===== */
-body.modo-escuro .menu-creditos {
-    border-top-color: var(--border);
-}
+/* ----- Créditos - tema escuro ----- */
+body.modo-escuro .menu-creditos { border-top-color: var(--border); }
+body.modo-escuro .creditos-linha { color: var(--a11y-text-secondary); }
+body.modo-escuro .creditos-nome { color: var(--a11y-text); }
+body.modo-escuro .creditos-link { background: var(--surface-alt); border-color: var(--border); color: var(--color-primary-light); }
+body.modo-escuro .creditos-link:hover { background: var(--color-primary); color: var(--a11y-white); border-color: var(--color-primary); }
 
-body.modo-escuro .creditos-linha {
-    color: var(--a11y-text-secondary);
-}
-
-body.modo-escuro .creditos-nome {
-    color: var(--a11y-text);
-}
-
-body.modo-escuro .creditos-link {
-    background: var(--surface-alt);
-    border-color: var(--border);
-    color: var(--color-primary-light);
-}
-
-body.modo-escuro .creditos-link:hover {
-    background: var(--color-primary);
-    color: var(--a11y-white);
-    border-color: var(--color-primary);
-}
-
-/* ===== ACESSIBILIDADE: pausar animações ===== */
 @media (prefers-reduced-motion: reduce) {
     .creditos-linha .icon-coracao,
     .creditos-nome strong,
