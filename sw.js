@@ -1,10 +1,10 @@
 // =====================================================
 // SERVICE WORKER - CALENDÁRIO DE ESCALAS
 // Estratégia: Cache First para assets, Network First para navegação
-// Versão: v4
+// Versão: v6
 // =====================================================
 
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v6';
 const CACHE_NAME = `calendario-escalas-${CACHE_VERSION}`;
 
 // =====================================================
@@ -27,6 +27,7 @@ const ASSETS_CRITICOS = [
     './js/core/pessoas.js',
     './js/core/estatisticas.js',
     './js/core/horasExtras.js',
+    './js/core/ferias.js',
 
     // JS - UI
     './js/ui/menu.js',
@@ -43,11 +44,15 @@ const ASSETS_CRITICOS = [
     // JS - Constants
     './js/constants/cores.js',
 
-    // Ícones
+    // Ícones SVG (sprite)
     './assets/icons/sprite.svg',
+
+    // 🆕 Ícones PWA
+    './icons/favicon.ico',
     './icons/icon-192.png',
     './icons/icon-512.png',
-    './icons/favicon.ico'
+    './icons/icon-192-maskable.png',
+    './icons/icon-512-maskable.png'
 ];
 
 // =====================================================
@@ -62,8 +67,6 @@ self.addEventListener('install', event => {
             .then(cache => {
                 console.log(`📦 Cache "${CACHE_NAME}" aberto. Adicionando ${ASSETS_CRITICOS.length} arquivos...`);
 
-                // Promise.allSettled: cacheia o que der, reporta o que falhar
-                // sem quebrar a instalação inteira por causa de 1 asset
                 return Promise.allSettled(
                     ASSETS_CRITICOS.map(url =>
                         cache.add(url).catch(err => {
@@ -115,18 +118,16 @@ self.addEventListener('fetch', event => {
     // 1️⃣ Ignora requisições não-HTTP (file://, chrome-extension://, etc.)
     if (!req.url.startsWith('http')) return;
 
-    // 2️⃣ Ignora métodos que não sejam GET (POST, PUT, DELETE)
+    // 2️⃣ Ignora métodos que não sejam GET
     if (req.method !== 'GET') return;
 
     // 3️⃣ Ignora GoatCounter (analytics em tempo real)
-    //    Não chama respondWith → navegador faz o fetch normalmente
     if (req.url.includes('goatcounter.com') || req.url.includes('gc.zgo.at')) {
         return;
     }
 
     // =====================================================
     // NAVEGAÇÃO (HTML) → Network First
-    // Busca sempre da rede; se offline, entrega o index.html do cache
     // =====================================================
     if (req.mode === 'navigate' || req.destination === 'document') {
         event.respondWith(
@@ -148,13 +149,10 @@ self.addEventListener('fetch', event => {
 
     // =====================================================
     // ASSETS (CSS, JS, imagens, ícones) → Cache First + SWR
-    // Entrega do cache imediatamente, atualiza em background
     // =====================================================
     event.respondWith(
         caches.match(req).then(cached => {
             if (cached) {
-                // 🔥 Stale-While-Revalidate com waitUntil
-                // Garante que o cache atualize mesmo se o SW morrer
                 event.waitUntil(
                     fetch(req)
                         .then(response => {
@@ -163,13 +161,12 @@ self.addEventListener('fetch', event => {
                                     .then(c => c.put(req, response));
                             }
                         })
-                        .catch(() => {}) // silencioso se offline
+                        .catch(() => {})
                 );
 
                 return cached;
             }
 
-            // Não está no cache → busca na rede e guarda
             return fetch(req)
                 .then(response => {
                     if (response && response.status === 200) {
@@ -179,15 +176,12 @@ self.addEventListener('fetch', event => {
                     return response;
                 })
                 .catch(() => {
-                    // Fallback para imagem quebrada
                     if (req.destination === 'image') {
                         return new Response(
                             '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#ddd"/></svg>',
                             { headers: { 'Content-Type': 'image/svg+xml' } }
                         );
                     }
-
-                    // Fallback genérico para outros assets
                     return new Response('Offline', {
                         status: 503,
                         statusText: 'Service Unavailable',
@@ -200,7 +194,6 @@ self.addEventListener('fetch', event => {
 
 // =====================================================
 // MENSAGENS DO CLIENTE
-// Permite forçar atualização via postMessage({ type: 'SKIP_WAITING' })
 // =====================================================
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {

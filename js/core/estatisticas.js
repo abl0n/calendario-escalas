@@ -8,6 +8,7 @@ import { getPessoas } from '../core/pessoas.js';
 import { HORAS_POR_DIA, DATA_REFERENCIA, getFeriados } from '../config.js';
 import { horasParaMinutos, formatarMinutos, getCicloCompleto } from '../utils/helpers.js';
 import { CORES_ESCALAS, CORES_TURNOS } from '../constants/cores.js';
+import { estaDeFerias } from '../core/ferias.js';   // 🏖️ NOVO
 
 let equipeSelecionada = null;
 
@@ -30,8 +31,14 @@ function calcularEstatisticas(periodoIndex) {
     const periodo = getPeriodoPorIndex(periodoIndex);
     const diasNoPeriodo = getDiasNoPeriodo(periodo);
 
-    let trabalhos = 0, folgas = 0, feriadosCount = 0, feriadosTrabalhadosCount = 0;
+    let trabalhos = 0;
+    let folgas = 0;
+    let feriadosCount = 0;
+    let feriadosTrabalhadosCount = 0;
+    let diasFerias = 0;                    // 🏖️ NOVO
     let horasTrabalhadas = 0;
+
+    const escalaId = equipeSelecionada?.id;
 
     const dataAtual = new Date(periodo.inicio);
     while (dataAtual <= periodo.fim) {
@@ -39,18 +46,26 @@ function calcularEstatisticas(periodoIndex) {
         const dia = dataAtual.getDate();
         const mes = dataAtual.getMonth() + 1;
         const ano = dataAtual.getFullYear();
+        const dataStr = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
-        // 🔥 CORRIGIDO: getFeriados(ano)
+        // 🏖️ Verifica se está de férias
+        const ehFerias = estaDeFerias(escalaId, dataStr);
+
+        // Feriado
         const chave = `${String(dia).padStart(2, '0')}-${String(mes).padStart(2, '0')}`;
         const infoFeriado = getFeriados(ano)[chave];
         const isFeriado = infoFeriado && infoFeriado.tipo === 'feriado';
 
         if (isFeriado) {
             feriadosCount++;
-            if (status === 1) feriadosTrabalhadosCount++;
+            // Só conta feriado trabalhado se NÃO estiver de férias
+            if (status === 1 && !ehFerias) feriadosTrabalhadosCount++;
         }
 
-        if (status === 1) {
+        // 🏖️ Se está de férias, conta como férias (ignora trabalho/folga)
+        if (ehFerias) {
+            diasFerias++;
+        } else if (status === 1) {
             trabalhos++;
             horasTrabalhadas += HORAS_POR_DIA;
         } else {
@@ -62,7 +77,7 @@ function calcularEstatisticas(periodoIndex) {
 
     const minutosTrabalhados = horasParaMinutos(horasTrabalhadas);
 
-    // 🔥 CORRIGIDO: horas extras SOMENTE dentro do período
+    // Horas extras SOMENTE dentro do período
     const extrasStorage = carregarExtrasStorage();
     const totalExtrasPeriodo = extrasStorage.reduce((acc, item) => {
         const itemData = new Date(item.data + 'T00:00:00');
@@ -73,10 +88,16 @@ function calcularEstatisticas(periodoIndex) {
     }, 0);
 
     const totalExtrasMin = horasParaMinutos(totalExtrasPeriodo);
-    const percentual = diasNoPeriodo > 0 ? Math.round((trabalhos / diasNoPeriodo) * 100) : 0;
+
+    // % de dias trabalhados = trabalhos / dias totais
+    const percentual = diasNoPeriodo > 0 
+        ? Math.round((trabalhos / diasNoPeriodo) * 100) 
+        : 0;
 
     const todasPessoas = getPessoas();
-    const pessoasEscala = todasPessoas.filter(p => Number(p.escalaId) === Number(equipeSelecionada?.id));
+    const pessoasEscala = todasPessoas.filter(p => 
+        Number(p.escalaId) === Number(equipeSelecionada?.id)
+    );
 
     const turnos = {
         M: pessoasEscala.filter(p => p.turno === 'M').length,
@@ -89,6 +110,7 @@ function calcularEstatisticas(periodoIndex) {
         diasNoPeriodo,
         trabalhos,
         folgas,
+        diasFerias,                     // 🏖️ NOVO
         feriadosCount,
         feriadosTrabalhadosCount,
         minutosTrabalhados,
@@ -112,7 +134,7 @@ function calcularTotaisPorCategoria() {
 }
 
 // =====================================================
-// RENDERIZAR ESTATÍSTICAS - NOMENCLATURA CLARA
+// RENDERIZAR ESTATÍSTICAS
 // =====================================================
 
 export function renderizarEstatisticas(container, periodoIndex) {
@@ -140,6 +162,9 @@ export function renderizarEstatisticas(container, periodoIndex) {
         const escalaId = equipeSelecionada?.id || 1;
         const corEscala = CORES_ESCALAS[escalaId]?.bg || '#2563EB';
         const corEscalaText = CORES_ESCALAS[escalaId]?.text || '#FFFFFF';
+
+        // 🏖️ Só mostra card de férias se houver dias
+        const mostrarFerias = stats.diasFerias > 0;
 
         let html = `
             <!-- ============================================================ -->
@@ -177,8 +202,17 @@ export function renderizarEstatisticas(container, periodoIndex) {
                             <span class="estatistica-valor" style="color:#2563EB;">${stats.trabalhos}</span>
                         </div>
                     </div>
-                    <div class="estatistica-card folga" style="border-left-color: #64748B;">
+                    ${mostrarFerias ? `
+                    <div class="estatistica-card ferias" style="border-left-color: #F59E0B;">
                         <div class="estatistica-icon">🏖️</div>
+                        <div class="estatistica-info">
+                            <span class="estatistica-label">Dias de férias (Escala ${escalaId})</span>
+                            <span class="estatistica-valor" style="color:#F59E0B;">${stats.diasFerias}</span>
+                        </div>
+                    </div>
+                    ` : ''}
+                    <div class="estatistica-card folga" style="border-left-color: #64748B;">
+                        <div class="estatistica-icon">🏠</div>
                         <div class="estatistica-info">
                             <span class="estatistica-label">Dias de folga (Escala ${escalaId})</span>
                             <span class="estatistica-valor" style="color:#64748B;">${stats.folgas}</span>

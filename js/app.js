@@ -1,5 +1,5 @@
 // =====================================================
-// APP - Inicialização principal (OTIMIZADO v2)
+// APP - Inicialização principal (OTIMIZADO v3 - Férias)
 // =====================================================
 
 import { 
@@ -41,7 +41,17 @@ import {
     fecharModalPessoa, 
     abrirModalExtra, 
     fecharModalExtra, 
-    initModais 
+    initModais,
+    // 🏖️ Férias
+    abrirModalFerias,
+    fecharModalFerias,
+    salvarFerias,
+    editarFerias,
+    excluirFeriasConfirmar,
+    confirmarExclusaoFerias,
+    cancelarExclusaoFerias,
+    cancelarEdicaoFerias,
+    initModaisFerias
 } from './ui/modais.js';
 
 import { 
@@ -57,18 +67,16 @@ import {
     carregarExtrasStorage, salvarExtrasStorage,
     carregarPeriodoStorage, salvarPeriodoStorage,
     carregarTemaStorage, salvarTemaStorage,
-    carregarPessoasStorage, salvarPessoasStorage
+    carregarPessoasStorage, salvarPessoasStorage,
+    carregarFeriasStorage, salvarFeriasStorage
 } from './utils/storage.js';
 
 import { recarregarPessoas, getPessoas } from './core/pessoas.js';
+import { estaDeFerias, getFeriasPorEscala } from './core/ferias.js';
 import { CORES_ESCALAS } from './constants/cores.js';
 
 // =====================================================
 // MIGRAÇÃO AUTOMÁTICA DE ESCALAS
-// =====================================================
-// Se a versão do storage for menor que a do config.js,
-// substitui as escalas automaticamente (útil quando
-// escalasPadrao muda — ex: adicionar marcadores 'T').
 // =====================================================
 
 const versaoStorage = parseInt(localStorage.getItem('escalas_versao') || '0');
@@ -120,12 +128,6 @@ const DOM = {
 // FUNÇÕES AUXILIARES
 // =====================================================
 
-/**
- * Retorna o status de um dia:
- *   0 = folga
- *   1 = trabalho
- *   2 = trabalho + alerta de saída antecipada
- */
 function obterStatusDia(equipe, data) {
     if (!equipe) return 0;
     const ciclo = getCicloCompleto(equipe);
@@ -135,10 +137,6 @@ function obterStatusDia(equipe, data) {
     return ciclo[posicao] || 0;
 }
 
-/**
- * 🔥 Retorna objeto de status pronto para renderização.
- * Centraliza a lógica: evita duplicar "status === 2" em 3 lugares.
- */
 function getStatusInfo(status) {
     switch (status) {
         case 2:
@@ -187,16 +185,24 @@ function getTotalExtras() {
     return horasExtras.reduce((acc, item) => acc + (item.horas || 0), 0);
 }
 
-/**
- * 🔥 Filtra horas extras pelo período atual.
- * Reutilizada em várias funções.
- */
 function getExtrasDoPeriodoAtual() {
     const periodo = getPeriodoPorIndex(periodoIndex);
     return horasExtras.filter(item => {
         const d = new Date(item.data + 'T00:00:00');
         return d >= periodo.inicio && d <= periodo.fim;
     });
+}
+
+/**
+ * 🏖️ Calcula o status do dia para validação no cadastro de férias
+ * @returns {number} 0=folga, 1=trabalho, 2=trabalho+alerta
+ */
+function calcularStatusDiaInicio() {
+    const inputInicio = document.getElementById('inputFeriasInicio');
+    if (!inputInicio?.value || !equipeSelecionada) return 1;
+    
+    const data = new Date(inputInicio.value + 'T00:00:00');
+    return obterStatusDia(equipeSelecionada, data);
 }
 
 // =====================================================
@@ -218,7 +224,6 @@ function renderizarCalendario() {
     container.className = '';
     container.classList.add('calendario', mesesClasses[mesIndex]);
 
-    // Calcular primeiro dia do calendário
     const mesInicio = periodo.inicio.getMonth();
     const mesFim = periodo.fim.getMonth();
     const anoInicio = periodo.inicio.getFullYear();
@@ -236,7 +241,6 @@ function renderizarCalendario() {
     const hoje = new Date();
     const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-    // Cabeçalho
     let html = `<table role="grid" aria-label="Calendário de escalas"><thead><tr>`;
     
     DIAS_SEMANA.forEach(dia => {
@@ -250,7 +254,6 @@ function renderizarCalendario() {
     
     html += '</tr></thead><tbody>';
 
-    // Loop de 42 dias
     let dataAtual = new Date(primeiroDia);
     let rowOpen = false;
 
@@ -267,7 +270,7 @@ function renderizarCalendario() {
         const dataStr = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
         const status = obterStatusDia(equipeSelecionada, dataAtual);
-        const info = getStatusInfo(status);   // 🔥 centralizado
+        const info = getStatusInfo(status);
 
         const isHoje = dataStr === hojeStr;
         const noPeriodo = dataEstaNoPeriodo(dataAtual, periodo);
@@ -276,10 +279,14 @@ function renderizarCalendario() {
         const temExtra = extras.length > 0;
         const totalExtraDia = extras.reduce((acc, item) => acc + item.horas, 0);
 
+        // 🏖️ Verifica férias
+        const temFerias = estaDeFerias(equipeSelecionada?.id, dataStr);
+
         const classePeriodo = noPeriodo ? '' : 'dia-outro-periodo';
-        const classeHoje = isHoje ? 'hoje' : ''; //const classeHoje = isHoje ? 'dia-hoje' : '';
+        const classeHoje = isHoje ? 'hoje' : '';
         const classeExtra = temExtra ? 'dia-com-extra' : '';
-        const classeAlerta = info.isAlerta ? 'dia-alerta-saida' : '';   // 🔥
+        const classeAlerta = info.isAlerta ? 'dia-alerta-saida' : '';
+        const classeFerias = temFerias ? 'dia-ferias' : '';   // 🏖️
 
         let classeEspecial = '';
         let iconeEvento = '';
@@ -297,24 +304,33 @@ function renderizarCalendario() {
         }
 
         let labelExtra = '';
-        if (temExtra) {
+        if (temExtra && !temFerias) {   // 🏖️ não mostra +Xh● durante férias
             const extraMin = Math.round(totalExtraDia * 60);
             const h = Math.floor(extraMin / 60);
             const m = extraMin % 60;
             labelExtra = `➕${h > 0 ? h + 'h' : ''}${m > 0 ? m + 'min' : ''}`;
         }
 
+        // 🏖️ Conteúdo do inf-dir: chip de férias OU indicador de extra
+        let conteudoInfDir = '';
+        if (temFerias) {
+            conteudoInfDir = '<span class="dia-ferias-chip">🏖️</span>';
+        } else if (temExtra) {
+            conteudoInfDir = labelExtra;
+        }
+
         // ARIA-LABEL
         const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
         let ariaLabel = `${dia} de ${meses[mes - 1]}, ${info.ariaLabel}`;
+        if (temFerias) ariaLabel = `${dia} de ${meses[mes - 1]}, de férias`;
         if (nomeEvento) ariaLabel += `, ${nomeEvento}`;
-        if (temExtra) ariaLabel += `, ${Math.round(totalExtraDia * 60)} minutos extras`;
+        if (temExtra && !temFerias) ariaLabel += `, ${Math.round(totalExtraDia * 60)} minutos extras`;
 
         const isFeriadoTrabalhado = info.isTrabalho && dataComemorativa?.tipo === 'feriado';
 
         html += `<td class="dia-td ${classePeriodo}" data-data="${dataStr}">
     <button 
-        class="dia-btn ${classeHoje} ${classeExtra} ${classeEspecial} ${classeAlerta}"
+        class="dia-btn ${classeHoje} ${classeExtra} ${classeEspecial} ${classeAlerta} ${classeFerias}"
         type="button"
         tabindex="0"
         data-data="${dataStr}"
@@ -324,7 +340,7 @@ function renderizarCalendario() {
         <span class="dia-sup-esq" aria-hidden="true">${dia}</span>
         <span class="dia-sup-dir ${info.isTrabalho ? 'status-trabalho' : 'status-folga'}" aria-hidden="true">${info.textoBadge}</span>
         <span class="dia-inf-esq ${isFeriadoTrabalhado ? 'feriado-trabalhado' : ''}" aria-hidden="true">${iconeEvento}</span>
-        <span class="dia-inf-dir ${temExtra ? 'tem-mensagem' : ''}" aria-hidden="true">${labelExtra}</span>
+        <span class="dia-inf-dir ${temExtra && !temFerias ? 'tem-mensagem' : ''}" aria-hidden="true">${conteudoInfDir}</span>
     </button>
 </td>`;
 
@@ -441,6 +457,9 @@ function renderizarBotoesEquipe() {
 function selecionarEquipe(equipe) {
     equipeSelecionada = equipe;
     
+    // 🔥 NOVO: aplica a cor da escala no body
+    document.body.setAttribute('data-escala-ativa', equipe.id);
+    
     import('./core/estatisticas.js').then(module => {
         if (module.initEstatisticas) module.initEstatisticas(equipe);
     });
@@ -458,7 +477,6 @@ function selecionarEquipe(equipe) {
 // =====================================================
 
 function atualizarContadores() {
-    // 🔥 Usa getPessoas() para pegar sempre a versão atualizada
     const todasPessoas = getPessoas();
     const pessoasEscala = todasPessoas.filter(p => Number(p.escalaId) === Number(equipeSelecionada?.id));
     
@@ -515,7 +533,6 @@ function getFeriadosDoPeriodo(periodo) {
             resultados.push({
                 data: new Date(dataAtual),
                 ...dataComemorativa,
-                // 🔥 FIX: status 2 também é trabalho
                 trabalhado: status === 1 || status === 2
             });
         }
@@ -535,11 +552,11 @@ function mudarPeriodo(delta) {
     renderizarCalendario();
     renderizarLegendaFeriados();
     atualizarPeriodoInfo();
-    renderizarListaExtras();   // 🔥 atualiza lista de extras do novo período
+    renderizarListaExtras();
 }
 
 // =====================================================
-// HORAS EXTRAS (🔥 filtradas pelo período)
+// HORAS EXTRAS
 // =====================================================
 
 function renderizarListaExtras() {
@@ -547,7 +564,7 @@ function renderizarListaExtras() {
     const totalModal = DOM.totalExtraModal;
     if (!container) return;
 
-    const extrasDoPeriodo = getExtrasDoPeriodoAtual();   // 🔥 FILTRO
+    const extrasDoPeriodo = getExtrasDoPeriodoAtual();
 
     if (extrasDoPeriodo.length === 0) {
         container.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.8rem;text-align:center;padding:16px;">Nenhuma hora extra neste período</p>';
@@ -560,20 +577,140 @@ function renderizarListaExtras() {
         const dataFormatada = item.data.split('-').reverse().join('/');
         const index = horasExtras.indexOf(item);
         const minutos = horasParaMinutos(item.horas);
+        const editando = item._editando === true;
+
         return `
-            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; margin-bottom:6px; background:var(--color-bg); border-radius:6px; border:1px solid var(--color-border);">
-                <div style="font-size:0.8rem; color:var(--color-text);">
-                    <strong>📅 ${dataFormatada}</strong>
-                    <span style="color:var(--color-text-muted);font-size:0.75rem;">(${item.inicio || '08:00'} às ${item.fim || '18:00'})</span>
-                    <span style="margin-left:6px;font-weight:600;color:var(--color-primary);">${formatarMinutos(minutos)}</span>
-                </div>
-                <button class="btn btn-ghost btn-sm" onclick="window.removerExtra(${index})" style="color:var(--color-danger);padding:4px 8px;">✕</button>
+            <div class="extra-item ${editando ? 'extra-item-editing' : ''}" data-index="${index}">
+                ${editando ? `
+                    <div class="extra-edit">
+                        <div class="extra-edit-row">
+                            <label>📅 Data</label>
+                            <input type="date" class="input input-sm" id="edit-extra-data-${index}" value="${item.data}">
+                        </div>
+                        <div class="extra-edit-row">
+                            <label>🕐 Início</label>
+                            <input type="time" class="input input-sm" id="edit-extra-inicio-${index}" value="${item.inicio || '08:00'}">
+                        </div>
+                        <div class="extra-edit-row">
+                            <label>🕐 Fim</label>
+                            <input type="time" class="input input-sm" id="edit-extra-fim-${index}" value="${item.fim || '18:00'}">
+                        </div>
+                        <div class="extra-edit-actions">
+                            <button class="btn btn-primary btn-sm" onclick="window.salvarEdicaoExtra(${index})">
+                                ✓ Salvar
+                            </button>
+                            <button class="btn btn-ghost btn-sm" onclick="window.cancelarEdicaoExtra(${index})">
+                                ✕ Cancelar
+                            </button>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="extra-view">
+                        <div class="extra-info">
+                            <strong>📅 ${dataFormatada}</strong>
+                            <span class="extra-horario">${item.inicio || '08:00'} → ${item.fim || '18:00'}</span>
+                            <span class="extra-total">${formatarMinutos(minutos)}</span>
+                        </div>
+                        <div class="extra-actions">
+                            <button class="btn-icon-extra btn-icon-edit" 
+                                    onclick="window.editarExtra(${index})" 
+                                    title="Editar hora extra"
+                                    aria-label="Editar hora extra">
+                                ✏️
+                            </button>
+                            <button class="btn-icon-extra btn-icon-delete" 
+                                    onclick="window.removerExtra(${index})" 
+                                    title="Remover hora extra"
+                                    aria-label="Remover hora extra">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                `}
             </div>
         `;
     }).join('');
 
     const totalMin = horasParaMinutos(extrasDoPeriodo.reduce((acc, i) => acc + i.horas, 0));
     if (totalModal) totalModal.textContent = `Total: ${formatarMinutos(totalMin)}`;
+}
+
+// =====================================================
+// 🆕 EDITAR HORA EXTRA
+// =====================================================
+
+/**
+ * Ativa o modo edição de uma hora extra
+ */
+function editarExtra(index) {
+    if (index < 0 || index >= horasExtras.length) {
+        mostrarToast('❌ Hora extra não encontrada.', 'erro');
+        return;
+    }
+    
+    horasExtras[index]._editando = true;
+    renderizarListaExtras();
+    
+    setTimeout(() => {
+        document.getElementById(`edit-extra-data-${index}`)?.focus();
+    }, 50);
+}
+
+/**
+ * Salva a edição de uma hora extra
+ */
+function salvarEdicaoExtra(index) {
+    if (index < 0 || index >= horasExtras.length) return;
+
+    const novaData = document.getElementById(`edit-extra-data-${index}`)?.value;
+    const novoInicio = document.getElementById(`edit-extra-inicio-${index}`)?.value;
+    const novoFim = document.getElementById(`edit-extra-fim-${index}`)?.value;
+
+    if (!novaData || !novoInicio || !novoFim) {
+        mostrarToast('⚠️ Preencha todos os campos.', 'erro');
+        return;
+    }
+
+    const [hInicio, mInicio] = novoInicio.split(':').map(Number);
+    const [hFim, mFim] = novoFim.split(':').map(Number);
+
+    let totalMinutos = (hFim * 60 + mFim) - (hInicio * 60 + mInicio);
+    if (totalMinutos < 0) totalMinutos += 1440;
+
+    const horas = totalMinutos / 60;
+
+    if (horas <= 0) {
+        mostrarToast('⚠️ Horário inválido.', 'erro');
+        return;
+    }
+
+    if (estaDeFerias(equipeSelecionada?.id, novaData)) {
+        mostrarToast('⚠️ Você está de férias nesse dia.', 'erro');
+        return;
+    }
+
+    horasExtras[index] = {
+        data: novaData,
+        inicio: novoInicio,
+        fim: novoFim,
+        horas
+    };
+
+    salvarExtrasStorage(horasExtras);
+    renderizarListaExtras();
+    renderizarCalendario();
+    renderizarLegendaFeriados();
+    mostrarToast('✅ Hora extra atualizada!', 'sucesso');
+}
+
+/**
+ * Cancela a edição
+ */
+function cancelarEdicaoExtra(index) {
+    if (index >= 0 && index < horasExtras.length) {
+        delete horasExtras[index]._editando;
+        renderizarListaExtras();
+    }
 }
 
 function salvarExtra() {
@@ -583,6 +720,12 @@ function salvarExtra() {
 
     if (!data || !inicio || !fim) {
         mostrarToast('Preencha todos os campos!', 'erro');
+        return;
+    }
+
+    // 🏖️ BLOQUEIO: não pode hora extra durante férias
+    if (estaDeFerias(equipeSelecionada?.id, data)) {
+        mostrarToast('⚠️ Você está de férias nesse dia. Não é possível registrar hora extra.', 'erro');
         return;
     }
 
@@ -696,6 +839,25 @@ function editarFuncionario(id) {
 }
 
 // =====================================================
+// 🏖️ FÉRIAS
+// =====================================================
+
+/**
+ * Abre o modal de férias com a escala atual
+ */
+function abrirModalFeriasWrapper() {
+    abrirModalFerias(equipeSelecionada);
+}
+
+/**
+ * Salva férias com o status do dia calculado corretamente
+ */
+function salvarFeriasWrapper() {
+    const statusDia = calcularStatusDiaInicio();
+    salvarFerias(statusDia);
+}
+
+// =====================================================
 // ESTATÍSTICAS
 // =====================================================
 
@@ -800,11 +962,17 @@ function abrirGuia() {
 2. 👤 Cadastre funcionários em "Cadastrar Funcionário"
 3. 👥 Clique nos contadores para ver a lista
 4. ⏱️ Adicione horas extras com "Extra"
-5. 📊 Veja estatísticas com "Stats"
-6. 📅 Altere o período no menu lateral
+5. 🏖️ Cadastre suas férias com "Férias"
+6. 📊 Veja estatísticas com "Stats"
+7. 📅 Altere o período no menu lateral
 
 🔴 DIAS COM ALERTA:
 Dias em vermelho indicam saída antecipada em 1 hora.
+
+🏖️ FÉRIAS:
+- Duração máxima de 30 dias
+- Não pode iniciar em dia de folga
+- Bloqueia hora extra durante o período
 
 💡 DICAS:
 - Use ESC para fechar modais
@@ -822,13 +990,14 @@ Dias em vermelho indicam saída antecipada em 1 hora.
 function exportarDados() {
     try {
         const dados = {
-            versao: "1.0.0",
+            versao: "1.1.0",
             escalasVersao: ESCALAS_VERSAO,
             dataExportacao: new Date().toISOString(),
             temaEscuro,
             escalas: equipes,
             horasExtras,
             pessoas,
+            ferias: carregarFeriasStorage(),   // 🏖️
             periodoConfig: { 
                 diaInicio: getConfigPeriodo().diaInicio, 
                 diaFim: getConfigPeriodo().diaFim 
@@ -894,6 +1063,10 @@ function importarDados() {
                     horasExtras = dados.horasExtras;
                     salvarExtrasStorage(horasExtras);
                 }
+                // 🏖️ Importar férias
+                if (dados.ferias?.length) {
+                    salvarFeriasStorage(dados.ferias);
+                }
                 if (dados.temaEscuro !== undefined) {
                     temaEscuro = dados.temaEscuro;
                     salvarTemaStorage(temaEscuro);
@@ -954,6 +1127,7 @@ function resetarTudo() {
         salvarExtrasStorage(horasExtras);
         pessoas = [];
         salvarPessoasStorage(pessoas);
+        salvarFeriasStorage([]);   // 🏖️ limpa férias também
         periodoIndex = 0;
         salvarPeriodoStorage(0);
         equipeSelecionada = equipes[0] || null;
@@ -983,7 +1157,7 @@ function abrirBug() {
 }
 
 // =====================================================
-// 🔥 DETALHES DO DIA (CORRIGIDO — mostra alerta)
+// DETALHES DO DIA
 // =====================================================
 
 function abrirDetalhesDia(dataStr) {
@@ -1000,12 +1174,41 @@ function abrirDetalhesDia(dataStr) {
     const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
     const nomeDia = diasSemana[data.getDay()];
 
-    // 🔥 Status usando getStatusInfo (trata status 2 corretamente)
     const status = obterStatusDia(equipeSelecionada, data);
     const info = getStatusInfo(status);
 
-    // 🔥 Card de alerta vermelho (só quando status === 2)
-    const alertaHtml = info.isAlerta ? `
+    // 🏖️ Card de férias (prioridade sobre o resto)
+    const temFerias = estaDeFerias(equipeSelecionada?.id, dataStr);
+    let feriasHtml = '';
+    if (temFerias) {
+        const ferias = getFeriasPorEscala(equipeSelecionada?.id).find(f => 
+            dataStr >= f.inicio && dataStr <= f.fim
+        );
+        if (ferias) {
+            const [anoI, mesI, diaI] = ferias.inicio.split('-');
+            const [anoF, mesF, diaF] = ferias.fim.split('-');
+            feriasHtml = `
+                <div class="detalhe-item" style="
+                    border-left-color: #FCD34D;
+                    background: #FFFBEB;
+                    border-radius: 8px;
+                    padding: 12px 14px;
+                ">
+                    <span class="detalhe-icone" style="font-size: 1.4rem;">🏖️</span>
+                    <div>
+                        <div class="detalhe-label" style="color:#78350F; font-weight:700; font-size:0.75rem; text-transform:uppercase;">
+                            Férias
+                        </div>
+                        <div class="detalhe-valor" style="color:#78350F; font-weight:700; font-size:0.9rem;">
+                            ${diaI}/${mesI}/${anoI} → ${diaF}/${mesF}/${anoF} (${ferias.dias} dias)
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    const alertaHtml = info.isAlerta && !temFerias ? `
         <div class="detalhe-item" style="
             border-left-color: #EF4444;
             background: #FEE2E2;
@@ -1018,13 +1221,12 @@ function abrirDetalhesDia(dataStr) {
                     Alerta do Dia
                 </div>
                 <div class="detalhe-valor" style="color:#7F1D1D; font-weight:700; font-size:1rem;">
-                    Antecipar saída em 1 hora (Ambipar)
+                    Antecipar saída em 1 hora
                 </div>
             </div>
         </div>
     ` : '';
 
-    // Feriado (móvel ou fixo)
     const dataComemorativa = getFeriado(dia, mes, ano);
 
     let feriadoHtml = '';
@@ -1052,7 +1254,6 @@ function abrirDetalhesDia(dataStr) {
         `;
     }
 
-    // Extras do período
     const periodoAtual = getPeriodoPorIndex(periodoIndex);
     const extras = getExtrasPorData(dataStr).filter(extra => {
         const d = new Date(extra.data + 'T00:00:00');
@@ -1060,7 +1261,7 @@ function abrirDetalhesDia(dataStr) {
     });
 
     let extrasHtml = '';
-    if (extras.length) {
+    if (extras.length && !temFerias) {   // 🏖️ não mostra extra durante férias
         const totalMinutos = extras.reduce((acc, item) => acc + Math.round(item.horas * 60), 0);
         const h = Math.floor(totalMinutos / 60);
         const m = totalMinutos % 60;
@@ -1098,17 +1299,21 @@ function abrirDetalhesDia(dataStr) {
         ${dataFormatada} - ${nomeDia}
     `;
 
+    const statusMostrar = temFerias
+        ? { cor: '#F59E0B', icone: 'icon-beach', texto: 'Férias' }
+        : info;
+
     conteudo.innerHTML = `
         <div style="display:flex;flex-direction:column;gap:12px;">
-            <div class="detalhe-item" style="border-left-color:${info.cor};">
+            <div class="detalhe-item" style="border-left-color:${statusMostrar.cor};">
                 <span class="detalhe-icone">
-                    <svg class="icon" width="24" height="24" style="color:${info.cor};">
-                        <use href="assets/icons/sprite.svg#${info.icone}"></use>
+                    <svg class="icon" width="24" height="24" style="color:${statusMostrar.cor};">
+                        <use href="assets/icons/sprite.svg#${statusMostrar.icone}"></use>
                     </svg>
                 </span>
                 <div>
                     <div class="detalhe-label">Status</div>
-                    <div class="detalhe-valor" style="color:${info.cor};font-weight:700;">${info.texto}</div>
+                    <div class="detalhe-valor" style="color:${statusMostrar.cor};font-weight:700;">${statusMostrar.texto}</div>
                 </div>
             </div>
             <div class="detalhe-item" style="border-left-color:#3B82F6;">
@@ -1118,10 +1323,11 @@ function abrirDetalhesDia(dataStr) {
                     <div class="detalhe-valor">${equipeNome}</div>
                 </div>
             </div>
+            ${feriasHtml}
             ${alertaHtml}
             ${feriadoHtml}
             ${extrasHtml}
-            ${!alertaHtml && !feriadoHtml && !extrasHtml ? `
+            ${!feriasHtml && !alertaHtml && !feriadoHtml && !extrasHtml ? `
                 <div style="text-align:center;padding:20px 0;color:var(--color-text-muted);">
                     <svg class="icon" width="32" height="32" style="opacity:0.3;">
                         <use href="assets/icons/sprite.svg#icon-info"></use>
@@ -1146,6 +1352,9 @@ function fecharDetalhesDia() {
 
 Object.assign(window, {
     toggleMenu, fecharMenu, toggleTema,
+    editarExtra,              // 🆕
+    salvarEdicaoExtra,        // 🆕
+    cancelarEdicaoExtra,      // 🆕
     abrirModalPessoa, fecharModalPessoa, abrirModalExtra, fecharModalExtra,
     abrirPopup, fecharPopup, abrirPopupADM,
     abrirEstatisticas, fecharEstatisticas,
@@ -1157,7 +1366,16 @@ Object.assign(window, {
     abrirMelhorias, abrirBug, abrirGuia,
     recarregarPessoas,
     abrirDetalhesDia, fecharDetalhesDia,
-    renderizarCalendario
+    renderizarCalendario,
+    // 🏖️ Férias
+    abrirModalFerias: abrirModalFeriasWrapper,
+    fecharModalFerias,
+    salvarFerias: salvarFeriasWrapper,
+    editarFerias,
+    excluirFeriasConfirmar,
+    confirmarExclusaoFerias,
+    cancelarExclusaoFerias,
+    cancelarEdicaoFerias
 });
 
 // 🔥 Debug global
@@ -1171,7 +1389,9 @@ window.__debug = {
     getStatusInfo,
     getFeriados,
     renderizarCalendario,
-    getExtrasDoPeriodoAtual
+    getExtrasDoPeriodoAtual,
+    estaDeFerias: (dataStr) => estaDeFerias(equipeSelecionada?.id, dataStr),
+    getFeriasPorEscala: () => getFeriasPorEscala(equipeSelecionada?.id)
 };
 
 console.log('✅ Funções exportadas para o window!');
@@ -1189,6 +1409,9 @@ document.addEventListener('keydown', function(e) {
         fecharPopup();
         fecharEstatisticas();
         fecharDetalhesDia();
+        // 🏖️
+        if (typeof fecharModalFerias === 'function') fecharModalFerias();
+        if (typeof cancelarExclusaoFerias === 'function') cancelarExclusaoFerias();
     }
 });
 
@@ -1198,12 +1421,19 @@ document.addEventListener('keydown', function(e) {
 
 function init() {
     console.log('🚀 Inicializando Explorer...');
+
+        // 🔥 NOVO: aplica a cor da escala inicial
+    if (equipeSelecionada) {
+        document.body.setAttribute('data-escala-ativa', equipeSelecionada.id);
+    }
+
     console.log('📋 Escalas versão:', ESCALAS_VERSAO);
     console.log('📋 Equipe selecionada:', equipeSelecionada?.id);
 
     initTema();
     initModais();
     initPopups(equipeSelecionada);
+    initModaisFerias();   // 🏖️ configura listeners dos inputs
 
     import('./core/estatisticas.js').then(module => {
         if (module.initEstatisticas) module.initEstatisticas(equipeSelecionada);
@@ -1214,7 +1444,6 @@ function init() {
     atualizarContadores();
     atualizarPeriodoInfo();
 
-    // 🔥 Usa setTimeout (mais compatível que requestIdleCallback)
     const lazyInit = () => {
         carregarConfigPeriodoUI();
         renderizarLegendaFeriados();
@@ -1233,8 +1462,15 @@ function init() {
     document.getElementById('modalPessoa')?.addEventListener('click', function(e) {
         if (e.target === this) fecharModalPessoa();
     });
+    // 🏖️ Fecha modal férias ao clicar fora
+    document.getElementById('modalFerias')?.addEventListener('click', function(e) {
+        if (e.target === this) fecharModalFerias();
+    });
+    // 🏖️ Fecha confirmação ao clicar fora
+    document.getElementById('modalConfirmarExclusao')?.addEventListener('click', function(e) {
+        if (e.target === this) cancelarExclusaoFerias();
+    });
 
-    // 🔥 Service Worker compatível com Safari
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         const registrarSW = () => {
             navigator.serviceWorker.register('sw.js')

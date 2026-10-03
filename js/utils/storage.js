@@ -7,7 +7,8 @@ const KEYS = {
     EXTRAS: 'horasExtras',
     PESSOAS: 'pessoas',
     PERIODO: 'periodoIndex',
-    TEMA: 'temaEscuro'
+    TEMA: 'temaEscuro',
+    FERIAS: 'ferias'                    // 🔥 NOVO
 };
 
 // ===== ESCALAS =====
@@ -75,4 +76,33 @@ export function carregarTemaStorage() {
 
 export function salvarTemaStorage(escuro) {
     localStorage.setItem(KEYS.TEMA, escuro);
+}
+
+// =====================================================
+// 🔥 FÉRIAS (NOVO)
+// =====================================================
+
+/**
+ * Carrega todas as férias salvas no localStorage.
+ * @returns {Array} Lista de férias (vazia se não houver)
+ */
+export function carregarFeriasStorage() {
+    const dados = localStorage.getItem(KEYS.FERIAS);
+    if (dados) {
+        try {
+            const parsed = JSON.parse(dados);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (e) {
+            console.error("Erro ao carregar férias do storage:", e);
+        }
+    }
+    return [];
+}
+
+/**
+ * Salva a lista de férias no localStorage.
+ * @param {Array} ferias
+ */
+export function salvarFeriasStorage(ferias) {
+    localStorage.setItem(KEYS.FERIAS, JSON.stringify(ferias));
 }
