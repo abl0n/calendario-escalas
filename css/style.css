@@ -60,6 +60,7 @@
     --text: #1E293B;
     --text-muted: #64748B;
     --border: #E2E8F0;
+    --border-calendario: #ffffff70;
     --bg: #F8FAFC;
 
     /* ----- SOMBRAS ----- */
@@ -458,6 +459,7 @@ body {
     line-height: 1;
     text-align: center;
     min-width: 18px;
+    border: 1px solid var(--a11y-focus);
 }
 
 /* ----- QUADRANTE 3: EMOJI/ÍCONE ----- */
@@ -1390,10 +1392,10 @@ body.modo-escuro {
     /* ----- CALENDÁRIO ----- */
     --cal-status-trabalho-bg: #2A4A7F;
     --cal-status-trabalho-hover: #1E3A5F;
-    --cal-status-trabalho-border: #1E3A5F;
+    --cal-status-trabalho-border: #041225;
     --cal-status-folga-bg: #EC4899;
     --cal-status-folga-hover: #BE185D;
-    --cal-status-folga-border: #BE185D;
+    --cal-status-folga-border: #2e0416;
     --cal-hoje-bg: rgba(59, 130, 246, 0.15);
     --cal-extra-bg: rgba(245, 158, 11, 0.08);
     --cal-feriado-bg: rgba(239, 68, 68, 0.12);
@@ -1424,7 +1426,7 @@ body.modo-escuro #calendarioContainer th:first-child {
 /* Célula do dia */
 body.modo-escuro #calendarioContainer .dia-td {
     background: #0d0d0d;
-    border: 1px solid #2a2a2a;
+    border: 1px solid var(--border-calendario)
 }
 
 body.modo-escuro #calendarioContainer .dia-td:hover {
